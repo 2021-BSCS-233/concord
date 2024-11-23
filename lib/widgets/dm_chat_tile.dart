@@ -1,0 +1,89 @@
+import 'package:concord/services/page_controllers.dart';
+import 'package:concord/widgets/profile_picture.dart';
+import 'package:concord/widgets/status_icons.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:concord/pages/chat_page.dart';
+
+class DmChatTile extends StatelessWidget {
+  final MainController mainController = Get.find<MainController>();
+  final Map chatData;
+
+  DmChatTile({super.key, required this.chatData});
+
+  @override
+  Widget build(BuildContext context) {
+    var time1 = chatData['time_stamp'].toDate();
+    var time2 = DateTime.now();
+    var difference = time2.difference(time1);
+    String timeDifference = '';
+    // if (difference.inMinutes < 1) {
+    //   timeDifference = '<1m';
+    // } else
+    if (difference.inHours < 1) {
+      timeDifference = '${difference.inMinutes}m';
+    } else if (difference.inDays < 1) {
+      timeDifference = '${difference.inHours}h';
+    } else if (difference.inDays < 30) {
+      timeDifference = '${difference.inDays}d';
+    } else if (difference.inDays < 365) {
+      timeDifference = '${(difference.inDays / 30).floor()}mo';
+    } else {
+      timeDifference = '${(difference.inDays / 365).floor()}yr';
+    }
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      child: ListTile(
+        titleAlignment: ListTileTitleAlignment.top,
+        onTap: () {
+          Get.to(Chat(
+            chatId: chatData['id'],
+            otherUsersData: [chatData['receiver_data']],
+            chatType: chatData['chat_type'],
+          ));
+        },
+        onLongPress: () {
+          mainController.toggleMenu([
+            chatData['id'],
+            chatData['receiver_data']['username'] ?? '',
+            chatData['receiver_data']['profile_picture'] ?? '',
+            chatData['chat_type'] ?? ''
+          ]);
+        },
+        dense: true,
+        contentPadding: EdgeInsets.zero,
+        leading: Stack(
+          children: [
+            ProfilePicture(
+              profileLink: chatData['receiver_data']['profile_picture'],
+              profileRadius: 20,
+            ),
+            Positioned(
+              bottom: -1,
+              right: -1,
+              child: StatusIcon(
+                iconType: chatData['receiver_data']['status'] == 'Online'
+                    ? chatData['receiver_data']['display_status']
+                    : chatData['receiver_data']['status'],
+              ),
+            ),
+          ],
+        ),
+        title: Text(
+          chatData['receiver_data']['display_name'],
+          style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Color(0xD0FFFFFF)),
+        ),
+        subtitle: Text(
+          chatData['latest_message'],
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
+          style: TextStyle(fontSize: 14, color: Color(0xB0FFFFFF)),
+        ),
+        trailing: Text(timeDifference),
+      ),
+    );
+  }
+}
