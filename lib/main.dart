@@ -89,21 +89,20 @@ class Loading extends StatelessWidget {
 
 class Home extends StatelessWidget {
   final Map userData;
-  late final MainController mainController;
+  late final MainController mainController = Get.put(MainController());
 
   Home({
     super.key,
     required this.userData,
   }) {
-    // print('home initialized here');
-    mainController = Get.put(MainController(currentUserData: userData));
+    mainController.currentUserData = userData;
     mainController.selectedIndex.value = 0;
     profileListener(userData['id']);
   }
 
   @override
   Widget build(BuildContext context) {
-    List pages = [Chats(), Posts(), Notifications(), Profile()];
+    List pages = [Chats(mainController: mainController,), Posts(), Notifications(), Profile()];
 
     return Stack(
       children: [

@@ -140,7 +140,7 @@ class MessageTileCompact extends StatelessWidget {
             Container(
               alignment: Alignment.centerRight,
               height: 15,
-              width: 42,
+              width: 48,
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -196,3 +196,4 @@ class Attachments extends StatelessWidget {
         });
   }
 }
+//TODO load images to display

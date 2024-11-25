@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:get/get.dart';
 import 'package:concord/services/firebase_services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -14,14 +15,7 @@ class MainController extends GetxController {
   var selectedUserPic = '';
   var selectedChatType = '';
 
-  MainController({required this.currentUserData});
-
-  // @override
-  // void onInit() {
-  //   super.onInit();
-  //   // Reset data on initialization
-  //   print('main initialized here');
-  // }
+  // MainController({required this.currentUserData});
 
   void toggleMenu(dataList) {
     selectedUserId = dataList[0];
@@ -165,6 +159,12 @@ class ChatsController extends GetxController {
   }
 }
 
+var generalImages = CacheManager(Config(
+  'generalImageCache',
+  stalePeriod: const Duration(days: 7),
+  maxNrOfCacheObjects: 50,
+));
+
 class ChatController extends GetxController {
   var chatId = '';
   var chatContent = [];
@@ -201,13 +201,22 @@ class ChatController extends GetxController {
   }
 
   void sendVisibility() {
-    sendVisible.value = (!editMode && chatFieldController.text != ''
-        ? true
-        : editMode &&
-                chatFieldController.text !=
-                    chatContent[messageSelected]['message']
-            ? true
-            : false);
+    if (!editMode && chatFieldController.text.trim() != '') {
+      sendVisible.value = true;
+    } else if (editMode &&
+        chatFieldController.text.trim() !=
+            chatContent[messageSelected]['message']) {
+      sendVisible.value = true;
+    } else {
+      sendVisible.value = false;
+    }
+    // sendVisible.value = (!editMode && chatFieldController.text.trim() != ''
+    //     ? true
+    //     : editMode &&
+    //             chatFieldController.text.trim() !=
+    //                 chatContent[messageSelected]['message']
+    //         ? true
+    //         : false);
   }
 
   getMessages(chatId) async {

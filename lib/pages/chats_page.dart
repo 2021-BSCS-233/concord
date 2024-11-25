@@ -7,11 +7,11 @@ import 'package:concord/widgets/status_icons.dart';
 import 'package:concord/services/page_controllers.dart';
 
 class Chats extends StatelessWidget {
-  final MainController mainController = Get.find<MainController>();
+  final MainController mainController;
   final ChatsController chatsController = Get.put(ChatsController());
   final FriendsController friendsController = Get.put(FriendsController());
 
-  Chats({super.key}) {
+  Chats({super.key, required this.mainController}) {
     chatsController.initial = true;
   }
 

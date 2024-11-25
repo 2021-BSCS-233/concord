@@ -19,10 +19,11 @@ class Chat extends StatelessWidget {
   final List otherUsersData;
   final String chatType;
 
-  Chat({super.key,
-    required this.chatId,
-    required this.otherUsersData,
-    required this.chatType}) {
+  Chat(
+      {super.key,
+      required this.chatId,
+      required this.otherUsersData,
+      required this.chatType}) {
     chatController.chatId = chatId;
     chatController.initial = true;
     chatController.userMap[mainController.currentUserData['id']] =
@@ -102,59 +103,66 @@ class Chat extends StatelessWidget {
                 const SizedBox(
                   height: 20,
                 ),
-                Obx(() =>
-                    Visibility(
-                        visible: chatController.attachmentVisible.value && chatController.updateA == chatController.updateA,
-                        child: Column(
-                          children: [
-                            Container(
-                              height: 150,
-                              width: double.infinity,
-                              color: Colors.grey.shade900,
-                              child: ListView.builder(
-                                  itemCount: chatController.attachments.length,
-                                  scrollDirection: Axis.horizontal,
-                                  itemBuilder: (context, index) {
-                                    return Stack(
-                                      children: [
-                                        Center(
-                                          child: Container(
-                                            margin: EdgeInsets.all(10),
-                                            height: 120,
-                                            width: 100,
-                                            child: ClipRRect(
-                                              borderRadius:
-                                              BorderRadius.all(Radius.circular(15)),
-                                              child: Image(
-                                                  fit: BoxFit.cover,
-                                                  image: FileImage(File(chatController
-                                                      .attachments[index].path))),
-                                            ),
-                                          ),
+                Obx(() => Visibility(
+                    visible: chatController.attachmentVisible.value &&
+                        chatController.updateA == chatController.updateA,
+                    child: Column(
+                      children: [
+                        Container(
+                          height: 150,
+                          width: double.infinity,
+                          color: Colors.grey.shade900,
+                          child: ListView.builder(
+                              itemCount: chatController.attachments.length,
+                              scrollDirection: Axis.horizontal,
+                              itemBuilder: (context, index) {
+                                return Stack(
+                                  children: [
+                                    Center(
+                                      child: Container(
+                                        margin: EdgeInsets.all(10),
+                                        height: 120,
+                                        width: 100,
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(15)),
+                                          child: Image(
+                                              fit: BoxFit.cover,
+                                              image: FileImage(File(
+                                                  chatController
+                                                      .attachments[index]
+                                                      .path))),
                                         ),
-                                        Positioned(
-                                          top: 4,
-                                          right: 2,
-                                          child: InkWell(
-                                            onTap: () {
-                                              chatController.removeAttachment(index);
-                                            },
-                                            child: Container(
-                                                decoration: BoxDecoration(color: Colors.grey.shade700, borderRadius: BorderRadius.all(Radius.circular(3))),
-                                                child: Icon(
-                                                  Icons.delete,
-
-                                                  color: Colors.grey.shade500,
-                                                )),
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  }),
-                            ),
-                            SizedBox(height: 5,)
-                          ],
-                        ))),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: 4,
+                                      right: 2,
+                                      child: InkWell(
+                                        onTap: () {
+                                          chatController
+                                              .removeAttachment(index);
+                                        },
+                                        child: Container(
+                                            decoration: BoxDecoration(
+                                                color: Colors.grey.shade700,
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(3))),
+                                            child: Icon(
+                                              Icons.delete,
+                                              color: Colors.grey.shade500,
+                                            )),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }),
+                        ),
+                        SizedBox(
+                          height: 5,
+                        )
+                      ],
+                    ))),
                 Row(
                   children: [
                     SizedBox(
@@ -187,8 +195,7 @@ class Chat extends StatelessWidget {
                         maxLines: 4,
                       ),
                     ),
-                    Obx(() =>
-                        Visibility(
+                    Obx(() => Visibility(
                           visible: chatController.sendVisible.value,
                           child: Container(
                             decoration: BoxDecoration(
@@ -222,8 +229,7 @@ class Chat extends StatelessWidget {
             ),
           ),
         ),
-        Obx(() =>
-            Visibility(
+        Obx(() => Visibility(
               visible: chatController.showMenu.value ||
                   chatController.showProfile.value,
               child: GestureDetector(
@@ -233,49 +239,38 @@ class Chat extends StatelessWidget {
                 },
                 child: Container(
                   color: Color(0xCA1D1D1F),
-                  height: MediaQuery
-                      .of(context)
-                      .size
-                      .height,
+                  height: MediaQuery.of(context).size.height,
                   width: double.infinity,
                 ),
               ),
             )),
-        Obx(() =>
-            AnimatedPositioned(
+        Obx(() => AnimatedPositioned(
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeInOut,
               bottom: chatController.showMenu.value
                   ? 0.0
-                  : -MediaQuery
-                  .of(context)
-                  .size
-                  .height,
+                  : -MediaQuery.of(context).size.height,
               left: 0.0,
               right: 0.0,
               child: chatController.chatContent.isNotEmpty
                   ? MessagePopup(
-                chatId: chatId,
-              )
+                      chatId: chatId,
+                    )
                   : Container(),
             )),
-        Obx(() =>
-            AnimatedPositioned(
+        Obx(() => AnimatedPositioned(
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeInOut,
               bottom: chatController.showProfile.value
                   ? 0.0
-                  : -MediaQuery
-                  .of(context)
-                  .size
-                  .height,
+                  : -MediaQuery.of(context).size.height,
               left: 0.0,
               right: 0.0,
               child: chatController.chatContent.isNotEmpty
                   ? ProfilePopup(
-                  selectedUser: chatController
-                      .chatContent[chatController.messageSelected]
-                  ['sender_id'])
+                      selectedUser: chatController
+                              .chatContent[chatController.messageSelected]
+                          ['sender_id'])
                   : Container(),
             )),
       ],
@@ -285,86 +280,85 @@ class Chat extends StatelessWidget {
   Future<Widget> messagesUI() async {
     chatController.initial ? await chatController.getMessages(chatId) : null;
     return Obx(
-          () =>
-      chatController.updateC.value == chatController.updateC.value &&
-          chatController.chatContent.isEmpty
+      () => chatController.updateC.value == chatController.updateC.value &&
+              chatController.chatContent.isEmpty
           ? Center(child: Text('chatEmpty'.tr))
           : Expanded(
-        child: ListView.builder(
-          itemCount: chatController.chatContent.length,
-          shrinkWrap: true,
-          reverse: true,
-          itemBuilder: (context, index) {
-            try {
-              if (chatController.chatContent[index]['sender_id'] !=
-                  chatController.chatContent[index + 1]['sender_id']) {
-                return MessageTileFull(
-                  messageData: chatController.chatContent[index],
-                  sendingUser: chatController.userMap[
-                  chatController.chatContent[index]['sender_id']],
-                  toggleMenu: () {
-                    chatController.toggleMenu(index);
-                  },
-                  toggleProfile: () {
-                    chatController.toggleProfile(index);
-                  },
-                );
-              } else {
-                bool select = true;
-                try {
-                  var time1 = chatController.chatContent[index]
-                  ['time_stamp']
-                      .toDate();
-                  var time2 = chatController.chatContent[index + 1]
-                  ['time_stamp']
-                      .toDate();
-                  var difference = time1.difference(time2);
-                  if (difference.inMinutes < 15) {
-                    select = true;
-                  } else {
-                    select = false;
-                  }
-                } catch (e) {
-                  select = true;
-                }
-                if (select) {
-                  return MessageTileCompact(
+              child: ListView.builder(
+                itemCount: chatController.chatContent.length,
+                shrinkWrap: true,
+                reverse: true,
+                itemBuilder: (context, index) {
+                  try {
+                    if (chatController.chatContent[index]['sender_id'] !=
+                        chatController.chatContent[index + 1]['sender_id']) {
+                      return MessageTileFull(
+                        messageData: chatController.chatContent[index],
+                        sendingUser: chatController.userMap[
+                            chatController.chatContent[index]['sender_id']],
+                        toggleMenu: () {
+                          chatController.toggleMenu(index);
+                        },
+                        toggleProfile: () {
+                          chatController.toggleProfile(index);
+                        },
+                      );
+                    } else {
+                      bool select = true;
+                      try {
+                        var time1 = chatController.chatContent[index]
+                                ['time_stamp']
+                            .toDate();
+                        var time2 = chatController.chatContent[index + 1]
+                                ['time_stamp']
+                            .toDate();
+                        var difference = time1.difference(time2);
+                        if (difference.inMinutes < 15) {
+                          select = true;
+                        } else {
+                          select = false;
+                        }
+                      } catch (e) {
+                        select = true;
+                      }
+                      if (select) {
+                        return MessageTileCompact(
+                            messageData: chatController.chatContent[index],
+                            sendingUser: chatController.userMap[
+                                chatController.chatContent[index]['sender_id']],
+                            toggleMenu: () {
+                              chatController.toggleMenu(index);
+                            });
+                      } else {
+                        return MessageTileFull(
+                          messageData: chatController.chatContent[index],
+                          sendingUser: chatController.userMap[
+                              chatController.chatContent[index]['sender_id']],
+                          toggleMenu: () {
+                            chatController.toggleMenu(index);
+                          },
+                          toggleProfile: () {
+                            chatController.toggleProfile(index);
+                          },
+                        );
+                      }
+                    }
+                  } catch (e) {
+                    return MessageTileFull(
                       messageData: chatController.chatContent[index],
                       sendingUser: chatController.userMap[
-                      chatController.chatContent[index]['sender_id']],
+                          chatController.chatContent[index]['sender_id']],
                       toggleMenu: () {
                         chatController.toggleMenu(index);
-                      });
-                } else {
-                  return MessageTileFull(
-                    messageData: chatController.chatContent[index],
-                    sendingUser: chatController.userMap[
-                    chatController.chatContent[index]['sender_id']],
-                    toggleMenu: () {
-                      chatController.toggleMenu(index);
-                    },
-                    toggleProfile: () {
-                      chatController.toggleProfile(index);
-                    },
-                  );
-                }
-              }
-            } catch (e) {
-              return MessageTileFull(
-                messageData: chatController.chatContent[index],
-                sendingUser: chatController.userMap[
-                chatController.chatContent[index]['sender_id']],
-                toggleMenu: () {
-                  chatController.toggleMenu(index);
+                      },
+                      toggleProfile: () {
+                        chatController.toggleProfile(index);
+                      },
+                    );
+                  }
                 },
-                toggleProfile: () {
-                  chatController.toggleProfile(index);
-                },
-              );
-            }
-          },
-        ),
-      ),
+              ),
+            ),
     );
   }
 }
