@@ -2,6 +2,8 @@ import 'package:concord/widgets/profile_picture.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import 'lazy_cached_image.dart';
+
 class MessageTileFull extends StatelessWidget {
   final Map messageData;
   final Map sendingUser;
@@ -26,7 +28,7 @@ class MessageTileFull extends StatelessWidget {
       DateFormat formatter = DateFormat('hh:mm a');
       formattedDateTime = 'Today at ${formatter.format(time)}';
     } else {
-      DateFormat formatter = DateFormat('hh:mm a dd/MM/yyyy');
+      DateFormat formatter = DateFormat('dd/MM/yyyy hh:mm a');
       formattedDateTime = formatter.format(time);
     }
 
@@ -97,7 +99,7 @@ class MessageTileFull extends StatelessWidget {
                                 ]
                               : null,
                         )),
-                  messageData['attachments'] == []
+                  messageData['attachments'].length == 0
                       ? const SizedBox()
                       : Attachments(
                           attachments: messageData['attachments'],
@@ -166,7 +168,7 @@ class MessageTileCompact extends StatelessWidget {
                               : null,
                         ),
                       ),
-                messageData['attachments'].isEmpty
+                messageData['attachments'].length == 0
                     ? const SizedBox()
                     : Attachments(attachments: messageData['attachments'])
               ],
@@ -185,15 +187,118 @@ class Attachments extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-        itemCount: attachments.length,
-        shrinkWrap: true,
-        itemBuilder: (context, index) {
-          return Text(
-            attachments[index],
-            overflow: TextOverflow.ellipsis,
-          );
-        });
+    var swSize = MediaQuery.of(context).size.width;
+    int remainder = 0;
+    int size = 0;
+    if (attachments.length > 4) {
+      remainder = attachments.length % 3;
+      size = attachments.length - remainder;
+    }
+    // return ListView.builder(
+    //     itemCount: attachments.length,
+    //     shrinkWrap: true,
+    //     itemBuilder: (context, index) {
+    //       return Text(
+    //         attachments[index],
+    //         overflow: TextOverflow.ellipsis,
+    //       );
+    //     });
+    return ClipRRect(
+      borderRadius: const BorderRadius.all(
+        Radius.circular(20),
+      ),
+      child: Column(
+        children: [
+          remainder == 1 || attachments.length == 1 || attachments.length == 3
+              ? Row(
+                  children: [
+                    Flexible(
+                      child: Container(
+                          padding: attachments.length == 3
+                              ? const EdgeInsets.fromLTRB(0, 0, 3, 0)
+                              : null,
+                          height: 200,
+                          width: attachments.length == 3
+                              ? swSize * 0.5
+                              : swSize * 0.8,
+                          child: LazyCachedImage(url: attachments[0],)),
+                    ),
+                    attachments.length == 3
+                        ? Column(
+                            children: [
+                              Container(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 0, 0, 3),
+                                  height: 102,
+                                  width: 95,
+                                  child: LazyCachedImage(url: attachments[1],)),
+                              SizedBox(
+                                  height: 98,
+                                  width: 95,
+                                  child: LazyCachedImage(url: attachments[2],)),
+                            ],
+                          )
+                        : const SizedBox(),
+                  ],
+                )
+              : const SizedBox(),
+          remainder == 2 || attachments.length == 2 || attachments.length == 4
+              ? Row(
+                  children: [
+                    Flexible(
+                      child: Container(
+                          padding: const EdgeInsets.fromLTRB(0, 0, 3, 3),
+                          height: attachments.length == 4 ? 100 : 200,
+                          width: swSize * 0.4,
+                          child: LazyCachedImage(url: attachments[0],)),
+                    ),
+                    Flexible(
+                      child: Container(
+                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 3),
+                          height: attachments.length == 4 ? 100 : 200,
+                          width: swSize * 0.4,
+                          child: LazyCachedImage(url: attachments[1],)),
+                    ),
+                  ],
+                )
+              : const SizedBox(),
+          attachments.length == 4
+              ? Row(
+                  children: [
+                    Flexible(
+                      child: Container(
+                          padding: const EdgeInsets.fromLTRB(0, 0, 3, 3),
+                          height: 100,
+                          width: swSize * 0.4,
+                          child: LazyCachedImage(url: attachments[2],)),
+                    ),
+                    Flexible(
+                      child: Container(
+                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 3),
+                          height: 100,
+                          width: swSize * 0.4,
+                          child: LazyCachedImage(url: attachments[3],)),
+                    ),
+                  ],
+                )
+              : const SizedBox(),
+          size > 2
+              ? GridView.builder(
+                  itemCount: size,
+                  shrinkWrap: true,
+                  physics: const ScrollPhysics(parent: NeverScrollableScrollPhysics()),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 4,
+                    mainAxisSpacing: 3,
+                  ),
+                  itemBuilder: (context, index) {
+                    return LazyCachedImage(url: attachments[index],);
+                  })
+              : const SizedBox()
+        ],
+      ),
+    );
   }
 }
 //TODO load images to display

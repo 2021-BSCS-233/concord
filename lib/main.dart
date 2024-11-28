@@ -1,3 +1,4 @@
+import 'package:concord/pages/login_page.dart';
 import 'package:concord/pages/notification_page.dart';
 import 'package:concord/pages/posts_page.dart';
 import 'package:concord/widgets/profile_picture.dart';
@@ -5,7 +6,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:concord/pages/signin_page.dart';
 import 'package:concord/pages/chats_page.dart';
 import 'package:concord/pages/profile_page.dart';
 import 'package:concord/services/firebase_services.dart';
@@ -20,7 +20,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  Get.put(LocalizationController(prefs: prefs));
+  Get.put(LocalizationController(prefs: prefs), permanent: true);
+  Get.put(MainController(), permanent: true);
   runApp(GetMaterialApp(
     debugShowCheckedModeBanner: false,
     theme: ThemeData.dark().copyWith(
@@ -73,7 +74,7 @@ class Loading extends StatelessWidget {
   }
 
   Future<Widget> _buildContent(BuildContext context) async {
-    var userData;
+    List userData = [];
     initialMain ? (userData = await autoLogin()) : null;
     if (userData[0]) {
       userData[1]['id'] = userData[2].user.uid;
@@ -81,15 +82,15 @@ class Loading extends StatelessWidget {
         userData: userData[1],
       );
     } else {
-      print('failed due to error:${userData[1]}');
-      return SignIn();
+      print('failed due to :${userData[1]}');
+      return LogIn();
     }
   }
 }
 
 class Home extends StatelessWidget {
   final Map userData;
-  late final MainController mainController = Get.put(MainController());
+  late final MainController mainController = Get.find<MainController>();
 
   Home({
     super.key,

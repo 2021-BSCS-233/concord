@@ -1,3 +1,4 @@
+import 'package:concord/pages/signin_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:concord/main.dart';
@@ -106,7 +107,23 @@ class LogIn extends StatelessWidget {
                           borderRadius: BorderRadius.all(Radius.circular(5))),
                       child: Center(child: Text('Log In')),
                     ),
-                  )
+                  ),
+                  const SizedBox(height: 20,),
+                  InkWell(
+                    enableFeedback: false,
+                    onTap: () {
+                      Get.to(SignIn());
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 10, bottom: 10),
+                      child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            'Create Account',
+                            style: TextStyle(color: Colors.blueAccent.shade200),
+                          )),
+                    ),
+                  ),
                 ],
               ),
             ),

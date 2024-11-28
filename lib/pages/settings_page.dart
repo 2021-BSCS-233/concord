@@ -1,3 +1,4 @@
+import 'package:concord/pages/login_page.dart';
 import 'package:concord/pages/signin_page.dart';
 import "package:flutter/material.dart";
 import 'package:get/get.dart';
@@ -160,13 +161,13 @@ class Settings extends StatelessWidget {
                         await SharedPreferences.getInstance();
                     await prefs.remove('email');
                     await prefs.remove('password');
-                    // Get.deleteAll();
-                    Get.delete<ChatsController>();
-                    Get.delete<FriendsController>();
-                    Get.delete<RequestsController>();
-                    Get.delete<EditProfileController>();
-                    Get.delete<SettingsController>();
-                    Get.offAll(SignIn());
+                    Get.deleteAll();
+                    // Get.delete<ChatsController>();
+                    // Get.delete<FriendsController>();
+                    // Get.delete<RequestsController>();
+                    // Get.delete<EditProfileController>();
+                    // Get.delete<SettingsController>();
+                    Get.offAll(LogIn());
                   },
                   child: Container(
                     height: 45,

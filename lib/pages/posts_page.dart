@@ -6,17 +6,27 @@ class Posts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Notifications',
-          style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Color(0xD0FFFFFF),
-              fontSize: 22),
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            'Posts',
+            style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Color(0xD0FFFFFF),
+                fontSize: 22),
+          ),
+          bottom: const TabBar(
+            tabs: [Tab(text: 'Public Posts'), Tab(text: 'Following')],
+            indicatorColor: Colors.transparent,
+            unselectedLabelColor: Colors.grey,
+            labelColor: Colors.white,
+            dividerColor: Colors.transparent,
+          ),
         ),
+        body: Container(),
       ),
-      body: Container(),
     );
   }
 }

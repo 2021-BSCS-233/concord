@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:concord/main.dart';
 import 'package:get/get.dart';
-import 'package:concord/pages/login_page.dart';
 import 'package:concord/widgets/input_field.dart';
 import 'package:concord/services/page_controllers.dart';
 import 'package:concord/services/firebase_services.dart';
@@ -48,7 +47,7 @@ class SignIn extends StatelessWidget {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Container(
-                        margin: EdgeInsets.only(left: 5, bottom: 5),
+                        margin: const EdgeInsets.only(left: 5, bottom: 5),
                         child: Text(
                           'ACCOUNT INFORMATION',
                           style: TextStyle(
@@ -128,21 +127,6 @@ class SignIn extends StatelessWidget {
                           color: Colors.blueAccent.shade700,
                           borderRadius: BorderRadius.all(Radius.circular(5))),
                       child: Center(child: Text('Sign In')),
-                    ),
-                  ),
-                  InkWell(
-                    enableFeedback: false,
-                    onTap: () {
-                      Get.to(LogIn());
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 20),
-                      child: Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            'Already have an account? Log In',
-                            style: TextStyle(color: Colors.blueAccent.shade200),
-                          )),
                     ),
                   ),
                 ],

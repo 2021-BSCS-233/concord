@@ -9,8 +9,6 @@ import 'package:concord/widgets/popup_menus.dart';
 import 'package:concord/widgets/input_field.dart';
 import 'package:concord/widgets/status_icons.dart';
 import 'package:concord/services/page_controllers.dart';
-import 'package:concord/services/firebase_services.dart';
-import 'package:image_picker/image_picker.dart';
 
 class Chat extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();

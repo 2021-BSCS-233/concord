@@ -94,7 +94,7 @@ class Friends extends StatelessWidget {
             ),
           )
         : Container(
-            padding: const EdgeInsets.only(left: 10),
+            padding: const EdgeInsets.only(left: 10, right: 10),
             child: ListView.builder(
                 itemCount: friendsController.friendsData.length,
                 shrinkWrap: true,
@@ -112,7 +112,7 @@ class Friends extends StatelessWidget {
                               friendsController.friendsData[index]['id']);
                         },
                         child: ProfilePicture(
-                          profileLink: friendsController.friendsData[index],
+                          profileLink: friendsController.friendsData[index]['profile_picture'],
                           profileRadius: 20,
                         ),
                       ),

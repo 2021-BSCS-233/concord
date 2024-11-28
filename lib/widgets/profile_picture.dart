@@ -14,7 +14,7 @@ class ProfilePicture extends StatelessWidget {
     final profilePictureCache = CacheManager(Config(
       'profilePictureCache',
       stalePeriod: const Duration(days: 30),
-      maxNrOfCacheObjects: 50,
+      maxNrOfCacheObjects: 100,
     ));
 
     // return CircleAvatar(
@@ -27,7 +27,7 @@ class ProfilePicture extends StatelessWidget {
     // );
     return CachedNetworkImage(
         imageUrl: profileLink,
-        // cacheManager: profilePictureCache,
+        cacheManager: profilePictureCache,
         imageBuilder: (context, imageProvider) => CircleAvatar(
               backgroundImage: imageProvider,
               radius: profileRadius,
