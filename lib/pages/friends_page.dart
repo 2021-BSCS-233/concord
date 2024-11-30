@@ -59,7 +59,7 @@ class Friends extends StatelessWidget {
           if (snapshot.hasData) {
             return snapshot.data!;
           } else if (snapshot.hasError) {
-            print(snapshot.error);
+            debugPrint('${snapshot.error}');
             return const Material(
                 color: Colors.transparent,
                 child: Center(

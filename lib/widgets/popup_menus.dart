@@ -45,21 +45,21 @@ class UserGroupPopup extends StatelessWidget {
                 ),
                 OptionTile(
                     action: () {
-                      print(
+                      debugPrint(
                           'Profile action on ${tileContent[0]}, chat type ${tileContent[3]}');
                     },
                     actionIcon: Icons.person,
                     actionName: 'Profile'),
                 OptionTile(
                     action: () {
-                      print(
+                      debugPrint(
                           'Close Action on ${tileContent[0]}, chat type ${tileContent[3]}');
                     },
                     actionIcon: Icons.remove_circle_outline,
                     actionName: 'Close DM'),
                 OptionTile(
                     action: () {
-                      print(
+                      debugPrint(
                           'MAR action on ${tileContent[0]}, chat type ${tileContent[3]}');
                     },
                     actionIcon: CupertinoIcons.eye,

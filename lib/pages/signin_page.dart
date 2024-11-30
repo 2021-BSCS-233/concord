@@ -117,7 +117,7 @@ class SignIn extends StatelessWidget {
                           userData: userData[0],
                         ));
                       } else {
-                        print('SingIn failed');
+                        debugPrint('SingIn failed');
                       }
                     },
                     child: Container(

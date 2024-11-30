@@ -278,7 +278,7 @@ class ChatController extends GetxController {
       sendVisible.value = true;
       updateA.value += 1;
     } else {
-      print('nothing selected');
+      debugPrint('nothing selected');
     }
   }
 

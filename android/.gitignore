@@ -11,3 +11,8 @@ GeneratedPluginRegistrant.java
 key.properties
 **/*.keystore
 **/*.jks
+
+#custome ignores files
+
+/app/build
+/app/google-services.json

@@ -2,14 +2,17 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:concord/services/page_controllers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final CollectionReference users =
     FirebaseFirestore.instance.collection('users');
-// final CollectionReference requests =
-//     FirebaseFirestore.instance.collection('requests');
+final CollectionReference requests =
+    FirebaseFirestore.instance.collection('requests');
+final CollectionReference chats =
+    FirebaseFirestore.instance.collection('chats');
 
 Future<List?> signInUser(
     String username, String displayName, String email, String pass) async {
@@ -36,14 +39,14 @@ Future<List?> signInUser(
     } else if (e.code == 'email-already-in-use') {
       return [false, 'Email already in use'];
     } else {
-      print("An error occurred: ${e.message}");
+      debugPrint("An error occurred: ${e.message}");
       return [
         false,
         'An error occurred while registering your user, Pls try again later'
       ];
     }
   } catch (e) {
-    print("An error occurred: $e");
+    debugPrint("An error occurred: $e");
     return [false, 'An unknown error occurred, Pls try again later'];
   }
 }
@@ -58,14 +61,14 @@ Future<List?> logInUser(String email, String pass) async {
     return [userData.data(), userCredential];
   } on FirebaseAuthException catch (e) {
     if (e.code == 'user-not-found') {
-      print("Email not found. Please check and try again.");
+      debugPrint("Email not found. Please check and try again.");
       return [false, 'No account registered with provided email'];
     } else {
-      print("An error occurred: ${e.message}");
+      debugPrint("An error occurred: ${e.message}");
       return [false, 'An error occurred while logging in, Pls try again later'];
     }
   } catch (e) {
-    print("An error occurred: $e");
+    debugPrint("An error occurred: $e");
     return [false, 'An unknown error occurred, Pls try again later'];
   }
 }
@@ -90,17 +93,17 @@ autoLogin() async {
       return [true, userData.data(), userCredential];
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
-        print("Email not found. Please check and try again.");
+        debugPrint("Email not found. Please check and try again.");
         return [false, 'No account registered with provided email'];
       } else {
-        print("An error occurred: ${e.message}");
+        debugPrint("An error occurred: ${e.message}");
         return [
           false,
           'An error occurred while logging in, Pls try again later'
         ];
       }
     } catch (e) {
-      print("An error occurred: $e");
+      debugPrint("An error occurred: $e");
       return [false, 'An unknown error occurred, Pls try again later'];
     }
   } else {
@@ -136,7 +139,7 @@ updateProfile(currentUserId, displayName, pronouns, aboutMe, image) async {
       updateData['profile_picture'] = downloadUrl;
       users.doc(currentUserId).update(updateData);
     }).catchError((error) {
-      print('Image Upload failed: $error');
+      debugPrint('Image Upload failed: $error');
       users.doc(currentUserId).update(updateData);
       return error;
     });
@@ -342,7 +345,7 @@ requestAction(requestId, action) async {
       ref.delete();
     }
   } catch (e) {
-    print('error $e');
+    debugPrint('error $e');
   }
 }
 

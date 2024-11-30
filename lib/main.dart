@@ -56,7 +56,7 @@ class Loading extends StatelessWidget {
         if (snapshot.hasData) {
           return snapshot.data!;
         } else if (snapshot.hasError) {
-          print("${snapshot.error}");
+          debugPrint("${snapshot.error}");
           return Material(
               color: Colors.transparent,
               child: Center(
@@ -82,7 +82,7 @@ class Loading extends StatelessWidget {
         userData: userData[1],
       );
     } else {
-      print('failed due to :${userData[1]}');
+      debugPrint('failed due to :${userData[1]}');
       return LogIn();
     }
   }

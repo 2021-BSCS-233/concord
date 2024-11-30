@@ -20,12 +20,23 @@ class LazyCachedImage extends StatelessWidget {
       onTap: () {
         Get.to(ImagePage(url: url));
       },
-      child: FadeInImage(
-        image: CachedNetworkImageProvider(url,
-            cacheManager: generalImageCache, scale: 0.5),
-        placeholder: const AssetImage('assets/images/placeholder1.jpg'),
+      child: CachedNetworkImage(
+        imageUrl: url,
         fit: BoxFit.cover,
+        errorWidget: (context, url, error) =>
+            Image.asset('assets/images/placeholder1.jpg'),
+        imageBuilder: (context, imageProvider) => FadeInImage(
+            fit: BoxFit.cover,
+            placeholder: const AssetImage('assets/images/placeholder1.jpg'),
+            image: imageProvider),
       ),
+
+      // child: FadeInImage(
+      //   image: CachedNetworkImageProvider(url,
+      //       cacheManager: generalImageCache,scale: 0.5, errorListener: (error){print('error loading image $error');}),
+      //   placeholder: const AssetImage('assets/images/placeholder1.jpg'),
+      //   fit: BoxFit.cover,
+      // ),
     );
   }
 }
@@ -33,7 +44,7 @@ class LazyCachedImage extends StatelessWidget {
 class ImagePage extends StatelessWidget {
   final String url;
 
-  ImagePage({required this.url});
+  const ImagePage({super.key, required this.url});
 
   @override
   Widget build(BuildContext context) {
