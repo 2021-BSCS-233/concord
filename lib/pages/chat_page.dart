@@ -24,7 +24,7 @@ class Chat extends StatelessWidget {
       required this.chatType}) {
     chatController.chatId = chatId;
     chatController.initial = true;
-    chatController.userMap[mainController.currentUserData['id']] =
+    chatController.userMap[mainController.currentUserData.id] =
         mainController.currentUserData;
     for (var user in otherUsersData) {
       chatController.userMap[user['id']] = user;
@@ -204,7 +204,7 @@ class Chat extends StatelessWidget {
                             child: TextButton(
                               onPressed: () {
                                 chatController.sendMessage(
-                                    mainController.currentUserData['id']);
+                                    mainController.currentUserData.id);
                               },
                               style: ButtonStyle(
                                 padding: WidgetStateProperty.all<EdgeInsets>(

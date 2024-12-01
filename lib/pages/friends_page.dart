@@ -148,7 +148,7 @@ class Friends extends StatelessWidget {
                               ),
                               onTap: () {
                                 removeFriend(
-                                    mainController.currentUserData['id'],
+                                    mainController.currentUserData.id,
                                     friendsController.friendsData[index]['id']);
                               },
                             )

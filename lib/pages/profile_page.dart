@@ -49,14 +49,14 @@ class Profile extends StatelessWidget {
                                 border: Border.all(width: 6)),
                             child: ProfilePicture(
                                 profileLink: mainController
-                                    .currentUserData['profile_picture']),
+                                    .currentUserData.profilePicture),
                           ),
                           Positioned(
                             bottom: 3,
                             right: 3,
                             child: StatusIcon(
                               iconType: mainController
-                                  .currentUserData['display_status'],
+                                  .currentUserData.displayStatus,
                               iconSize: 24,
                               iconBorder: 4,
                             ),
@@ -100,8 +100,8 @@ class Profile extends StatelessWidget {
                     children: [
                       Text(
                         mainController.updateM.value == 1
-                            ? mainController.currentUserData['display_name']
-                            : mainController.currentUserData['display_name'],
+                            ? mainController.currentUserData.displayName
+                            : mainController.currentUserData.displayName,
                         style: const TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
@@ -109,14 +109,14 @@ class Profile extends StatelessWidget {
                         height: 3,
                       ),
                       Text(
-                        mainController.currentUserData['username'],
+                        mainController.currentUserData.username,
                         style: const TextStyle(fontSize: 14),
                       ),
                       const SizedBox(
                         height: 3,
                       ),
                       Text(
-                        mainController.currentUserData['pronouns'],
+                        mainController.currentUserData.pronouns,
                         style:
                             const TextStyle(fontSize: 15, color: Colors.grey),
                       ),
@@ -219,7 +219,7 @@ class Profile extends StatelessWidget {
                         width: double.infinity,
                         child: SingleChildScrollView(
                           child: Text(
-                            mainController.currentUserData['about_me'],
+                            mainController.currentUserData.aboutMe,
                             style: TextStyle(
                                 fontSize: 15, color: Colors.grey.shade300),
                           ),

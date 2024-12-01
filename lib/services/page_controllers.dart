@@ -1,3 +1,4 @@
+import 'package:concord/models/users.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:get/get.dart';
@@ -5,7 +6,7 @@ import 'package:concord/services/firebase_services.dart';
 import 'package:image_picker/image_picker.dart';
 
 class MainController extends GetxController {
-  Map currentUserData = {};
+  late Users currentUserData;
   var updateM = 0.obs;
   var showMenu = false.obs;
   var showProfile = false.obs;
@@ -29,38 +30,51 @@ class MainController extends GetxController {
     selectedUserId = data;
     showProfile.value = !showProfile.value;
   }
-
-  void updateCurrentUserData(newData) {
-    currentUserData = newData;
-    updateM.value += 1;
-  }
 }
 
 class SignInController extends GetxController {
-  TextEditingController signInUsernameController = TextEditingController();
-  TextEditingController signInDisplayController = TextEditingController();
-  TextEditingController signInEmailController = TextEditingController();
-  TextEditingController signInPassController = TextEditingController();
+  MainController mainController = Get.find<MainController>();
+  TextEditingController signInUsernameTextController = TextEditingController();
+  TextEditingController signInDisplayTextController = TextEditingController();
+  TextEditingController signInEmailTextController = TextEditingController();
+  TextEditingController signInPassTextController = TextEditingController();
 
   var showOverlaySignIn = false.obs;
   var showMessageSignIn = false.obs;
   double messageHeightSignIn = 250;
   String failMessage = '';
 
-  sendSignIn(user, display, email, pass) async {
+  sendSignIn() async {
+    String user = signInUsernameTextController.text.trim().toLowerCase();
+    String email = signInEmailTextController.text.trim();
+    String pass = signInPassTextController.text.trim();
+    String display = signInDisplayTextController.text.trim();
+    showOverlaySignIn.value = true;
     if (RegExp(r'^[a-zA-Z][a-zA-Z0-9_]*?$').hasMatch(user) &&
         user.length >= 3 &&
         user.length <= 20 &&
         RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(email) &&
         RegExp(r'.{8,}').hasMatch(pass)) {
-      var response = await signInUser(user, display, email, pass);
-      if (response?[0] != false) {
-        return response;
+      mainController.currentUserData = Users(
+          username: user,
+          email: email,
+          displayName: display != '' ? display : user,
+          profilePicture: '',
+          status: 'Online',
+          displayStatus: 'Online',
+          pronouns: '',
+          aboutMe: '',
+          friends: []);
+      var response = await signInUser(email, pass);
+      if (response?[0]) {
+        await saveUserOnDevice(email, signInPassTextController.text.trim());
+        showOverlaySignIn.value = false;
+        return response?[0];
       } else {
         failMessage = '• ${response?[1]}';
         showOverlaySignIn.value = true;
         showMessageSignIn.value = true;
-        return 0;
+        return false;
       }
     } else {
       if (user == '') {
@@ -82,28 +96,34 @@ class SignInController extends GetxController {
       }
       showOverlaySignIn.value = true;
       showMessageSignIn.value = true;
-      return 0;
+      return false;
     }
   }
 }
 
 class LogInController extends GetxController {
-  TextEditingController logInEmailController = TextEditingController();
-  TextEditingController logInPassController = TextEditingController();
+  TextEditingController logInEmailTextController = TextEditingController();
+  TextEditingController logInPassTextController = TextEditingController();
   var showOverlayLogIn = false.obs;
   var showMessageLogIn = false.obs;
 
-  sendLogIn(email, pass) async {
+  Future<bool> sendLogIn() async {
+    var email = logInEmailTextController.text.trim();
+    var pass = logInPassTextController.text.trim();
+    showOverlayLogIn.value = true;
     if (RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(email) &&
         RegExp(r'.{8,}').hasMatch(pass)) {
       var response = await logInUser(email, pass);
-      if (response?[0] != false) {
-        return response;
+      if (response) {
+        await saveUserOnDevice(email, pass);
+        showOverlayLogIn.value = false;
       } else {
-        return 0;
+        showOverlayLogIn.value = true;
+        showMessageLogIn.value = true;
       }
+      return response;
     } else {
-      return 0;
+      return false;
     }
   }
 }

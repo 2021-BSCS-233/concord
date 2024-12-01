@@ -14,9 +14,9 @@ class Settings extends StatelessWidget {
 
   Settings({super.key}) {
     editSettingsController.usernameController.text =
-        mainController.currentUserData['username'];
+        mainController.currentUserData.username;
     editSettingsController.emailController.text =
-        mainController.currentUserData['email'];
+        mainController.currentUserData.email;
   }
 
   @override
@@ -56,7 +56,7 @@ class Settings extends StatelessWidget {
                         floatingLabelBehavior: FloatingLabelBehavior.never,
                         border: OutlineInputBorder(),
                         labelText:
-                            mainController.currentUserData['display_name'],
+                            mainController.currentUserData.displayName,
                       ),
                     ),
                     const SizedBox(
@@ -74,7 +74,7 @@ class Settings extends StatelessWidget {
                             EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                         floatingLabelBehavior: FloatingLabelBehavior.never,
                         border: OutlineInputBorder(),
-                        labelText: mainController.currentUserData['email'],
+                        labelText: mainController.currentUserData.email,
                       ),
                     ),
                     const SizedBox(

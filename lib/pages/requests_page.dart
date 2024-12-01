@@ -63,7 +63,7 @@ class Requests extends StatelessWidget {
   Future<Widget> requestsData() async {
     requestsController.initial
         ? await requestsController
-            .getInitialData(mainController.currentUserData['id'])
+            .getInitialData(mainController.currentUserData.id)
         : null;
     return TabBarView(
       children: [
@@ -172,7 +172,7 @@ class Requests extends StatelessWidget {
                             onPressed: () {
                               requestsController.fieldCheck.value = false;
                               sendRequest(
-                                  mainController.currentUserData['id'],
+                                  mainController.currentUserData.id,
                                   requestsController
                                       .requestsFieldController.text
                                       .trim());

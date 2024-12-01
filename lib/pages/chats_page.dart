@@ -80,11 +80,11 @@ class Chats extends StatelessWidget {
   Future<Widget> chatsUI() async {
     chatsController.initial
         ? await chatsController
-            .getInitialData(mainController.currentUserData['id'])
+            .getInitialData(mainController.currentUserData.id)
         : null;
     friendsController.initial
         ? await friendsController
-            .getInitialData(mainController.currentUserData['id'])
+            .getInitialData(mainController.currentUserData.id)
         : null;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10),

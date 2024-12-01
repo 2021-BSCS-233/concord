@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:concord/services/page_controllers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:concord/models/users.dart';
 
 final CollectionReference users =
     FirebaseFirestore.instance.collection('users');
@@ -14,25 +15,17 @@ final CollectionReference requests =
 final CollectionReference chats =
     FirebaseFirestore.instance.collection('chats');
 
-Future<List?> signInUser(
-    String username, String displayName, String email, String pass) async {
+Future<List?> signInUser(email, pass) async {
+  MainController mainController = Get.find<MainController>();
   try {
     var userCredential = await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(email: email, password: pass);
+        .createUserWithEmailAndPassword(
+            email: email,
+            password: pass);
     var userInstance = users.doc(userCredential.user?.uid);
-    await userInstance.set({
-      'username': username,
-      'email': email,
-      'display_name': displayName != '' ? displayName : username,
-      'profile_picture': '',
-      'status': 'Online',
-      'display_status': 'Online',
-      'pronouns': '',
-      'about_me': '',
-      'friends': []
-    });
-    var userData = await userInstance.get();
-    return [userData.data(), userCredential];
+    await userInstance.set(mainController.currentUserData.toJson());
+    mainController.currentUserData.id = userCredential.user?.uid;
+    return [true, ''];
   } on FirebaseAuthException catch (e) {
     if (e.code == 'weak-password') {
       return [false, 'Please enter a stronger password'];
@@ -51,25 +44,30 @@ Future<List?> signInUser(
   }
 }
 
-Future<List?> logInUser(String email, String pass) async {
+Future<bool> logInUser(String email, String pass) async {
+  MainController mainController = Get.find<MainController>();
   try {
     var userCredential = await FirebaseAuth.instance
         .signInWithEmailAndPassword(email: email, password: pass);
     var userInstance = users.doc(userCredential.user?.uid);
     userInstance.update({'status': 'Online'});
     var userData = await userInstance.get();
-    return [userData.data(), userCredential];
+
+    mainController.currentUserData =
+        Users.fromJson(userData.data() as Map<String, dynamic>);
+    mainController.currentUserData.id = userCredential.user?.uid;
+    return true;
   } on FirebaseAuthException catch (e) {
     if (e.code == 'user-not-found') {
       debugPrint("Email not found. Please check and try again.");
-      return [false, 'No account registered with provided email'];
+      return false;
     } else {
       debugPrint("An error occurred: ${e.message}");
-      return [false, 'An error occurred while logging in, Pls try again later'];
+      return false;
     }
   } catch (e) {
     debugPrint("An error occurred: $e");
-    return [false, 'An unknown error occurred, Pls try again later'];
+    return false;
   }
 }
 
@@ -79,8 +77,9 @@ saveUserOnDevice(email, pass) async {
   await prefs.setString('password', pass);
 }
 
-autoLogin() async {
+Future<bool> autoLogin() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
+  MainController mainController = Get.find<MainController>();
   var email = prefs.getString('email');
   var pass = prefs.getString('password');
   if (email != null && pass != null) {
@@ -90,24 +89,26 @@ autoLogin() async {
       var userInstance = users.doc(userCredential.user?.uid);
       userInstance.update({'status': 'Online'});
       var userData = await userInstance.get();
-      return [true, userData.data(), userCredential];
+
+      mainController.currentUserData =
+          Users.fromJson(userData.data() as Map<String, dynamic>);
+      mainController.currentUserData.id = userCredential.user?.uid;
+      return true;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         debugPrint("Email not found. Please check and try again.");
-        return [false, 'No account registered with provided email'];
+        return false;
       } else {
         debugPrint("An error occurred: ${e.message}");
-        return [
-          false,
-          'An error occurred while logging in, Pls try again later'
-        ];
+        return false;
       }
     } catch (e) {
       debugPrint("An error occurred: $e");
-      return [false, 'An unknown error occurred, Pls try again later'];
+      return false;
     }
   } else {
-    return [false, 'No login data found'];
+    debugPrint('failed due to : No login data found');
+    return false;
   }
 }
 
@@ -118,17 +119,17 @@ profileListener(currentUserId) {
       .doc(currentUserId)
       .snapshots()
       .listen((event) {
-    var userData = event.data();
-    userData?['id'] = event.id;
-    mainController.updateCurrentUserData(userData);
+    mainController.currentUserData = Users.fromJson(event.data() as Map<String, dynamic>);
+    mainController.currentUserData.id = event.id;
+    mainController.updateM.value += 1;
   });
 }
 
 updateProfile(currentUserId, displayName, pronouns, aboutMe, image) async {
   var updateData = {
-    'display_name': displayName,
+    'displayName': displayName,
     'pronouns': pronouns,
-    'about_me': aboutMe
+    'aboutMe': aboutMe
   };
   if (image != null) {
     var storageRef = FirebaseStorage.instance.ref().child(
@@ -136,7 +137,7 @@ updateProfile(currentUserId, displayName, pronouns, aboutMe, image) async {
     var task = storageRef.putFile(File(image));
     task.whenComplete(() async {
       var downloadUrl = await task.snapshot.ref.getDownloadURL();
-      updateData['profile_picture'] = downloadUrl;
+      updateData['profilePicture'] = downloadUrl;
       users.doc(currentUserId).update(updateData);
     }).catchError((error) {
       debugPrint('Image Upload failed: $error');
@@ -146,15 +147,11 @@ updateProfile(currentUserId, displayName, pronouns, aboutMe, image) async {
   } else {
     users.doc(currentUserId).update(updateData);
   }
-  // (await getExternalStorageDirectory())?.delete();
-  // (await getTemporaryDirectory()).delete(recursive: true);
-  // await FilePicker.platform.clearTemporaryFiles();
-  // print('temporary deleted');
 }
 
 updateStatusDisplay(userId, displayStatus) async {
   try {
-    await users.doc(userId).update({'display_status': displayStatus});
+    await users.doc(userId).update({'displayStatus': displayStatus});
     return true;
   } catch (e) {
     return false;
@@ -164,7 +161,7 @@ updateStatusDisplay(userId, displayStatus) async {
 getInitialFriends(currentUserId) async {
   var friendInstances = await FirebaseFirestore.instance
       .collection('users')
-      .orderBy('display_name')
+      .orderBy('displayName')
       .where('friends', arrayContains: currentUserId)
       .get();
   var friends = [];
@@ -180,7 +177,7 @@ friendsListener(currentUserId) async {
   FriendsController friendsController = Get.find<FriendsController>();
   return FirebaseFirestore.instance
       .collection('users')
-      .orderBy('display_name')
+      .orderBy('displayName')
       .where('friends', arrayContains: currentUserId)
       .snapshots()
       .map((snapshot) => snapshot.docChanges)

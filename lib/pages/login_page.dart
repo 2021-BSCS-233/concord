@@ -57,7 +57,7 @@ class LogIn extends StatelessWidget {
                   ),
                   InputField(
                     fieldLabel: 'Email',
-                    controller: logInController.logInEmailController,
+                    controller: logInController.logInEmailTextController,
                     fieldRadius: 2,
                     horizontalMargin: 0,
                     verticalMargin: 2,
@@ -67,7 +67,7 @@ class LogIn extends StatelessWidget {
                   ),
                   InputField(
                     fieldLabel: 'Password',
-                    controller: logInController.logInPassController,
+                    controller: logInController.logInPassTextController,
                     fieldRadius: 2,
                     horizontalMargin: 0,
                     verticalMargin: 2,
@@ -80,23 +80,12 @@ class LogIn extends StatelessWidget {
                   ),
                   InkWell(
                     onTap: () async {
-                      logInController.showOverlayLogIn.value = true;
-                      var userData = await logInController.sendLogIn(
-                          logInController.logInEmailController.text.trim(),
-                          logInController.logInPassController.text.trim());
-                      if (userData != 0) {
-                        await saveUserOnDevice(
-                            logInController.logInEmailController.text.trim(),
-                            logInController.logInPassController.text.trim());
-                        logInController.showOverlayLogIn.value = false;
-                        userData[0]['id'] = userData[1].user.uid;
+                      bool response = await logInController.sendLogIn();
+                      if (response) {
                         Get.delete<LogInController>();
-                        Get.offAll(Home(
-                          userData: userData[0],
-                        ));
+                        Get.offAll(Home());
                       } else {
-                        logInController.showOverlayLogIn.value = true;
-                        logInController.showMessageLogIn.value = true;
+                        debugPrint('login failed');
                       }
                     },
                     child: Container(

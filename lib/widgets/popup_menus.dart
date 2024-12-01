@@ -102,7 +102,7 @@ class MessagePopup extends StatelessWidget {
                   ),
                   chatController.chatContent[chatController.messageSelected]
                               ['sender_id'] ==
-                          mainController.currentUserData['id']
+                          mainController.currentUserData.id
                       ? OptionTile(
                           action: () {
                             chatController.editMessage();
@@ -121,7 +121,7 @@ class MessagePopup extends StatelessWidget {
                       actionName: 'Copy Text'),
                   chatController.chatContent[chatController.messageSelected]
                               ['sender_id'] ==
-                          mainController.currentUserData['id']
+                          mainController.currentUserData.id
                       ? OptionTile(
                           action: () {
                             chatController.deleteMessage();
@@ -316,14 +316,15 @@ class ProfilePopup extends StatelessWidget {
 var selectedValue = 1.obs;
 
 class StatusPopup extends StatelessWidget {
-  final Map currentUserData;
+  final String status;
+  final String id;
 
-  StatusPopup({super.key, required this.currentUserData}) {
-    if (currentUserData['display_status'] == 'DND') {
+  StatusPopup({super.key, required this.status, required this.id}) {
+    if (status == 'DND') {
       selectedValue.value = 2;
-    } else if (currentUserData['display_status'] == 'Asleep') {
+    } else if (status == 'Asleep') {
       selectedValue.value = 3;
-    } else if (currentUserData['display_status'] == 'Offline') {
+    } else if (status == 'Offline') {
       selectedValue.value = 4;
     }
   }
@@ -376,7 +377,7 @@ class StatusPopup extends StatelessWidget {
                     child: Obx(() => Column(
                           children: [
                             ListTile(
-                              leading: StatusIcon(iconType: 'Online'),
+                              leading: const StatusIcon(iconType: 'Online'),
                               title: Text('online'.tr),
                               trailing: Radio(
                                   value: 1,
@@ -385,14 +386,14 @@ class StatusPopup extends StatelessWidget {
                                     var temp = selectedValue.value;
                                     selectedValue.value = value as int;
                                     var result = await updateStatusDisplay(
-                                        currentUserData['id'], 'Online');
+                                        id, 'Online');
                                     if (!result) {
                                       selectedValue.value = temp;
                                     }
                                   }),
                             ),
                             ListTile(
-                              leading: StatusIcon(iconType: 'DND'),
+                              leading: const StatusIcon(iconType: 'DND'),
                               title: Text('dnd'.tr),
                               trailing: Radio(
                                   value: 2,
@@ -401,14 +402,14 @@ class StatusPopup extends StatelessWidget {
                                     var temp = selectedValue.value;
                                     selectedValue.value = value as int;
                                     var result = await updateStatusDisplay(
-                                        currentUserData['id'], 'DND');
+                                        id, 'DND');
                                     if (!result) {
                                       selectedValue.value = temp;
                                     }
                                   }),
                             ),
                             ListTile(
-                              leading: StatusIcon(iconType: 'Asleep'),
+                              leading: const StatusIcon(iconType: 'Asleep'),
                               title: Text('idle'.tr),
                               trailing: Radio(
                                   value: 3,
@@ -417,14 +418,14 @@ class StatusPopup extends StatelessWidget {
                                     var temp = selectedValue.value;
                                     selectedValue.value = value as int;
                                     var result = await updateStatusDisplay(
-                                        currentUserData['id'], 'Asleep');
+                                        id, 'Asleep');
                                     if (!result) {
                                       selectedValue.value = temp;
                                     }
                                   }),
                             ),
                             ListTile(
-                              leading: StatusIcon(iconType: 'Offline'),
+                              leading: const StatusIcon(iconType: 'Offline'),
                               title: Text('hidden'.tr),
                               trailing: Radio(
                                   value: 4,
@@ -433,7 +434,7 @@ class StatusPopup extends StatelessWidget {
                                     var temp = selectedValue.value;
                                     selectedValue.value = value as int;
                                     var result = await updateStatusDisplay(
-                                        currentUserData['id'], 'Offline');
+                                        id, 'Offline');
                                     if (!result) {
                                       selectedValue.value = temp;
                                     }

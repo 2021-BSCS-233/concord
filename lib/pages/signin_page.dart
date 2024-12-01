@@ -56,7 +56,7 @@ class SignIn extends StatelessWidget {
                   ),
                   InputField(
                     fieldLabel: 'Username',
-                    controller: signInController.signInUsernameController,
+                    controller: signInController.signInUsernameTextController,
                     fieldRadius: 2,
                     horizontalMargin: 0,
                     verticalMargin: 2,
@@ -67,7 +67,7 @@ class SignIn extends StatelessWidget {
                   ),
                   InputField(
                     fieldLabel: 'Display Name',
-                    controller: signInController.signInDisplayController,
+                    controller: signInController.signInDisplayTextController,
                     fieldRadius: 2,
                     horizontalMargin: 0,
                     verticalMargin: 2,
@@ -77,7 +77,7 @@ class SignIn extends StatelessWidget {
                   ),
                   InputField(
                     fieldLabel: 'Email',
-                    controller: signInController.signInEmailController,
+                    controller: signInController.signInEmailTextController,
                     fieldRadius: 2,
                     horizontalMargin: 0,
                     verticalMargin: 2,
@@ -87,7 +87,7 @@ class SignIn extends StatelessWidget {
                   ),
                   InputField(
                     fieldLabel: 'Password',
-                    controller: signInController.signInPassController,
+                    controller: signInController.signInPassTextController,
                     fieldRadius: 2,
                     horizontalMargin: 0,
                     verticalMargin: 2,
@@ -100,22 +100,10 @@ class SignIn extends StatelessWidget {
                   ),
                   InkWell(
                     onTap: () async {
-                      signInController.showOverlaySignIn.value = true;
-                      var userData = await signInController.sendSignIn(
-                          signInController.signInUsernameController.text.trim(),
-                          signInController.signInDisplayController.text.trim(),
-                          signInController.signInEmailController.text.trim(),
-                          signInController.signInPassController.text.trim());
-                      if (userData != 0) {
-                        await saveUserOnDevice(
-                            signInController.signInEmailController.text.trim(),
-                            signInController.signInPassController.text.trim());
-                        signInController.showOverlaySignIn.value = false;
-                        userData[0]['id'] = userData[1].user.uid;
-                        Get.delete<SignInController>();
-                        Get.offAll(Home(
-                          userData: userData[0],
-                        ));
+                      var response = await signInController.sendSignIn();
+                      if (response) {
+                        Get.deleteAll();
+                        Get.offAll(Home());
                       } else {
                         debugPrint('SingIn failed');
                       }

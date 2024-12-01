@@ -18,11 +18,11 @@ class EditProfile extends StatelessWidget {
     super.key,
   }) {
     editProfileController.displayController.text =
-        mainController.currentUserData['display_name'];
+        mainController.currentUserData.displayName;
     editProfileController.pronounceController.text =
-        mainController.currentUserData['pronouns'];
+        mainController.currentUserData.pronouns;
     editProfileController.aboutMeController.text =
-        mainController.currentUserData['about_me'];
+        mainController.currentUserData.aboutMe;
     editProfileController.image = null;
   }
 
@@ -40,16 +40,12 @@ class EditProfile extends StatelessWidget {
           InkWell(
             onTap: () async {
               await updateProfile(
-                  mainController.currentUserData['id'],
+                  mainController.currentUserData.id,
                   editProfileController.displayController.text.trim() != ''
                       ? editProfileController.displayController.text.trim()
-                      : mainController.currentUserData['display_name'],
-                  editProfileController.pronounceController.text.trim() != ''
-                      ? editProfileController.pronounceController.text.trim()
-                      : mainController.currentUserData['pronouns'],
-                  editProfileController.aboutMeController.text.trim() != ''
-                      ? editProfileController.aboutMeController.text.trim()
-                      : mainController.currentUserData['about_me'],
+                      : mainController.currentUserData.displayName,
+                  editProfileController.pronounceController.text.trim(),
+                  editProfileController.aboutMeController.text.trim(),
                   editProfileController.image);
               Get.back();
             },
@@ -118,12 +114,10 @@ class EditProfile extends StatelessWidget {
                                         editProfileController.image != null
                                     ? FileImage(
                                         File(editProfileController.image))
-                                    : mainController.currentUserData[
-                                                'profile_picture'] !=
+                                    : mainController.currentUserData.profilePicture !=
                                             ''
                                         ? CachedNetworkImageProvider(
-                                            mainController.currentUserData[
-                                                'profile_picture'])
+                                            mainController.currentUserData.profilePicture)
                                         : const AssetImage(
                                                 'assets/images/default.png')
                                             as ImageProvider,
@@ -136,7 +130,7 @@ class EditProfile extends StatelessWidget {
                           right: 3,
                           child: StatusIcon(
                             iconType: mainController
-                                .currentUserData['display_status'],
+                                .currentUserData.displayStatus,
                             iconSize: 24,
                             iconBorder: 4,
                           ),
@@ -188,7 +182,7 @@ class EditProfile extends StatelessWidget {
                         floatingLabelBehavior: FloatingLabelBehavior.never,
                         border: const OutlineInputBorder(),
                         labelText:
-                            mainController.currentUserData['display_name'],
+                            mainController.currentUserData.displayName,
                       ),
                     ),
                     const SizedBox(
@@ -208,7 +202,7 @@ class EditProfile extends StatelessWidget {
                           floatingLabelBehavior: FloatingLabelBehavior.never,
                           border: const OutlineInputBorder(),
                           labelText:
-                              mainController.currentUserData['pronouns']),
+                              mainController.currentUserData.pronouns),
                     ),
                     const SizedBox(
                       height: 20,
@@ -227,7 +221,7 @@ class EditProfile extends StatelessWidget {
                             vertical: 5, horizontal: 10),
                         floatingLabelBehavior: FloatingLabelBehavior.never,
                         border: const OutlineInputBorder(),
-                        label: Text(mainController.currentUserData['about_me']),
+                        label: Text(mainController.currentUserData.aboutMe),
                         // labelStyle: TextStyle(overflow: TextOverflow.ellipsis)
                       ),
                     ),

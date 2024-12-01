@@ -74,36 +74,36 @@ class Loading extends StatelessWidget {
   }
 
   Future<Widget> _buildContent(BuildContext context) async {
-    List userData = [];
-    initialMain ? (userData = await autoLogin()) : null;
-    if (userData[0]) {
-      userData[1]['id'] = userData[2].user.uid;
-      return Home(
-        userData: userData[1],
-      );
+    bool response = false;
+    initialMain ? (response = await autoLogin()) : null;
+    if (response) {
+      return Home();
     } else {
-      debugPrint('failed due to :${userData[1]}');
       return LogIn();
     }
   }
 }
 
 class Home extends StatelessWidget {
-  final Map userData;
   late final MainController mainController = Get.find<MainController>();
 
   Home({
     super.key,
-    required this.userData,
   }) {
-    mainController.currentUserData = userData;
     mainController.selectedIndex.value = 0;
-    profileListener(userData['id']);
+    profileListener(mainController.currentUserData.id);
   }
 
   @override
   Widget build(BuildContext context) {
-    List pages = [Chats(mainController: mainController,), Posts(), Notifications(), Profile()];
+    List pages = [
+      Chats(
+        mainController: mainController,
+      ),
+      Posts(),
+      Notifications(),
+      Profile()
+    ];
 
     return Stack(
       children: [
@@ -138,15 +138,16 @@ class Home extends StatelessWidget {
                               child: Stack(
                                 children: [
                                   ProfilePicture(
-                                      profileLink: mainController
-                                          .currentUserData['profile_picture'],
-                                      profileRadius: 11.5,),
+                                    profileLink: mainController
+                                        .currentUserData.profilePicture,
+                                    profileRadius: 11.5,
+                                  ),
                                   Positioned(
                                     bottom: -1,
                                     right: -1,
                                     child: StatusIcon(
                                       iconType: mainController
-                                          .currentUserData['display_status'],
+                                          .currentUserData.displayStatus,
                                       borderColor: const Color(0xFF222222),
                                     ),
                                   ),
@@ -193,7 +194,8 @@ class Home extends StatelessWidget {
                     )
                   : mainController.selectedIndex.value == 3
                       ? StatusPopup(
-                          currentUserData: mainController.currentUserData)
+                          id: mainController.currentUserData.id!,
+                          status: mainController.currentUserData.displayStatus)
                       : Container(),
             )),
         Obx(() => AnimatedPositioned(
