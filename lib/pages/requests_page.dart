@@ -2,15 +2,15 @@ import 'package:concord/widgets/profile_picture.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:concord/services/page_controllers.dart';
+import 'package:concord/controllers/page_controllers.dart';
 import 'package:concord/widgets/input_field.dart';
 import 'package:concord/services/firebase_services.dart';
 
-class Requests extends StatelessWidget {
+class RequestsPage extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
   final RequestsController requestsController = Get.put(RequestsController());
 
-  Requests({super.key});
+  RequestsPage({super.key});
 
   @override
   Widget build(BuildContext context) {

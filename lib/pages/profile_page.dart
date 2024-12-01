@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:concord/pages/edit_profile_page.dart';
 import 'package:concord/pages/settings_page.dart';
-import 'package:concord/services/page_controllers.dart';
+import 'package:concord/controllers/page_controllers.dart';
 import 'package:concord/widgets/status_icons.dart';
 
-class Profile extends StatelessWidget {
+class ProfilePage extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
 
-  Profile({super.key});
+  ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +69,7 @@ class Profile extends StatelessWidget {
                         top: 40,
                         child: InkWell(
                           onTap: () {
-                            Get.to(Settings());
+                            Get.to(SettingsPage());
                           },
                           child: Container(
                               height: 35,
@@ -160,7 +160,7 @@ class Profile extends StatelessWidget {
                             ),
                             InkWell(
                               onTap: () {
-                                Get.to(EditProfile());
+                                Get.to(EditProfilePage());
                               },
                               child: Container(
                                 height: 38,

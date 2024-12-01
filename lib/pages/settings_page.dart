@@ -1,18 +1,18 @@
 import 'package:concord/pages/login_page.dart';
 import "package:flutter/material.dart";
 import 'package:get/get.dart';
-import 'package:concord/services/language_controller.dart';
-import 'package:concord/services/page_controllers.dart';
+import 'package:concord/controllers/language_controller.dart';
+import 'package:concord/controllers/page_controllers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class Settings extends StatelessWidget {
+class SettingsPage extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
   final SettingsController editSettingsController =
       Get.put(SettingsController());
   final LocalizationController localizationController =
       Get.find<LocalizationController>();
 
-  Settings({super.key}) {
+  SettingsPage({super.key}) {
     editSettingsController.usernameController.text =
         mainController.currentUserData.username;
     editSettingsController.emailController.text =
@@ -166,7 +166,7 @@ class Settings extends StatelessWidget {
                     // Get.delete<RequestsController>();
                     // Get.delete<EditProfileController>();
                     // Get.delete<SettingsController>();
-                    Get.offAll(LogIn());
+                    Get.offAll(LogInPage());
                   },
                   child: Container(
                     height: 45,

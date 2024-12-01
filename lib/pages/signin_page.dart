@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:concord/main.dart';
 import 'package:get/get.dart';
 import 'package:concord/widgets/input_field.dart';
-import 'package:concord/services/page_controllers.dart';
+import 'package:concord/controllers/page_controllers.dart';
 import 'package:concord/services/firebase_services.dart';
 
-class SignIn extends StatelessWidget {
+class SignInPage extends StatelessWidget {
   final SignInController signInController = Get.put(SignInController());
 
-  SignIn({super.key});
+  SignInPage({super.key});
 
   @override
   Widget build(BuildContext context) {

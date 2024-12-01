@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:concord/widgets/dm_chat_tile.dart';
 import 'package:concord/widgets/status_icons.dart';
-import 'package:concord/services/page_controllers.dart';
+import 'package:concord/controllers/page_controllers.dart';
 
-class Chats extends StatelessWidget {
+class ChatsPage extends StatelessWidget {
   final MainController mainController;
   final ChatsController chatsController = Get.put(ChatsController());
   final FriendsController friendsController = Get.put(FriendsController());
 
-  Chats({super.key, required this.mainController}) {
+  ChatsPage({super.key, required this.mainController}) {
     chatsController.initial = true;
   }
 
@@ -30,7 +30,7 @@ class Chats extends StatelessWidget {
           InkWell(
             enableFeedback: true,
             onTap: () {
-              Get.to(Friends());
+              Get.to(FriendsPage());
             },
             child: SizedBox(
               height: 40,
@@ -116,8 +116,8 @@ class Chats extends StatelessWidget {
                             child: Center(
                               child: InkWell(
                                 onTap: () {
-                                  mainController.toggleProfile(friendsController
-                                      .friendsData[index]['id']);
+                                  mainController.toggleProfile(
+                                      friendsController.friendsData[index].id);
                                 },
                                 child: Stack(
                                   children: [
@@ -126,22 +126,22 @@ class Chats extends StatelessWidget {
                                       width: 50,
                                       child: ProfilePicture(
                                           profileLink: friendsController
-                                                  .friendsData[index]
-                                              ['profile_picture']),
+                                              .friendsData[index]
+                                              .profilePicture),
                                     ),
                                     Positioned(
                                       bottom: -2,
                                       right: -2,
                                       child: StatusIcon(
                                         iconType: friendsController
-                                                        .friendsData[index]
-                                                    ['status'] ==
+                                                    .friendsData[index]
+                                                    .status ==
                                                 'Online'
                                             ? friendsController
-                                                    .friendsData[index]
-                                                ['display_status']
+                                                .friendsData[index]
+                                                .displayStatus
                                             : friendsController
-                                                .friendsData[index]['status'],
+                                                .friendsData[index].status,
                                         iconSize: 17,
                                         iconBorder: 3.5,
                                       ),
@@ -176,8 +176,7 @@ class Chats extends StatelessWidget {
                         itemCount: chatsController.chatsData.length,
                         shrinkWrap: true,
                         itemBuilder: (context, index) {
-                          return chatsController.chatsData[index]
-                                      ['chat_type'] ==
+                          return chatsController.chatsData[index].chatType ==
                                   'dm'
                               ? DmChatTile(
                                   chatData: chatsController.chatsData[index])
@@ -186,7 +185,7 @@ class Chats extends StatelessWidget {
                                   width: 100,
                                   child: Center(
                                     child: Text(
-                                        'add support for ${chatsController.chatsData[index]['chat_type']}'),
+                                        'add support for ${chatsController.chatsData[index].chatType}'),
                                   ),
                                 );
                         },

@@ -3,14 +3,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:concord/pages/requests_page.dart';
-import 'package:concord/services/page_controllers.dart';
+import 'package:concord/controllers/page_controllers.dart';
 import 'package:concord/services/firebase_services.dart';
 
-class Friends extends StatelessWidget {
+class FriendsPage extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
   final FriendsController friendsController = Get.find<FriendsController>();
 
-  Friends({super.key}) {
+  FriendsPage({super.key}) {
     friendsController.initial = true;
   }
 
@@ -28,7 +28,7 @@ class Friends extends StatelessWidget {
         actions: [
           InkWell(
             onTap: () {
-              Get.to(Requests());
+              Get.to(RequestsPage());
             },
             child: Container(
               height: 40,
@@ -109,15 +109,15 @@ class Friends extends StatelessWidget {
                       leading: InkWell(
                         onTap: () {
                           mainController.toggleProfile(
-                              friendsController.friendsData[index]['id']);
+                              friendsController.friendsData[index].id);
                         },
                         child: ProfilePicture(
-                          profileLink: friendsController.friendsData[index]['profile_picture'],
+                          profileLink: friendsController.friendsData[index].profilePicture,
                           profileRadius: 20,
                         ),
                       ),
                       title: Text(
-                        friendsController.friendsData[index]['display_name'],
+                        friendsController.friendsData[index].displayName,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       trailing: SizedBox(
@@ -149,7 +149,7 @@ class Friends extends StatelessWidget {
                               onTap: () {
                                 removeFriend(
                                     mainController.currentUserData.id,
-                                    friendsController.friendsData[index]['id']);
+                                    friendsController.friendsData[index].id);
                               },
                             )
                           ],

@@ -1,28 +1,27 @@
 import 'dart:io';
+import 'package:concord/models/chats_model.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:concord/services/page_controllers.dart';
+import 'package:concord/controllers/page_controllers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:concord/models/users.dart';
+import 'package:concord/models/users_model.dart';
 
-final CollectionReference users =
+final CollectionReference usersRef =
     FirebaseFirestore.instance.collection('users');
-final CollectionReference requests =
+final CollectionReference requestsRef =
     FirebaseFirestore.instance.collection('requests');
-final CollectionReference chats =
+final CollectionReference chatsRef =
     FirebaseFirestore.instance.collection('chats');
 
 Future<List?> signInUser(email, pass) async {
   MainController mainController = Get.find<MainController>();
   try {
     var userCredential = await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(
-            email: email,
-            password: pass);
-    var userInstance = users.doc(userCredential.user?.uid);
+        .createUserWithEmailAndPassword(email: email, password: pass);
+    var userInstance = usersRef.doc(userCredential.user?.uid);
     await userInstance.set(mainController.currentUserData.toJson());
     mainController.currentUserData.id = userCredential.user?.uid;
     return [true, ''];
@@ -32,14 +31,14 @@ Future<List?> signInUser(email, pass) async {
     } else if (e.code == 'email-already-in-use') {
       return [false, 'Email already in use'];
     } else {
-      debugPrint("An error occurred: ${e.message}");
+      debugPrint('An error occurred: ${e.message}');
       return [
         false,
         'An error occurred while registering your user, Pls try again later'
       ];
     }
   } catch (e) {
-    debugPrint("An error occurred: $e");
+    debugPrint('An error occurred: $e');
     return [false, 'An unknown error occurred, Pls try again later'];
   }
 }
@@ -49,12 +48,12 @@ Future<bool> logInUser(String email, String pass) async {
   try {
     var userCredential = await FirebaseAuth.instance
         .signInWithEmailAndPassword(email: email, password: pass);
-    var userInstance = users.doc(userCredential.user?.uid);
+    var userInstance = usersRef.doc(userCredential.user?.uid);
     userInstance.update({'status': 'Online'});
     var userData = await userInstance.get();
 
     mainController.currentUserData =
-        Users.fromJson(userData.data() as Map<String, dynamic>);
+        UsersModel.fromJson(userData.data() as Map<String, dynamic>);
     mainController.currentUserData.id = userCredential.user?.uid;
     return true;
   } on FirebaseAuthException catch (e) {
@@ -86,12 +85,12 @@ Future<bool> autoLogin() async {
     try {
       var userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: pass);
-      var userInstance = users.doc(userCredential.user?.uid);
+      var userInstance = usersRef.doc(userCredential.user?.uid);
       userInstance.update({'status': 'Online'});
       var userData = await userInstance.get();
 
       mainController.currentUserData =
-          Users.fromJson(userData.data() as Map<String, dynamic>);
+          UsersModel.fromJson(userData.data() as Map<String, dynamic>);
       mainController.currentUserData.id = userCredential.user?.uid;
       return true;
     } on FirebaseAuthException catch (e) {
@@ -114,12 +113,9 @@ Future<bool> autoLogin() async {
 
 profileListener(currentUserId) {
   MainController mainController = Get.find<MainController>();
-  FirebaseFirestore.instance
-      .collection('users')
-      .doc(currentUserId)
-      .snapshots()
-      .listen((event) {
-    mainController.currentUserData = Users.fromJson(event.data() as Map<String, dynamic>);
+  usersRef.doc(currentUserId).snapshots().listen((event) {
+    mainController.currentUserData =
+        UsersModel.fromJson(event.data() as Map<String, dynamic>);
     mainController.currentUserData.id = event.id;
     mainController.updateM.value += 1;
   });
@@ -138,20 +134,20 @@ updateProfile(currentUserId, displayName, pronouns, aboutMe, image) async {
     task.whenComplete(() async {
       var downloadUrl = await task.snapshot.ref.getDownloadURL();
       updateData['profilePicture'] = downloadUrl;
-      users.doc(currentUserId).update(updateData);
+      usersRef.doc(currentUserId).update(updateData);
     }).catchError((error) {
       debugPrint('Image Upload failed: $error');
-      users.doc(currentUserId).update(updateData);
+      usersRef.doc(currentUserId).update(updateData);
       return error;
     });
   } else {
-    users.doc(currentUserId).update(updateData);
+    usersRef.doc(currentUserId).update(updateData);
   }
 }
 
 updateStatusDisplay(userId, displayStatus) async {
   try {
-    await users.doc(userId).update({'displayStatus': displayStatus});
+    await usersRef.doc(userId).update({'displayStatus': displayStatus});
     return true;
   } catch (e) {
     return false;
@@ -166,8 +162,10 @@ getInitialFriends(currentUserId) async {
       .get();
   var friends = [];
   for (var doc in friendInstances.docs) {
-    Map friendUserData = doc.data();
-    friendUserData['id'] = doc.id;
+    UsersModel friendUserData = UsersModel.fromJson(doc.data());
+    // Map friendUserData = doc.data();
+    // friendUserData['id'] = doc.id;
+    friendUserData.id = doc.id;
     friends.add(friendUserData);
   }
   return friends;
@@ -183,8 +181,8 @@ friendsListener(currentUserId) async {
       .map((snapshot) => snapshot.docChanges)
       .listen((event) {
     for (var change in event) {
-      var updateData = change.doc.data();
-      updateData?['id'] = change.doc.id;
+      var updateData = UsersModel.fromJson(change.doc.data()!);
+      updateData.id = change.doc.id;
       if (change.type == DocumentChangeType.modified) {
         friendsController.updateFriends(updateData, 'modified');
       } else if (change.type == DocumentChangeType.added) {
@@ -197,14 +195,14 @@ friendsListener(currentUserId) async {
 }
 
 getUserProfile(userId) async {
-  return await FirebaseFirestore.instance.collection('users').doc(userId).get();
+  return await usersRef.doc(userId).get();
 }
 
 removeFriend(currentUserId, friendId) {
-  users.doc(currentUserId).update({
+  usersRef.doc(currentUserId).update({
     'friends': FieldValue.arrayRemove([friendId])
   });
-  users.doc(friendId).update({
+  usersRef.doc(friendId).update({
     'friends': FieldValue.arrayRemove([currentUserId])
   });
 }
@@ -212,14 +210,14 @@ removeFriend(currentUserId, friendId) {
 getInitialRequest(currentUserId) async {
   var incomingInstances = await FirebaseFirestore.instance
       .collection('requests')
-      .orderBy('time_stamp', descending: true)
-      .where('receiver_id', isEqualTo: currentUserId)
+      .orderBy('timeStamp', descending: true)
+      .where('receiverId', isEqualTo: currentUserId)
       .get();
   var incoming = [];
   for (var doc in incomingInstances.docs) {
     var requestData = doc.data();
     requestData['id'] = doc.id;
-    dynamic user = await users.doc(doc['sender_id']).get();
+    dynamic user = await usersRef.doc(doc['senderId']).get();
     if (user.data() != null) {
       var temp = user.data();
       temp['id'] = user.id;
@@ -229,14 +227,14 @@ getInitialRequest(currentUserId) async {
   }
   var outgoingInstances = await FirebaseFirestore.instance
       .collection('requests')
-      .orderBy('time_stamp', descending: true)
-      .where('sender_id', isEqualTo: currentUserId)
+      .orderBy('timeStamp', descending: true)
+      .where('senderId', isEqualTo: currentUserId)
       .get();
   var outgoing = [];
   for (var doc in outgoingInstances.docs) {
     var requestData = doc.data();
     requestData['id'] = doc.id;
-    dynamic user = await users.doc(doc['receiver_id']).get();
+    dynamic user = await usersRef.doc(doc['receiverId']).get();
     if (user.data() != null) {
       var temp = user.data();
       temp['id'] = user.id;
@@ -251,8 +249,8 @@ requestsListeners(currentUserId) {
   RequestsController requestsController = Get.find<RequestsController>();
   FirebaseFirestore.instance
       .collection('requests')
-      .orderBy('time_stamp', descending: true)
-      .where('receiver_id', isEqualTo: currentUserId)
+      .orderBy('timeStamp', descending: true)
+      .where('receiverId', isEqualTo: currentUserId)
       .snapshots()
       .map((snapshot) => snapshot.docChanges)
       .listen((event) async {
@@ -260,7 +258,7 @@ requestsListeners(currentUserId) {
       var requestData = change.doc.data();
       requestData?['id'] = change.doc.id;
       if (change.type == DocumentChangeType.added) {
-        dynamic user = await users.doc(requestData?['sender_id']).get();
+        dynamic user = await usersRef.doc(requestData?['senderId']).get();
         if (user.data() != null) {
           var temp = user.data();
           temp['id'] = user.id;
@@ -274,8 +272,8 @@ requestsListeners(currentUserId) {
   });
   FirebaseFirestore.instance
       .collection('requests')
-      .orderBy('time_stamp', descending: true)
-      .where('sender_id', isEqualTo: currentUserId)
+      .orderBy('timeStamp', descending: true)
+      .where('senderId', isEqualTo: currentUserId)
       .snapshots()
       .map((snapshot) => snapshot.docChanges)
       .listen((event) async {
@@ -283,7 +281,7 @@ requestsListeners(currentUserId) {
       var requestData = change.doc.data();
       requestData?['id'] = change.doc.id;
       if (change.type == DocumentChangeType.added) {
-        dynamic user = await users.doc(requestData?['receiver_id']).get();
+        dynamic user = await usersRef.doc(requestData?['receiverId']).get();
         if (user.data() != null) {
           var temp = user.data();
           temp['id'] = user.id;
@@ -300,21 +298,21 @@ requestsListeners(currentUserId) {
 sendRequest(currentUserId, receiverName) async {
   var ref = FirebaseFirestore.instance.collection('requests');
   var receiverRef =
-      await users.where('username', isEqualTo: receiverName).get();
+      await usersRef.where('username', isEqualTo: receiverName).get();
   if (receiverRef.docs.isNotEmpty) {
     var check1 = await ref
-        .where('sender_id', isEqualTo: currentUserId)
-        .where('receiver_id', isEqualTo: receiverRef.docs[0].id)
+        .where('senderId', isEqualTo: currentUserId)
+        .where('receiverId', isEqualTo: receiverRef.docs[0].id)
         .get();
     var check2 = await ref
-        .where('sender_id', isEqualTo: currentUserId)
-        .where('receiver_id', isEqualTo: receiverRef.docs[0].id)
+        .where('senderId', isEqualTo: currentUserId)
+        .where('receiverId', isEqualTo: receiverRef.docs[0].id)
         .get();
     if (check1.docs.isEmpty && check2.docs.isEmpty) {
       ref.add({
-        'sender_id': currentUserId,
-        'receiver_id': receiverRef.docs[0].id,
-        'time_stamp': DateTime.now(),
+        'senderId': currentUserId,
+        'receiverId': receiverRef.docs[0].id,
+        'timeStamp': DateTime.now(),
       });
     }
   }
@@ -323,21 +321,36 @@ sendRequest(currentUserId, receiverName) async {
 requestAction(requestId, action) async {
   try {
     var ref = FirebaseFirestore.instance.collection('requests').doc(requestId);
+    var batch = FirebaseFirestore.instance.batch();
     var requestData = (await ref.get()).data();
     if (action == 'accept') {
-      users.doc(requestData?['receiver_id']).update({
-        'friends': FieldValue.arrayUnion([requestData?['sender_id']])
+      batch.update(usersRef.doc(requestData?['receiverId']), {
+        'friends': FieldValue.arrayUnion([requestData?['senderId']])
       });
-      users.doc(requestData?['sender_id']).update({
-        'friends': FieldValue.arrayUnion([requestData?['receiver_id']])
+      batch.update(usersRef.doc(requestData?['senderId']), {
+        'friends': FieldValue.arrayUnion([requestData?['receiverId']])
       });
-      FirebaseFirestore.instance.collection('chats').add({
-        'chat_type': 'dm',
-        'latest_message': '',
-        'time_stamp': DateTime.now(),
-        'users': [requestData?['receiver_id'], requestData?['sender_id']]
+      batch.set(chatsRef.doc(), {
+        'chatType': 'dm',
+        'latestMessage': '',
+        'timeStamp': DateTime.now(),
+        'users': [requestData?['receiverId'], requestData?['senderId']]
       });
-      ref.delete();
+      batch.delete(ref);
+      batch.commit();
+      // usersRef.doc(requestData?['receiverId']).update({
+      //   'friends': FieldValue.arrayUnion([requestData?['senderId']])
+      // });
+      // usersRef.doc(requestData?['senderId']).update({
+      //   'friends': FieldValue.arrayUnion([requestData?['receiverId']])
+      // });
+      // chatsRef.add({
+      //   'chatType': 'dm',
+      //   'latestMessage': '',
+      //   'timeStamp': DateTime.now(),
+      //   'users': [requestData?['receiverId'], requestData?['senderId']]
+      // });
+      // ref.delete();
     } else if (action == 'deny') {
       ref.delete();
     }
@@ -345,24 +358,24 @@ requestAction(requestId, action) async {
     debugPrint('error $e');
   }
 }
-
+//TODO: test the changes
 getInitialChats(currentUserId) async {
   var chatInstances = await FirebaseFirestore.instance
       .collection('chats')
-      .orderBy('time_stamp', descending: true)
+      .orderBy('timeStamp', descending: true)
       .where('users', arrayContains: currentUserId)
       .get();
   var chats = [];
   for (var doc in chatInstances.docs) {
-    Map chatData = doc.data();
-    chatData['id'] = doc.id;
-    chatData['users'].removeWhere((element) => element == currentUserId);
-    if (chatData['chat_type'] == 'dm') {
-      dynamic user = await users.doc(chatData['users'][0]).get();
+    ChatsModel chatData = ChatsModel.fromJson(doc.data());
+    chatData.id = doc.id;
+    chatData.users.removeWhere((element) => element == currentUserId);
+    if (chatData.chatType == 'dm') {
+      dynamic user = await usersRef.doc(chatData.users[0]).get();
       if (user.data() != null) {
-        var temp = user.data();
-        temp['id'] = user.id;
-        chatData['receiver_data'] = temp;
+        var temp = UsersModel.fromJson(user.data());
+        temp.id = user.id;
+        chatData.receiverData?.add(temp);
       }
       chats.add(chatData);
     }
@@ -373,24 +386,26 @@ getInitialChats(currentUserId) async {
 chatsListener(currentUserId, updateChats) async {
   return FirebaseFirestore.instance
       .collection('chats')
-      .orderBy('time_stamp', descending: true)
+      .orderBy('timeStamp', descending: true)
       .where('users', arrayContains: currentUserId)
       .snapshots()
       .map((snapshot) => snapshot.docChanges)
       .listen((event) async {
     for (var change in event) {
-      var updateData = change.doc.data();
-      updateData?['id'] = change.doc.id;
+      ChatsModel updateData = ChatsModel.fromJson(change.doc.data()!);
+      updateData.id = change.doc.id;
+      // var updateData = change.doc.data();
+      // updateData?['id'] = change.doc.id;
       if (change.type == DocumentChangeType.modified) {
         updateChats(updateData, 'modified');
       } else if (change.type == DocumentChangeType.added) {
-        updateData?['users'].removeWhere((element) => element == currentUserId);
-        if (updateData?['chat_type'] == 'dm') {
-          dynamic user = await users.doc(updateData?['users'][0]).get();
+        updateData.users.removeWhere((element) => element == currentUserId);
+        if (updateData.chatType == 'dm') {
+          dynamic user = await usersRef.doc(updateData.users[0]).get();
           if (user.data() != null) {
-            var temp = user.data();
-            temp['id'] = user.id;
-            updateData?['receiver_data'] = temp;
+            var temp = UsersModel.fromJson(user.data());
+            temp.id = user.id;
+            updateData.receiverData?.add(temp);
           }
         }
         updateChats(updateData, 'added');
@@ -404,7 +419,7 @@ getInitialMessages(chatId) async {
       .collection('chats')
       .doc(chatId)
       .collection('messages')
-      .orderBy('time_stamp', descending: true)
+      .orderBy('timeStamp', descending: true)
       .get();
   var messages = [];
   for (var message in messageInstances.docs) {
@@ -421,7 +436,7 @@ messagesListener(chatId) async {
       .collection('chats')
       .doc(chatId)
       .collection('messages')
-      .orderBy('time_stamp', descending: true)
+      .orderBy('timeStamp', descending: true)
       .snapshots()
       .map((snapshot) => snapshot.docChanges)
       .listen((event) async {
@@ -440,7 +455,7 @@ messagesListener(chatId) async {
 }
 
 sendMessageFirebase(chatId, message, clientUserId, attachments) async {
-  var chatRef = FirebaseFirestore.instance.collection('chats').doc(chatId);
+  var chatRef = chatsRef.doc(chatId);
   var storageRef = FirebaseStorage.instance.ref();
   var fileLinks = [];
 
@@ -456,33 +471,23 @@ sendMessageFirebase(chatId, message, clientUserId, attachments) async {
   var time = DateTime.now();
   var batch = FirebaseFirestore.instance.batch();
   batch.set(chatRef.collection('messages').doc(), {
-    'sender_id': clientUserId,
-    'time_stamp': time,
+    'senderId': clientUserId,
+    'timeStamp': time,
     'message': message,
     'edited': false,
     'attachments': fileLinks
   });
-  batch.update(chatRef, {'latest_message': message, 'time_stamp': time});
+  batch.update(chatRef, {'latestMessage': message, 'timeStamp': time});
   batch.commit();
 }
 
 editMessageFirebase(chatId, messageId, message) {
-  FirebaseFirestore.instance
-      .collection('chats')
-      .doc(chatId)
-      .collection('messages')
-      .doc(messageId)
-      .update({
+  chatsRef.doc(chatId).collection('messages').doc(messageId).update({
     'message': message,
     'edited': true,
   });
 }
 
 deleteMessageFirebase(chatId, messageId) {
-  FirebaseFirestore.instance
-      .collection('chats')
-      .doc(chatId)
-      .collection('messages')
-      .doc(messageId)
-      .delete();
+  chatsRef.doc(chatId).collection('messages').doc(messageId).delete();
 }

@@ -9,11 +9,11 @@ import 'package:flutter/material.dart';
 import 'package:concord/pages/chats_page.dart';
 import 'package:concord/pages/profile_page.dart';
 import 'package:concord/services/firebase_services.dart';
-import 'package:concord/services/language_controller.dart';
+import 'package:concord/controllers/language_controller.dart';
 import 'package:concord/widgets/popup_menus.dart';
 import 'package:concord/widgets/status_icons.dart';
 import 'package:concord/firebase_options.dart';
-import 'package:concord/services/page_controllers.dart';
+import 'package:concord/controllers/page_controllers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
@@ -79,7 +79,7 @@ class Loading extends StatelessWidget {
     if (response) {
       return Home();
     } else {
-      return LogIn();
+      return LogInPage();
     }
   }
 }
@@ -97,12 +97,12 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List pages = [
-      Chats(
+      ChatsPage(
         mainController: mainController,
       ),
-      Posts(),
-      Notifications(),
-      Profile()
+      PostsPage(),
+      NotificationsPage(),
+      ProfilePage()
     ];
 
     return Stack(
@@ -125,8 +125,8 @@ class Home extends StatelessWidget {
                     BottomNavigationBarItem(
                         icon: const Icon(CupertinoIcons.chat_bubble_2_fill),
                         label: 'messages'.tr),
-                    BottomNavigationBarItem(
-                        icon: const Icon(Icons.people), label: 'Posts'),
+                    const BottomNavigationBarItem(
+                        icon: Icon(Icons.people), label: 'Posts'),
                     const BottomNavigationBarItem(
                         icon: Icon(Icons.notifications),
                         label: 'Notifications'),

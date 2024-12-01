@@ -1,4 +1,5 @@
-import 'package:concord/services/page_controllers.dart';
+import 'package:concord/controllers/page_controllers.dart';
+import 'package:concord/models/chats_model.dart';
 import 'package:concord/widgets/profile_picture.dart';
 import 'package:concord/widgets/status_icons.dart';
 import 'package:flutter/material.dart';
@@ -7,13 +8,13 @@ import 'package:concord/pages/chat_page.dart';
 
 class DmChatTile extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
-  final Map chatData;
+  final ChatsModel chatData;
 
   DmChatTile({super.key, required this.chatData});
 
   @override
   Widget build(BuildContext context) {
-    var time1 = chatData['time_stamp'].toDate();
+    var time1 = chatData.timeStamp;
     var time2 = DateTime.now();
     var difference = time2.difference(time1);
     String timeDifference = '';
@@ -36,18 +37,18 @@ class DmChatTile extends StatelessWidget {
       child: ListTile(
         titleAlignment: ListTileTitleAlignment.top,
         onTap: () {
-          Get.to(Chat(
-            chatId: chatData['id'],
-            otherUsersData: [chatData['receiver_data']],
-            chatType: chatData['chat_type'],
+          Get.to(ChatPage(
+            chatId: chatData.id!,
+            otherUsersData: [chatData.receiverData],
+            chatType: chatData.chatType,
           ));
         },
         onLongPress: () {
           mainController.toggleMenu([
-            chatData['id'],
-            chatData['receiver_data']['username'] ?? '',
-            chatData['receiver_data']['profile_picture'] ?? '',
-            chatData['chat_type'] ?? ''
+            chatData.id,
+            chatData.receiverData![0].username,
+            chatData.receiverData![0].profilePicture,
+            chatData.chatType
           ]);
         },
         dense: true,
@@ -55,30 +56,30 @@ class DmChatTile extends StatelessWidget {
         leading: Stack(
           children: [
             ProfilePicture(
-              profileLink: chatData['receiver_data']['profile_picture'],
+              profileLink: chatData.receiverData![0].profilePicture,
               profileRadius: 20,
             ),
             Positioned(
               bottom: -1,
               right: -1,
               child: StatusIcon(
-                iconType: chatData['receiver_data']['status'] == 'Online'
-                    ? chatData['receiver_data']['display_status']
-                    : chatData['receiver_data']['status'],
+                iconType: chatData.receiverData![0].status == 'Online'
+                    ? chatData.receiverData![0].displayStatus
+                    : chatData.receiverData![0].status,
               ),
             ),
           ],
         ),
         title: Text(
-          chatData['receiver_data']['display_name'],
+          chatData.receiverData![0].displayName,
           style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Color(0xD0FFFFFF)),
         ),
-        subtitle: chatData['latest_message'] != ''
+        subtitle: chatData.latestMessage != ''
             ? Text(
-                chatData['latest_message'],
+                chatData.latestMessage,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
                 style: TextStyle(fontSize: 14, color: Color(0xB0FFFFFF)),

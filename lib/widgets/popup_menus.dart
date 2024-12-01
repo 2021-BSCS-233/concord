@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:concord/services/page_controllers.dart';
+import 'package:concord/controllers/page_controllers.dart';
 import 'package:concord/services/firebase_services.dart';
 import 'package:concord/widgets/status_icons.dart';
 import 'package:concord/widgets/option_tile.dart';

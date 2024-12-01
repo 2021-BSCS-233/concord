@@ -3,18 +3,18 @@ import 'package:cached_network_image/cached_network_image.dart';
 // import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:concord/services/page_controllers.dart';
+import 'package:concord/controllers/page_controllers.dart';
 import 'package:concord/widgets/status_icons.dart';
 import 'package:concord/services/firebase_services.dart';
 import 'package:image_picker/image_picker.dart';
 
 // var _selectedColor = Color(0xFFFFC42C).obs;
-class EditProfile extends StatelessWidget {
+class EditProfilePage extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
   final EditProfileController editProfileController =
       Get.put(EditProfileController());
 
-  EditProfile({
+  EditProfilePage({
     super.key,
   }) {
     editProfileController.displayController.text =

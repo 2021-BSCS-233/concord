@@ -1,4 +1,5 @@
-import 'package:concord/models/users.dart';
+import 'package:concord/models/chats_model.dart';
+import 'package:concord/models/users_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:get/get.dart';
@@ -6,7 +7,7 @@ import 'package:concord/services/firebase_services.dart';
 import 'package:image_picker/image_picker.dart';
 
 class MainController extends GetxController {
-  late Users currentUserData;
+  late UsersModel currentUserData;
   var updateM = 0.obs;
   var showMenu = false.obs;
   var showProfile = false.obs;
@@ -55,7 +56,7 @@ class SignInController extends GetxController {
         user.length <= 20 &&
         RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(email) &&
         RegExp(r'.{8,}').hasMatch(pass)) {
-      mainController.currentUserData = Users(
+      mainController.currentUserData = UsersModel(
           username: user,
           email: email,
           displayName: display != '' ? display : user,
@@ -132,7 +133,7 @@ class FriendsController extends GetxController {
   bool initial = true;
   var updateF = 0.obs;
   var friendsListenerRef;
-  List friendsData = [];
+  List<UsersModel> friendsData = [];
 
   getInitialData(currentUserId) async {
     friendsListenerRef = await friendsListener(
@@ -142,8 +143,8 @@ class FriendsController extends GetxController {
     initial = false;
   }
 
-  updateFriends(updateData, updateType) {
-    var index = friendsData.indexWhere((map) => map['id'] == updateData['id']);
+  updateFriends(UsersModel updateData, updateType) {
+    var index = friendsData.indexWhere((map) => map.id == updateData.id);
     if (updateType == 'modified') {
       friendsData[index] = updateData;
     } else if (updateType == 'added' && index < 0) {
@@ -159,7 +160,7 @@ class ChatsController extends GetxController {
   var updateCs = 0.obs;
   bool initial = true;
   var chatsListenerRef;
-  List chatsData = [];
+  List<ChatsModel> chatsData = [];
 
   getInitialData(currentUserId) async {
     chatsListenerRef = await chatsListener(currentUserId, updateChats);
@@ -167,11 +168,11 @@ class ChatsController extends GetxController {
     initial = false;
   }
 
-  updateChats(updateData, updateType) {
-    var index = chatsData.indexWhere((map) => map['id'] == updateData['id']);
+  updateChats(ChatsModel updateData, updateType) {
+    var index = chatsData.indexWhere((map) => map.id == updateData.id);
     if (updateType == 'modified') {
-      chatsData[index]['latest_message'] = updateData['latest_message'];
-      chatsData[index]['time_stamp'] = updateData['time_stamp'];
+      chatsData[index].latestMessage = updateData.latestMessage;
+      chatsData[index].timeStamp = updateData.timeStamp;
     } else if (updateType == 'added' && index < 0) {
       chatsData.insert(0, updateData);
     }
@@ -230,13 +231,6 @@ class ChatController extends GetxController {
     } else {
       sendVisible.value = false;
     }
-    // sendVisible.value = (!editMode && chatFieldController.text.trim() != ''
-    //     ? true
-    //     : editMode &&
-    //             chatFieldController.text.trim() !=
-    //                 chatContent[messageSelected]['message']
-    //         ? true
-    //         : false);
   }
 
   getMessages(chatId) async {

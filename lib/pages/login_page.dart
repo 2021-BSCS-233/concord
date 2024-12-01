@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:concord/main.dart';
 import 'package:get/get.dart';
 import 'package:concord/widgets/input_field.dart';
-import 'package:concord/services/page_controllers.dart';
+import 'package:concord/controllers/page_controllers.dart';
 import 'package:concord/services/firebase_services.dart';
 
-class LogIn extends StatelessWidget {
+class LogInPage extends StatelessWidget {
   final LogInController logInController = Get.put(LogInController());
 
-  LogIn({super.key});
+  LogInPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +101,7 @@ class LogIn extends StatelessWidget {
                   InkWell(
                     enableFeedback: false,
                     onTap: () {
-                      Get.to(SignIn());
+                      Get.to(SignInPage());
                     },
                     child: Padding(
                       padding: const EdgeInsets.only(top: 10, bottom: 10),

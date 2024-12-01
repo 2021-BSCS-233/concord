@@ -8,16 +8,16 @@ import 'package:concord/widgets/message_tile.dart';
 import 'package:concord/widgets/popup_menus.dart';
 import 'package:concord/widgets/input_field.dart';
 import 'package:concord/widgets/status_icons.dart';
-import 'package:concord/services/page_controllers.dart';
+import 'package:concord/controllers/page_controllers.dart';
 
-class Chat extends StatelessWidget {
+class ChatPage extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
   late final ChatController chatController = Get.put(ChatController());
   final String chatId;
   final List otherUsersData;
   final String chatType;
 
-  Chat(
+  ChatPage(
       {super.key,
       required this.chatId,
       required this.otherUsersData,

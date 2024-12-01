@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 //this page is not in use for now
-class Posts extends StatelessWidget {
-  const Posts({super.key});
+class PostsPage extends StatelessWidget {
+  const PostsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
