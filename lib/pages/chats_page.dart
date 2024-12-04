@@ -99,9 +99,7 @@ class ChatsPage extends StatelessWidget {
                         friendsController.friendsData.isEmpty
                     ? const SizedBox()
                     : ListView.builder(
-                        itemCount: friendsController.friendsData.length < 20
-                            ? friendsController.friendsData.length
-                            : 20,
+                        itemCount: friendsController.friendsData.length,
                         shrinkWrap: true,
                         scrollDirection: Axis.horizontal,
                         itemBuilder: (context, index) {

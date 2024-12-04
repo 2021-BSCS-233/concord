@@ -1,4 +1,6 @@
 import 'package:concord/models/chats_model.dart';
+import 'package:concord/models/messages_model.dart';
+import 'package:concord/models/request_model.dart';
 import 'package:concord/models/users_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -12,15 +14,15 @@ class MainController extends GetxController {
   var showMenu = false.obs;
   var showProfile = false.obs;
   var selectedIndex = 0.obs;
+  var selectedId = '';
   var selectedUsername = '';
-  var selectedUserId = '';
   var selectedUserPic = '';
   var selectedChatType = '';
 
   // MainController({required this.currentUserData});
 
   void toggleMenu(dataList) {
-    selectedUserId = dataList[0];
+    selectedId = dataList[0];
     selectedUsername = dataList[1];
     selectedUserPic = dataList[2];
     selectedChatType = dataList[3];
@@ -28,7 +30,7 @@ class MainController extends GetxController {
   }
 
   void toggleProfile(data) {
-    selectedUserId = data;
+    selectedId = data;
     showProfile.value = !showProfile.value;
   }
 }
@@ -132,11 +134,10 @@ class LogInController extends GetxController {
 class FriendsController extends GetxController {
   bool initial = true;
   var updateF = 0.obs;
-  var friendsListenerRef;
   List<UsersModel> friendsData = [];
 
   getInitialData(currentUserId) async {
-    friendsListenerRef = await friendsListener(
+    await friendsListener(
       currentUserId,
     );
     friendsData = await getInitialFriends(currentUserId);
@@ -159,11 +160,10 @@ class FriendsController extends GetxController {
 class ChatsController extends GetxController {
   var updateCs = 0.obs;
   bool initial = true;
-  var chatsListenerRef;
   List<ChatsModel> chatsData = [];
 
   getInitialData(currentUserId) async {
-    chatsListenerRef = await chatsListener(currentUserId, updateChats);
+    await chatsListener(currentUserId, updateChats);
     chatsData = await getInitialChats(currentUserId);
     initial = false;
   }
@@ -187,14 +187,13 @@ var generalImages = CacheManager(Config(
 ));
 
 class ChatController extends GetxController {
-  var chatId = '';
-  var chatContent = [];
-  var messagesListenerRef;
-  var userMap = {};
-  var lastSender = '';
-  var initial = true;
-  var editMode = false;
-  var messageSelected = 0;
+  String chatId = '';
+  List<MessagesModel> chatContent = [];
+  Map userMap = {};
+  String lastSender = '';
+  bool initial = true;
+  bool editMode = false;
+  int messageSelected = 0;
   var attachments = [];
   var showMenu = false.obs;
   var updateC = 0.obs;
@@ -226,7 +225,7 @@ class ChatController extends GetxController {
       sendVisible.value = true;
     } else if (editMode &&
         chatFieldController.text.trim() !=
-            chatContent[messageSelected]['message']) {
+            chatContent[messageSelected].message) {
       sendVisible.value = true;
     } else {
       sendVisible.value = false;
@@ -234,7 +233,7 @@ class ChatController extends GetxController {
   }
 
   getMessages(chatId) async {
-    messagesListenerRef = await messagesListener(chatId);
+    await messagesListener(chatId, updateMessages);
     chatContent = await getInitialMessages(chatId);
     initial = false;
   }
@@ -242,28 +241,33 @@ class ChatController extends GetxController {
   sendMessage(currentUserId) {
     sendVisible.value = false;
     attachmentVisible.value = false;
-    editMode
-        ? sendEditMessage()
-        : sendMessageFirebase(
-            chatId, chatFieldController.text, currentUserId, attachments);
+    if (editMode) {
+      sendEditMessage();
+    } else {
+      MessagesModel messageData = MessagesModel(
+          senderId: currentUserId,
+          message: chatFieldController.text.trim(),
+          edited: false);
+      sendMessageFirebase(chatId, messageData, attachments);
+    }
     chatFieldController.clear();
     attachments = [];
   }
 
   sendEditMessage() {
-    editMessageFirebase(
-        chatId, chatContent[messageSelected]['id'], chatFieldController.text);
+    editMessageFirebase(chatId, chatContent[messageSelected].id,
+        chatFieldController.text.trim());
     chatFocusNode.unfocus();
     editMode = false;
   }
 
-  updateMessages(updateData, updateType) {
-    var index = chatContent.indexWhere((map) => map['id'] == updateData['id']);
+  updateMessages(MessagesModel updateData, updateType) {
+    var index = chatContent.indexWhere((map) => map.id == updateData.id);
     if (updateType == 'added' && index < 0) {
       chatContent.insert(0, updateData);
     } else if (updateType == 'modified') {
-      chatContent[index]['message'] = updateData['message'];
-      chatContent[index]['edited'] = true;
+      chatContent[index].message = updateData.message;
+      chatContent[index].edited = true;
     } else if (updateType == 'removed') {
       chatContent.removeAt(index);
     }
@@ -273,12 +277,12 @@ class ChatController extends GetxController {
   editMessage() {
     showMenu.value = false;
     editMode = true;
-    chatFieldController.text = chatContent[messageSelected]['message'];
+    chatFieldController.text = chatContent[messageSelected].message;
     chatFocusNode.requestFocus();
   }
 
   deleteMessage() {
-    deleteMessageFirebase(chatId, chatContent[messageSelected]['id']);
+    deleteMessageFirebase(chatId, chatContent[messageSelected].id);
     showMenu.value = false;
   }
 
@@ -292,6 +296,9 @@ class ChatController extends GetxController {
       sendVisible.value = true;
       updateA.value += 1;
     } else {
+      attachmentVisible.value = false;
+      sendVisible.value = false;
+      updateA.value += 1;
       debugPrint('nothing selected');
     }
   }
@@ -310,8 +317,8 @@ class RequestsController extends GetxController {
   var updateI = 0.obs;
   var updateO = 0.obs;
   var initial = true;
-  List incomingRequestsData = [];
-  List outgoingRequestsData = [];
+  List<RequestsModel> incomingRequestsData = [];
+  List<RequestsModel> outgoingRequestsData = [];
   var fieldCheck = false.obs;
   TextEditingController requestsFieldController = TextEditingController();
 
@@ -327,9 +334,9 @@ class RequestsController extends GetxController {
     initial = false;
   }
 
-  updateIncomingRequests(updateData, updateType) {
+  updateIncomingRequests(RequestsModel updateData, updateType) {
     var index =
-        incomingRequestsData.indexWhere((map) => map['id'] == updateData['id']);
+        incomingRequestsData.indexWhere((map) => map.id == updateData.id);
     if (updateType == 'added' && index < 0) {
       incomingRequestsData.insert(0, updateData);
     } else if (updateType == 'removed') {
@@ -338,9 +345,9 @@ class RequestsController extends GetxController {
     updateI.value += 1;
   }
 
-  updateOutgoingRequests(updateData, updateType) {
+  updateOutgoingRequests(RequestsModel updateData, updateType) {
     var index =
-        outgoingRequestsData.indexWhere((map) => map['id'] == updateData['id']);
+        outgoingRequestsData.indexWhere((map) => map.id == updateData.id);
     if (updateType == 'added' && index < 0) {
       outgoingRequestsData.insert(0, updateData);
     } else if (updateType == 'removed') {

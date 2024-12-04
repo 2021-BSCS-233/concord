@@ -37,11 +37,7 @@ class DmChatTile extends StatelessWidget {
       child: ListTile(
         titleAlignment: ListTileTitleAlignment.top,
         onTap: () {
-          Get.to(ChatPage(
-            chatId: chatData.id!,
-            otherUsersData: [chatData.receiverData],
-            chatType: chatData.chatType,
-          ));
+          Get.to(ChatPage(chatData: chatData));
         },
         onLongPress: () {
           mainController.toggleMenu([

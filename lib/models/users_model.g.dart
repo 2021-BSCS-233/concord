@@ -15,7 +15,8 @@ UsersModel _$UsersModelFromJson(Map<String, dynamic> json) => UsersModel(
       displayStatus: json['displayStatus'] as String,
       pronouns: json['pronouns'] as String,
       aboutMe: json['aboutMe'] as String,
-      friends: json['friends'] as List<dynamic>,
+      friends:
+          (json['friends'] as List<dynamic>).map((e) => e as String).toList(),
     );
 
 Map<String, dynamic> _$UsersModelToJson(UsersModel instance) =>

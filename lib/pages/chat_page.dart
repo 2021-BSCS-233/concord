@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:concord/models/chats_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:core';
@@ -13,21 +14,15 @@ import 'package:concord/controllers/page_controllers.dart';
 class ChatPage extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
   late final ChatController chatController = Get.put(ChatController());
-  final String chatId;
-  final List otherUsersData;
-  final String chatType;
+  final ChatsModel chatData;
 
-  ChatPage(
-      {super.key,
-      required this.chatId,
-      required this.otherUsersData,
-      required this.chatType}) {
-    chatController.chatId = chatId;
+  ChatPage({super.key, required this.chatData}) {
+    chatController.chatId = chatData.id!;
     chatController.initial = true;
     chatController.userMap[mainController.currentUserData.id] =
         mainController.currentUserData;
-    for (var user in otherUsersData) {
-      chatController.userMap[user['id']] = user;
+    for (var user in chatData.receiverData!) {
+      chatController.userMap[user.id] = user;
     }
   }
 
@@ -42,16 +37,16 @@ class ChatPage extends StatelessWidget {
                 Stack(
                   children: [
                     ProfilePicture(
-                      profileLink: otherUsersData[0]['profile_picture'],
+                      profileLink: chatData.receiverData![0].profilePicture,
                       profileRadius: 17,
                     ),
                     Positioned(
                       bottom: -2,
                       right: -2,
                       child: StatusIcon(
-                        iconType: otherUsersData[0]['status'] == 'Online'
-                            ? otherUsersData[0]['display_status']
-                            : otherUsersData[0]['status'],
+                        iconType: chatData.receiverData![0].status == 'Online'
+                            ? chatData.receiverData![0].displayStatus
+                            : chatData.receiverData![0].status,
                         iconSize: 16.0,
                         iconBorder: 3,
                       ),
@@ -62,7 +57,7 @@ class ChatPage extends StatelessWidget {
                   width: 10,
                 ),
                 Text(
-                  otherUsersData[0]['display_name'],
+                  chatData.receiverData![0].displayName,
                   style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
@@ -118,11 +113,11 @@ class ChatPage extends StatelessWidget {
                                   children: [
                                     Center(
                                       child: Container(
-                                        margin: EdgeInsets.all(10),
+                                        margin: const EdgeInsets.all(10),
                                         height: 120,
                                         width: 100,
                                         child: ClipRRect(
-                                          borderRadius: BorderRadius.all(
+                                          borderRadius: const BorderRadius.all(
                                               Radius.circular(15)),
                                           child: Image(
                                               fit: BoxFit.cover,
@@ -144,8 +139,9 @@ class ChatPage extends StatelessWidget {
                                         child: Container(
                                             decoration: BoxDecoration(
                                                 color: Colors.grey.shade700,
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(3))),
+                                                borderRadius:
+                                                    const BorderRadius.all(
+                                                        Radius.circular(3))),
                                             child: Icon(
                                               Icons.delete,
                                               color: Colors.grey.shade500,
@@ -156,9 +152,7 @@ class ChatPage extends StatelessWidget {
                                 );
                               }),
                         ),
-                        SizedBox(
-                          height: 5,
-                        )
+                        const SizedBox(height: 5)
                       ],
                     ))),
                 Row(
@@ -185,7 +179,7 @@ class ChatPage extends StatelessWidget {
                         fieldFocusNode: chatController.chatFocusNode,
                         fieldRadius: 20,
                         fieldLabel: 'messageTo'.trParams(
-                            {'name': otherUsersData[0]['display_name']}),
+                            {'name': chatData.receiverData![0].displayName}),
                         controller: chatController.chatFieldController,
                         suffixIcon: Icons.all_inclusive,
                         fieldColor: Color(0xFF151515),
@@ -252,7 +246,7 @@ class ChatPage extends StatelessWidget {
               right: 0.0,
               child: chatController.chatContent.isNotEmpty
                   ? MessagePopup(
-                      chatId: chatId,
+                      chatId: chatData.id!,
                     )
                   : Container(),
             )),
@@ -267,8 +261,7 @@ class ChatPage extends StatelessWidget {
               child: chatController.chatContent.isNotEmpty
                   ? ProfilePopup(
                       selectedUser: chatController
-                              .chatContent[chatController.messageSelected]
-                          ['sender_id'])
+                          .chatContent[chatController.messageSelected].senderId)
                   : Container(),
             )),
       ],
@@ -276,7 +269,9 @@ class ChatPage extends StatelessWidget {
   }
 
   Future<Widget> messagesUI() async {
-    chatController.initial ? await chatController.getMessages(chatId) : null;
+    chatController.initial
+        ? await chatController.getMessages(chatData.id!)
+        : null;
     return Obx(
       () => chatController.updateC.value == chatController.updateC.value &&
               chatController.chatContent.isEmpty
@@ -288,12 +283,12 @@ class ChatPage extends StatelessWidget {
                 reverse: true,
                 itemBuilder: (context, index) {
                   try {
-                    if (chatController.chatContent[index]['sender_id'] !=
-                        chatController.chatContent[index + 1]['sender_id']) {
+                    if (chatController.chatContent[index].senderId !=
+                        chatController.chatContent[index + 1].senderId) {
                       return MessageTileFull(
                         messageData: chatController.chatContent[index],
                         sendingUser: chatController.userMap[
-                            chatController.chatContent[index]['sender_id']],
+                            chatController.chatContent[index].senderId],
                         toggleMenu: () {
                           chatController.toggleMenu(index);
                         },
@@ -304,13 +299,10 @@ class ChatPage extends StatelessWidget {
                     } else {
                       bool select = true;
                       try {
-                        var time1 = chatController.chatContent[index]
-                                ['time_stamp']
-                            .toDate();
-                        var time2 = chatController.chatContent[index + 1]
-                                ['time_stamp']
-                            .toDate();
-                        var difference = time1.difference(time2);
+                        var time1 = chatController.chatContent[index].timeStamp;
+                        var time2 =
+                            chatController.chatContent[index + 1].timeStamp;
+                        var difference = time1!.difference(time2!);
                         if (difference.inMinutes < 15) {
                           select = true;
                         } else {
@@ -323,7 +315,7 @@ class ChatPage extends StatelessWidget {
                         return MessageTileCompact(
                             messageData: chatController.chatContent[index],
                             sendingUser: chatController.userMap[
-                                chatController.chatContent[index]['sender_id']],
+                                chatController.chatContent[index].senderId],
                             toggleMenu: () {
                               chatController.toggleMenu(index);
                             });
@@ -331,7 +323,7 @@ class ChatPage extends StatelessWidget {
                         return MessageTileFull(
                           messageData: chatController.chatContent[index],
                           sendingUser: chatController.userMap[
-                              chatController.chatContent[index]['sender_id']],
+                              chatController.chatContent[index].senderId],
                           toggleMenu: () {
                             chatController.toggleMenu(index);
                           },
@@ -344,8 +336,8 @@ class ChatPage extends StatelessWidget {
                   } catch (e) {
                     return MessageTileFull(
                       messageData: chatController.chatContent[index],
-                      sendingUser: chatController.userMap[
-                          chatController.chatContent[index]['sender_id']],
+                      sendingUser: chatController
+                          .userMap[chatController.chatContent[index].senderId],
                       toggleMenu: () {
                         chatController.toggleMenu(index);
                       },

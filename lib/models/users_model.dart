@@ -12,7 +12,7 @@ class UsersModel {
   String displayStatus;
   String pronouns;
   String aboutMe;
-  List friends;
+  List<String> friends;
   @JsonKey(includeToJson: false, includeFromJson: false)
   String? id;
 

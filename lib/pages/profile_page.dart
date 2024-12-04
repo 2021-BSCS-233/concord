@@ -131,7 +131,7 @@ class ProfilePage extends StatelessWidget {
                             InkWell(
                               onTap: () {
                                 mainController.toggleMenu(
-                                    ['null', 'null', 'null', 'null']);
+                                    ['', '', '', '']);
                               },
                               child: Container(
                                   height: 38,

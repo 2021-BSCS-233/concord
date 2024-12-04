@@ -87,19 +87,18 @@ class RequestsPage extends StatelessWidget {
                       child: ListTile(
                         dense: true,
                         leading: ProfilePicture(
-                          profileLink:
-                              requestsController.incomingRequestsData[index]
-                                  ['user']['profile_picture'],
+                          profileLink: requestsController
+                              .incomingRequestsData[index].user!.profilePicture,
                           profileRadius: 17,
                         ),
                         title: Text(
-                          requestsController.incomingRequestsData[index]['user']
-                              ['display_name'],
+                          requestsController
+                              .incomingRequestsData[index].user!.displayName,
                           style: const TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 16),
                         ),
                         subtitle: Text(requestsController
-                            .incomingRequestsData[index]['user']['username']),
+                            .incomingRequestsData[index].user!.username),
                         trailing: SizedBox(
                           width: 100,
                           child: Row(
@@ -116,7 +115,7 @@ class RequestsPage extends StatelessWidget {
                                 onTap: () async {
                                   await requestAction(
                                       requestsController
-                                          .incomingRequestsData[index]['id'],
+                                          .incomingRequestsData[index].id,
                                       'accept');
                                 },
                               ),
@@ -124,17 +123,17 @@ class RequestsPage extends StatelessWidget {
                                 width: 10,
                               ),
                               InkWell(
-                                child: SizedBox(
+                                child: const SizedBox(
                                     width: 35,
                                     height: 40,
-                                    child: const Icon(
+                                    child: Icon(
                                       Icons.close,
                                       color: Colors.red,
                                     )),
                                 onTap: () {
                                   requestAction(
                                       requestsController
-                                          .incomingRequestsData[index]['id'],
+                                          .incomingRequestsData[index].id,
                                       'deny');
                                 },
                               )
@@ -216,34 +215,36 @@ class RequestsPage extends StatelessWidget {
                                   dense: true,
                                   leading: ProfilePicture(
                                     profileLink: requestsController
-                                            .outgoingRequestsData[index]['user']
-                                        ['profile_picture'],
+                                        .outgoingRequestsData[index]
+                                        .user!
+                                        .profilePicture,
                                     profileRadius: 17,
                                   ),
                                   title: Text(
                                     requestsController
-                                            .outgoingRequestsData[index]['user']
-                                        ['display_name'],
+                                        .outgoingRequestsData[index]
+                                        .user!
+                                        .displayName,
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16),
                                   ),
                                   subtitle: Text(requestsController
-                                          .outgoingRequestsData[index]['user']
-                                      ['username']),
+                                      .outgoingRequestsData[index]
+                                      .user!
+                                      .username),
                                   trailing: InkWell(
-                                    child: SizedBox(
+                                    child: const SizedBox(
                                         width: 40,
                                         height: 40,
-                                        child: const Icon(
+                                        child: Icon(
                                           Icons.close,
                                           color: Colors.red,
                                         )),
                                     onTap: () {
                                       requestAction(
                                           requestsController
-                                                  .outgoingRequestsData[index]
-                                              ['id'],
+                                              .outgoingRequestsData[index].id,
                                           'deny');
                                     },
                                   ),

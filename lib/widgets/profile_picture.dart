@@ -25,7 +25,7 @@ class ProfilePicture extends StatelessWidget {
     //   radius: profileRadius,
     //   backgroundColor: Colors.grey.shade900,
     // );
-    return CachedNetworkImage(
+    return profileLink != '' ? CachedNetworkImage(
         imageUrl: profileLink,
         cacheManager: profilePictureCache,
         imageBuilder: (context, imageProvider) => CircleAvatar(
@@ -39,6 +39,9 @@ class ProfilePicture extends StatelessWidget {
         errorWidget: (context, url, error) => CircleAvatar(
               backgroundImage: const AssetImage('assets/images/default.png'),
               radius: profileRadius,
-            ));
+            )) : CircleAvatar(
+      backgroundImage: const AssetImage('assets/images/default.png'),
+      radius: profileRadius,
+    );
   }
 }

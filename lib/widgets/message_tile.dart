@@ -1,3 +1,5 @@
+import 'package:concord/models/messages_model.dart';
+import 'package:concord/models/users_model.dart';
 import 'package:concord/widgets/profile_picture.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -5,8 +7,8 @@ import 'package:intl/intl.dart';
 import 'lazy_cached_image.dart';
 
 class MessageTileFull extends StatelessWidget {
-  final Map messageData;
-  final Map sendingUser;
+  final MessagesModel messageData;
+  final UsersModel sendingUser;
   final Function toggleMenu;
   final Function toggleProfile;
 
@@ -19,10 +21,10 @@ class MessageTileFull extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var time = messageData['time_stamp'].toDate();
+    var time = messageData.timeStamp;
     var timeNow = DateTime.now();
     var formattedDateTime = '';
-    if (timeNow.year == time.year &&
+    if (timeNow.year == time!.year &&
         timeNow.month == time.month &&
         timeNow.day == time.day) {
       DateFormat formatter = DateFormat('hh:mm a');
@@ -43,7 +45,7 @@ class MessageTileFull extends StatelessWidget {
               toggleProfile();
             },
             child: ProfilePicture(
-              profileLink: sendingUser['profile_picture'],
+              profileLink: sendingUser.profilePicture,
               profileRadius: 20,
             ),
           ),
@@ -63,7 +65,7 @@ class MessageTileFull extends StatelessWidget {
                       InkWell(
                         onTap: () {},
                         child: Text(
-                          sendingUser['display_name'],
+                          sendingUser.displayName,
                           style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -80,16 +82,16 @@ class MessageTileFull extends StatelessWidget {
                       ),
                     ],
                   ),
-                  messageData['message'] == ''
+                  messageData.message == ''
                       ? const SizedBox()
                       : RichText(
                           text: TextSpan(
-                          text: messageData['message'],
+                          text: messageData.message,
                           style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w400,
                               color: Color(0xFFDEDEE2)),
-                          children: messageData['edited']
+                          children: messageData.edited
                               ? [
                                   TextSpan(
                                       text: ' (edited)',
@@ -99,10 +101,10 @@ class MessageTileFull extends StatelessWidget {
                                 ]
                               : null,
                         )),
-                  messageData['attachments'].length == 0
+                  messageData.attachments!.isEmpty
                       ? const SizedBox()
                       : Attachments(
-                          attachments: messageData['attachments'],
+                          attachments: messageData.attachments!,
                         )
                 ],
               ),
@@ -115,7 +117,7 @@ class MessageTileFull extends StatelessWidget {
 }
 
 class MessageTileCompact extends StatelessWidget {
-  final Map messageData;
+  final MessagesModel messageData;
   final Map sendingUser;
   final Function toggleMenu;
 
@@ -148,16 +150,16 @@ class MessageTileCompact extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                messageData['message'] == ''
+                messageData.message == ''
                     ? const SizedBox()
                     : RichText(
                         text: TextSpan(
-                          text: messageData['message'],
+                          text: messageData.message,
                           style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w400,
                               color: Color(0xFFDEDEE2)),
-                          children: messageData['edited']
+                          children: messageData.edited
                               ? [
                                   TextSpan(
                                       text: ' (edited)',
@@ -168,9 +170,9 @@ class MessageTileCompact extends StatelessWidget {
                               : null,
                         ),
                       ),
-                messageData['attachments'].length == 0
+                messageData.attachments!.isEmpty
                     ? const SizedBox()
-                    : Attachments(attachments: messageData['attachments'])
+                    : Attachments(attachments: messageData.attachments!)
               ],
             ),
           ],
@@ -181,7 +183,7 @@ class MessageTileCompact extends StatelessWidget {
 }
 
 class Attachments extends StatelessWidget {
-  final List attachments;
+  final List<String> attachments;
 
   const Attachments({super.key, required this.attachments});
 

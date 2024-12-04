@@ -1,3 +1,5 @@
+import 'package:concord/models/chats_model.dart';
+import 'package:concord/models/users_model.dart';
 import 'package:concord/widgets/profile_picture.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -100,8 +102,8 @@ class MessagePopup extends StatelessWidget {
                   const SizedBox(
                     height: 10,
                   ),
-                  chatController.chatContent[chatController.messageSelected]
-                              ['sender_id'] ==
+                  chatController
+                              .chatContent[chatController.messageSelected].id ==
                           mainController.currentUserData.id
                       ? OptionTile(
                           action: () {
@@ -114,13 +116,13 @@ class MessagePopup extends StatelessWidget {
                       action: () async {
                         await Clipboard.setData(ClipboardData(
                             text: chatController
-                                    .chatContent[chatController.messageSelected]
-                                ['message']));
+                                .chatContent[chatController.messageSelected]
+                                .message));
                       },
                       actionIcon: Icons.copy,
                       actionName: 'Copy Text'),
-                  chatController.chatContent[chatController.messageSelected]
-                              ['sender_id'] ==
+                  chatController
+                              .chatContent[chatController.messageSelected].id ==
                           mainController.currentUserData.id
                       ? OptionTile(
                           action: () {
@@ -138,8 +140,6 @@ class MessagePopup extends StatelessWidget {
     );
   }
 }
-
-var userProfileData = {};
 
 class ProfilePopup extends StatelessWidget {
   final String selectedUser;
@@ -164,7 +164,7 @@ class ProfilePopup extends StatelessWidget {
   }
 
   Future<Widget> _buildContent(BuildContext context) async {
-    userProfileData = (await getUserProfile(selectedUser)).data();
+    UsersModel userProfileData = await getUserProfile(selectedUser);
     return SizedBox(
       height: MediaQuery.of(context).size.height * 0.65,
       width: double.infinity,
@@ -214,15 +214,15 @@ class ProfilePopup extends StatelessWidget {
                                     Border.all(width: 6, color: Colors.black)),
                             child: ProfilePicture(
                                 profileLink:
-                                    userProfileData['profile_picture']),
+                                    userProfileData.profilePicture),
                           ),
                           Positioned(
                             bottom: 3,
                             right: 3,
                             child: StatusIcon(
-                              iconType: userProfileData['status'] == 'Online'
-                                  ? userProfileData['display_status']
-                                  : userProfileData['status'] ?? 'Offline',
+                              iconType: userProfileData.status == 'Online'
+                                  ? userProfileData.displayStatus
+                                  : userProfileData.status,
                               iconSize: 24,
                               iconBorder: 4,
                             ),
@@ -233,8 +233,8 @@ class ProfilePopup extends StatelessWidget {
                   ],
                 ),
                 Container(
-                  margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                  padding: EdgeInsets.symmetric(horizontal: 14, vertical: 18),
+                  margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 18),
                   alignment: Alignment.centerLeft,
                   width: double.infinity,
                   height: 130,
@@ -245,7 +245,7 @@ class ProfilePopup extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        userProfileData['display_name'] ?? 'User Error',
+                        userProfileData.displayName,
                         style: const TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
@@ -253,7 +253,7 @@ class ProfilePopup extends StatelessWidget {
                         height: 3,
                       ),
                       Text(
-                        userProfileData['username'] ??
+                        userProfileData.username ??
                             'Failed to load user data',
                         style: TextStyle(fontSize: 14),
                       ),
@@ -261,7 +261,7 @@ class ProfilePopup extends StatelessWidget {
                         height: 3,
                       ),
                       Text(
-                        userProfileData['pronouns'] ?? 'Try again later',
+                        userProfileData.pronouns,
                         style: TextStyle(fontSize: 15, color: Colors.grey),
                       ),
                       const SizedBox(
@@ -271,8 +271,8 @@ class ProfilePopup extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                  padding: EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                  margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                   alignment: Alignment.centerLeft,
                   width: double.infinity,
                   height: 200,
@@ -295,7 +295,7 @@ class ProfilePopup extends StatelessWidget {
                         width: double.infinity,
                         child: SingleChildScrollView(
                           child: Text(
-                            userProfileData['about_me'] ?? '',
+                            userProfileData.aboutMe,
                             style: TextStyle(
                                 fontSize: 15, color: Colors.grey.shade300),
                           ),
@@ -385,8 +385,8 @@ class StatusPopup extends StatelessWidget {
                                   onChanged: (value) async {
                                     var temp = selectedValue.value;
                                     selectedValue.value = value as int;
-                                    var result = await updateStatusDisplay(
-                                        id, 'Online');
+                                    var result =
+                                        await updateStatusDisplay(id, 'Online');
                                     if (!result) {
                                       selectedValue.value = temp;
                                     }
@@ -401,8 +401,8 @@ class StatusPopup extends StatelessWidget {
                                   onChanged: (value) async {
                                     var temp = selectedValue.value;
                                     selectedValue.value = value as int;
-                                    var result = await updateStatusDisplay(
-                                        id, 'DND');
+                                    var result =
+                                        await updateStatusDisplay(id, 'DND');
                                     if (!result) {
                                       selectedValue.value = temp;
                                     }
@@ -417,8 +417,8 @@ class StatusPopup extends StatelessWidget {
                                   onChanged: (value) async {
                                     var temp = selectedValue.value;
                                     selectedValue.value = value as int;
-                                    var result = await updateStatusDisplay(
-                                        id, 'Asleep');
+                                    var result =
+                                        await updateStatusDisplay(id, 'Asleep');
                                     if (!result) {
                                       selectedValue.value = temp;
                                     }

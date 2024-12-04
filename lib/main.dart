@@ -164,7 +164,6 @@ class Home extends StatelessWidget {
                   mainController.showProfile.value,
               child: GestureDetector(
                 onTap: () {
-                  mainController.selectedUserId = '';
                   mainController.showMenu.value = false;
                   mainController.showProfile.value = false;
                 },
@@ -186,7 +185,7 @@ class Home extends StatelessWidget {
               child: mainController.selectedIndex.value == 0
                   ? UserGroupPopup(
                       tileContent: [
-                        mainController.selectedUserId,
+                        mainController.selectedId,
                         mainController.selectedUsername,
                         mainController.selectedUserPic,
                         mainController.selectedChatType
@@ -206,9 +205,9 @@ class Home extends StatelessWidget {
                   : -MediaQuery.of(context).size.height,
               left: 0.0,
               right: 0.0,
-              child: mainController.selectedUserId == ''
+              child: mainController.selectedId == ''
                   ? Container()
-                  : ProfilePopup(selectedUser: mainController.selectedUserId),
+                  : ProfilePopup(selectedUser: mainController.selectedId),
             ))
       ],
     );

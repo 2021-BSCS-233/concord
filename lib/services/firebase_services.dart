@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:concord/models/chats_model.dart';
+import 'package:concord/models/messages_model.dart';
+import 'package:concord/models/request_model.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -70,7 +72,7 @@ Future<bool> logInUser(String email, String pass) async {
   }
 }
 
-saveUserOnDevice(email, pass) async {
+Future<void> saveUserOnDevice(email, pass) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.setString('email', email);
   await prefs.setString('password', pass);
@@ -111,7 +113,7 @@ Future<bool> autoLogin() async {
   }
 }
 
-profileListener(currentUserId) {
+void profileListener(currentUserId) {
   MainController mainController = Get.find<MainController>();
   usersRef.doc(currentUserId).snapshots().listen((event) {
     mainController.currentUserData =
@@ -121,7 +123,8 @@ profileListener(currentUserId) {
   });
 }
 
-updateProfile(currentUserId, displayName, pronouns, aboutMe, image) async {
+Future<void> updateProfile(
+    currentUserId, displayName, pronouns, aboutMe, image) async {
   var updateData = {
     'displayName': displayName,
     'pronouns': pronouns,
@@ -145,7 +148,7 @@ updateProfile(currentUserId, displayName, pronouns, aboutMe, image) async {
   }
 }
 
-updateStatusDisplay(userId, displayStatus) async {
+Future<bool> updateStatusDisplay(userId, displayStatus) async {
   try {
     await usersRef.doc(userId).update({'displayStatus': displayStatus});
     return true;
@@ -154,13 +157,13 @@ updateStatusDisplay(userId, displayStatus) async {
   }
 }
 
-getInitialFriends(currentUserId) async {
+Future<List<UsersModel>> getInitialFriends(currentUserId) async {
   var friendInstances = await FirebaseFirestore.instance
       .collection('users')
       .orderBy('displayName')
       .where('friends', arrayContains: currentUserId)
       .get();
-  var friends = [];
+  List<UsersModel> friends = [];
   for (var doc in friendInstances.docs) {
     UsersModel friendUserData = UsersModel.fromJson(doc.data());
     // Map friendUserData = doc.data();
@@ -171,9 +174,9 @@ getInitialFriends(currentUserId) async {
   return friends;
 }
 
-friendsListener(currentUserId) async {
+Future<void> friendsListener(currentUserId) async {
   FriendsController friendsController = Get.find<FriendsController>();
-  return FirebaseFirestore.instance
+  FirebaseFirestore.instance
       .collection('users')
       .orderBy('displayName')
       .where('friends', arrayContains: currentUserId)
@@ -194,11 +197,15 @@ friendsListener(currentUserId) async {
   });
 }
 
-getUserProfile(userId) async {
-  return await usersRef.doc(userId).get();
+Future<UsersModel> getUserProfile(userId) async {
+  var user = await usersRef.doc(userId).get();
+  UsersModel userData =
+      UsersModel.fromJson(user.data() as Map<String, dynamic>);
+  userData.id = user.id;
+  return userData;
 }
 
-removeFriend(currentUserId, friendId) {
+void removeFriend(currentUserId, friendId) {
   usersRef.doc(currentUserId).update({
     'friends': FieldValue.arrayRemove([friendId])
   });
@@ -213,15 +220,16 @@ getInitialRequest(currentUserId) async {
       .orderBy('timeStamp', descending: true)
       .where('receiverId', isEqualTo: currentUserId)
       .get();
-  var incoming = [];
+  List<RequestsModel> incoming = [];
   for (var doc in incomingInstances.docs) {
-    var requestData = doc.data();
-    requestData['id'] = doc.id;
-    dynamic user = await usersRef.doc(doc['senderId']).get();
+    RequestsModel requestData = RequestsModel.fromJson(doc.data());
+    requestData.id = doc.id;
+    var user = await usersRef.doc(requestData.senderId).get();
     if (user.data() != null) {
-      var temp = user.data();
-      temp['id'] = user.id;
-      requestData['user'] = temp;
+      UsersModel userData =
+          UsersModel.fromJson(user.data() as Map<String, dynamic>);
+      userData.id = user.id;
+      requestData.user = userData;
     }
     incoming.add(requestData);
   }
@@ -230,22 +238,25 @@ getInitialRequest(currentUserId) async {
       .orderBy('timeStamp', descending: true)
       .where('senderId', isEqualTo: currentUserId)
       .get();
-  var outgoing = [];
+  List<RequestsModel> outgoing = [];
   for (var doc in outgoingInstances.docs) {
-    var requestData = doc.data();
-    requestData['id'] = doc.id;
-    dynamic user = await usersRef.doc(doc['receiverId']).get();
+    RequestsModel requestData =
+        RequestsModel.fromJson(doc.data());
+    requestData.id = doc.id;
+    var user = await usersRef.doc(requestData.receiverId).get();
     if (user.data() != null) {
-      var temp = user.data();
-      temp['id'] = user.id;
-      requestData['user'] = temp;
+      UsersModel userData =
+          UsersModel.fromJson(user.data() as Map<String, dynamic>);
+      userData.id = user.id;
+      requestData.user = userData;
     }
     outgoing.add(requestData);
   }
   return [incoming, outgoing];
 }
 
-requestsListeners(currentUserId) {
+//TODO: Test requests
+void requestsListeners(currentUserId) {
   RequestsController requestsController = Get.find<RequestsController>();
   FirebaseFirestore.instance
       .collection('requests')
@@ -255,14 +266,20 @@ requestsListeners(currentUserId) {
       .map((snapshot) => snapshot.docChanges)
       .listen((event) async {
     for (var change in event) {
-      var requestData = change.doc.data();
-      requestData?['id'] = change.doc.id;
+      RequestsModel requestData =
+          RequestsModel.fromJson(change.doc.data() as Map<String, dynamic>);
+      requestData.id = change.doc.id;
+      // var requestData = change.doc.data();
+      // requestData?['id'] = change.doc.id;
       if (change.type == DocumentChangeType.added) {
-        dynamic user = await usersRef.doc(requestData?['senderId']).get();
+        var user = await usersRef.doc(requestData.senderId).get();
         if (user.data() != null) {
-          var temp = user.data();
-          temp['id'] = user.id;
-          requestData?['user'] = temp;
+          UsersModel userData =
+              UsersModel.fromJson(user.data() as Map<String, dynamic>);
+          userData.id = user.id;
+          // var temp = user.data();
+          // temp['id'] = user.id;
+          requestData.user = userData;
         }
         requestsController.updateIncomingRequests(requestData, 'added');
       } else if (change.type == DocumentChangeType.removed) {
@@ -278,14 +295,16 @@ requestsListeners(currentUserId) {
       .map((snapshot) => snapshot.docChanges)
       .listen((event) async {
     for (var change in event) {
-      var requestData = change.doc.data();
-      requestData?['id'] = change.doc.id;
+      RequestsModel requestData =
+          RequestsModel.fromJson(change.doc.data() as Map<String, dynamic>);
+      requestData.id = change.doc.id;
       if (change.type == DocumentChangeType.added) {
-        dynamic user = await usersRef.doc(requestData?['receiverId']).get();
+        var user = await usersRef.doc(requestData.receiverId).get();
         if (user.data() != null) {
-          var temp = user.data();
-          temp['id'] = user.id;
-          requestData?['user'] = temp;
+          UsersModel userData =
+              UsersModel.fromJson(user.data() as Map<String, dynamic>);
+          userData.id = user.id;
+          requestData.user = userData;
         }
         requestsController.updateOutgoingRequests(requestData, 'added');
       } else if (change.type == DocumentChangeType.removed) {
@@ -295,7 +314,7 @@ requestsListeners(currentUserId) {
   });
 }
 
-sendRequest(currentUserId, receiverName) async {
+Future<void> sendRequest(currentUserId, receiverName) async {
   var ref = FirebaseFirestore.instance.collection('requests');
   var receiverRef =
       await usersRef.where('username', isEqualTo: receiverName).get();
@@ -309,16 +328,16 @@ sendRequest(currentUserId, receiverName) async {
         .where('receiverId', isEqualTo: receiverRef.docs[0].id)
         .get();
     if (check1.docs.isEmpty && check2.docs.isEmpty) {
-      ref.add({
-        'senderId': currentUserId,
-        'receiverId': receiverRef.docs[0].id,
-        'timeStamp': DateTime.now(),
-      });
+      RequestsModel requestData = RequestsModel(
+          senderId: currentUserId,
+          receiverId: receiverRef.docs[0].id,
+          timeStamp: DateTime.now());
+      ref.add(requestData.toJson());
     }
   }
 }
 
-requestAction(requestId, action) async {
+Future<void> requestAction(requestId, action) async {
   try {
     var ref = FirebaseFirestore.instance.collection('requests').doc(requestId);
     var batch = FirebaseFirestore.instance.batch();
@@ -358,22 +377,24 @@ requestAction(requestId, action) async {
     debugPrint('error $e');
   }
 }
-//TODO: test the changes
-getInitialChats(currentUserId) async {
+
+Future<List<ChatsModel>> getInitialChats(currentUserId) async {
   var chatInstances = await FirebaseFirestore.instance
       .collection('chats')
       .orderBy('timeStamp', descending: true)
       .where('users', arrayContains: currentUserId)
       .get();
-  var chats = [];
+  List<ChatsModel> chats = [];
   for (var doc in chatInstances.docs) {
     ChatsModel chatData = ChatsModel.fromJson(doc.data());
+    chatData.receiverData = [];
     chatData.id = doc.id;
     chatData.users.removeWhere((element) => element == currentUserId);
     if (chatData.chatType == 'dm') {
-      dynamic user = await usersRef.doc(chatData.users[0]).get();
+      var user = await usersRef.doc(chatData.users[0]).get();
       if (user.data() != null) {
-        var temp = UsersModel.fromJson(user.data());
+        UsersModel temp =
+            UsersModel.fromJson(user.data() as Map<String, dynamic>);
         temp.id = user.id;
         chatData.receiverData?.add(temp);
       }
@@ -383,8 +404,8 @@ getInitialChats(currentUserId) async {
   return chats;
 }
 
-chatsListener(currentUserId, updateChats) async {
-  return FirebaseFirestore.instance
+Future<void> chatsListener(currentUserId, updateChats) async {
+  FirebaseFirestore.instance
       .collection('chats')
       .orderBy('timeStamp', descending: true)
       .where('users', arrayContains: currentUserId)
@@ -414,24 +435,23 @@ chatsListener(currentUserId, updateChats) async {
   });
 }
 
-getInitialMessages(chatId) async {
+Future<List<MessagesModel>> getInitialMessages(chatId) async {
   var messageInstances = await FirebaseFirestore.instance
       .collection('chats')
       .doc(chatId)
       .collection('messages')
       .orderBy('timeStamp', descending: true)
       .get();
-  var messages = [];
+  List<MessagesModel> messages = [];
   for (var message in messageInstances.docs) {
-    var temp = message.data();
-    temp['id'] = message.id;
-    messages.add(temp);
+    MessagesModel messageData = MessagesModel.fromJson(message.data());
+    messageData.id = message.id;
+    messages.add(messageData);
   }
   return messages;
 }
 
-messagesListener(chatId) async {
-  ChatController chatController = Get.find<ChatController>();
+Future<void> messagesListener(chatId, Function updateMessages) async {
   FirebaseFirestore.instance
       .collection('chats')
       .doc(chatId)
@@ -441,23 +461,24 @@ messagesListener(chatId) async {
       .map((snapshot) => snapshot.docChanges)
       .listen((event) async {
     for (var change in event) {
-      var updateData = change.doc.data();
-      updateData?['id'] = change.doc.id;
+      MessagesModel updateData = MessagesModel.fromJson(change.doc.data()!);
+      updateData.id = change.doc.id;
       if (change.type == DocumentChangeType.added) {
-        chatController.updateMessages(updateData, 'added');
+        updateMessages(updateData, 'added');
       } else if (change.type == DocumentChangeType.modified) {
-        chatController.updateMessages(updateData, 'modified');
+        updateMessages(updateData, 'modified');
       } else if (change.type == DocumentChangeType.removed) {
-        chatController.updateMessages(updateData, 'removed');
+        updateMessages(updateData, 'removed');
       }
     }
   });
 }
 
-sendMessageFirebase(chatId, message, clientUserId, attachments) async {
+Future<void> sendMessageFirebase(
+    chatId, MessagesModel messageData, attachments) async {
   var chatRef = chatsRef.doc(chatId);
   var storageRef = FirebaseStorage.instance.ref();
-  var fileLinks = [];
+  List<String> fileLinks = [];
 
   if (attachments.isNotEmpty) {
     fileLinks =
@@ -468,26 +489,24 @@ sendMessageFirebase(chatId, message, clientUserId, attachments) async {
       return downloadUrl;
     }));
   }
-  var time = DateTime.now();
+  messageData.timeStamp = DateTime.now();
+  messageData.attachments = fileLinks;
   var batch = FirebaseFirestore.instance.batch();
-  batch.set(chatRef.collection('messages').doc(), {
-    'senderId': clientUserId,
-    'timeStamp': time,
-    'message': message,
-    'edited': false,
-    'attachments': fileLinks
+  batch.set(chatRef.collection('messages').doc(), messageData.toJson());
+  batch.update(chatRef, {
+    'latestMessage': messageData.message,
+    'timeStamp': messageData.timeStamp
   });
-  batch.update(chatRef, {'latestMessage': message, 'timeStamp': time});
   batch.commit();
 }
 
-editMessageFirebase(chatId, messageId, message) {
+void editMessageFirebase(chatId, messageId, message) {
   chatsRef.doc(chatId).collection('messages').doc(messageId).update({
     'message': message,
     'edited': true,
   });
 }
 
-deleteMessageFirebase(chatId, messageId) {
+void deleteMessageFirebase(chatId, messageId) {
   chatsRef.doc(chatId).collection('messages').doc(messageId).delete();
 }

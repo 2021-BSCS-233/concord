@@ -7,7 +7,8 @@ part 'chats_model.g.dart';
 class ChatsModel {
   String chatType;
   String latestMessage;
-  DateTime timeStamp;
+  @JsonKey(fromJson: _customDateFromJson, toJson: _customDateToJson)
+  DateTime timeStamp; // (json['timeStamp'] as Timestamp).toDate()
   List<String> users;
   @JsonKey(includeToJson: false, includeFromJson: false)
   String? id;
@@ -26,4 +27,11 @@ class ChatsModel {
       _$ChatsModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$ChatsModelToJson(this);
+
+  static DateTime _customDateFromJson(dynamic json){
+    return json.toDate();
+  }
+  static DateTime _customDateToJson(dynamic timeStamp) {
+    return timeStamp;
+  }
 }
