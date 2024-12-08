@@ -253,16 +253,15 @@ class ProfilePopup extends StatelessWidget {
                         height: 3,
                       ),
                       Text(
-                        userProfileData.username ??
-                            'Failed to load user data',
-                        style: TextStyle(fontSize: 14),
+                        userProfileData.username,
+                        style: const TextStyle(fontSize: 14),
                       ),
                       const SizedBox(
                         height: 3,
                       ),
                       Text(
                         userProfileData.pronouns,
-                        style: TextStyle(fontSize: 15, color: Colors.grey),
+                        style: const TextStyle(fontSize: 15, color: Colors.grey),
                       ),
                       const SizedBox(
                         height: 16,
