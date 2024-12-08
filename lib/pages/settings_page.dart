@@ -2,7 +2,8 @@ import 'package:concord/pages/login_page.dart';
 import "package:flutter/material.dart";
 import 'package:get/get.dart';
 import 'package:concord/controllers/language_controller.dart';
-import 'package:concord/controllers/page_controllers.dart';
+import 'package:concord/controllers/main_controller.dart';
+import 'package:concord/controllers/settings_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatelessWidget {

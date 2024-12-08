@@ -1,4 +1,4 @@
-import 'package:concord/controllers/page_controllers.dart';
+import 'package:concord/controllers/main_controller.dart';
 import 'package:concord/models/chats_model.dart';
 import 'package:concord/widgets/profile_picture.dart';
 import 'package:concord/widgets/status_icons.dart';
@@ -68,7 +68,8 @@ class DmChatTile extends StatelessWidget {
         ),
         title: Text(
           chatData.receiverData![0].displayName,
-          style: TextStyle(
+          style: const TextStyle(
+              overflow: TextOverflow.ellipsis,
               fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Color(0xD0FFFFFF)),
@@ -78,7 +79,7 @@ class DmChatTile extends StatelessWidget {
                 chatData.latestMessage,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
-                style: TextStyle(fontSize: 14, color: Color(0xB0FFFFFF)),
+                style: const TextStyle(fontSize: 14, color: Color(0xB0FFFFFF)),
               )
             : const Row(
                 children: [

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:concord/pages/edit_profile_page.dart';
 import 'package:concord/pages/settings_page.dart';
-import 'package:concord/controllers/page_controllers.dart';
+import 'package:concord/controllers/main_controller.dart';
 import 'package:concord/widgets/status_icons.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -195,8 +195,8 @@ class ProfilePage extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                  padding: EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                  margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                   alignment: Alignment.centerLeft,
                   width: double.infinity,
                   // height: 200,

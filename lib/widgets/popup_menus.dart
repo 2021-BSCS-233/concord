@@ -1,11 +1,11 @@
-import 'package:concord/models/chats_model.dart';
 import 'package:concord/models/users_model.dart';
 import 'package:concord/widgets/profile_picture.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:concord/controllers/page_controllers.dart';
+import 'package:concord/controllers/chat_controller.dart';
+import 'package:concord/controllers/main_controller.dart';
 import 'package:concord/services/firebase_services.dart';
 import 'package:concord/widgets/status_icons.dart';
 import 'package:concord/widgets/option_tile.dart';

@@ -9,7 +9,6 @@ class MessagesModel {
   DateTime? timeStamp;
   String message;
   bool edited;
-  @JsonKey(defaultValue: [])
   List<String>? attachments;
   @JsonKey(includeToJson: false, includeFromJson: false)
   String? id;

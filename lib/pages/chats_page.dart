@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:concord/widgets/dm_chat_tile.dart';
 import 'package:concord/widgets/status_icons.dart';
-import 'package:concord/controllers/page_controllers.dart';
+import 'package:concord/controllers/friends_controller.dart';
+import 'package:concord/controllers/main_controller.dart';
+import 'package:concord/controllers/chats_controller.dart';
 
 class ChatsPage extends StatelessWidget {
   final MainController mainController;

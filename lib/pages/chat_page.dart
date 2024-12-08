@@ -9,7 +9,8 @@ import 'package:concord/widgets/message_tile.dart';
 import 'package:concord/widgets/popup_menus.dart';
 import 'package:concord/widgets/input_field.dart';
 import 'package:concord/widgets/status_icons.dart';
-import 'package:concord/controllers/page_controllers.dart';
+import 'package:concord/controllers/main_controller.dart';
+import 'package:concord/controllers/chat_controller.dart';
 
 class ChatPage extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();

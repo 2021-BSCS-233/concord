@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
-// import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:concord/controllers/page_controllers.dart';
+import 'package:concord/controllers/main_controller.dart';
+import 'package:concord/controllers/editprofile_controller.dart';
 import 'package:concord/widgets/status_icons.dart';
 import 'package:concord/services/firebase_services.dart';
 import 'package:image_picker/image_picker.dart';

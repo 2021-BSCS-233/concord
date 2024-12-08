@@ -7,7 +7,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:concord/controllers/page_controllers.dart';
+import 'package:concord/controllers/main_controller.dart';
+import 'package:concord/controllers/requests_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:concord/models/users_model.dart';
 
@@ -174,8 +175,7 @@ Future<List<UsersModel>> getInitialFriends(currentUserId) async {
   return friends;
 }
 
-Future<void> friendsListener(currentUserId) async {
-  FriendsController friendsController = Get.find<FriendsController>();
+Future<void> friendsListener(currentUserId,Function updateFriends) async {
   FirebaseFirestore.instance
       .collection('users')
       .orderBy('displayName')
@@ -187,11 +187,11 @@ Future<void> friendsListener(currentUserId) async {
       var updateData = UsersModel.fromJson(change.doc.data()!);
       updateData.id = change.doc.id;
       if (change.type == DocumentChangeType.modified) {
-        friendsController.updateFriends(updateData, 'modified');
+        updateFriends(updateData, 'modified');
       } else if (change.type == DocumentChangeType.added) {
-        friendsController.updateFriends(updateData, 'added');
+        updateFriends(updateData, 'added');
       } else if (change.type == DocumentChangeType.removed) {
-        friendsController.updateFriends(updateData, 'removed');
+        updateFriends(updateData, 'removed');
       }
     }
   });

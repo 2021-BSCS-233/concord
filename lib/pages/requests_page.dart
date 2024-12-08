@@ -2,9 +2,10 @@ import 'package:concord/widgets/profile_picture.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:concord/controllers/page_controllers.dart';
+import 'package:concord/controllers/main_controller.dart';
 import 'package:concord/widgets/input_field.dart';
 import 'package:concord/services/firebase_services.dart';
+import 'package:concord/controllers/requests_controller.dart';
 
 class RequestsPage extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
@@ -53,7 +54,7 @@ class RequestsPage extends StatelessWidget {
                 ),
               );
             }
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           },
         ),
       ),
@@ -68,7 +69,7 @@ class RequestsPage extends StatelessWidget {
     return TabBarView(
       children: [
         Container(
-          padding: EdgeInsets.only(left: 10),
+          padding: const EdgeInsets.only(left: 10),
           child: Obx(() => requestsController.updateI.value ==
                       requestsController.updateI.value &&
                   requestsController.incomingRequestsData.isEmpty

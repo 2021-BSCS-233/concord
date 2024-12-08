@@ -1,0 +1,30 @@
+import 'package:concord/models/users_model.dart';
+import 'package:get/get.dart';
+import 'package:concord/services/firebase_services.dart';
+
+class FriendsController extends GetxController {
+  bool initial = true;
+  var updateF = 0.obs;
+  List<UsersModel> friendsData = [];
+
+  getInitialData(currentUserId) async {
+    await friendsListener(
+      currentUserId,
+      updateFriends
+    );
+    friendsData = await getInitialFriends(currentUserId);
+    initial = false;
+  }
+
+  updateFriends(UsersModel updateData, updateType) {
+    var index = friendsData.indexWhere((map) => map.id == updateData.id);
+    if (updateType == 'modified') {
+      friendsData[index] = updateData;
+    } else if (updateType == 'added' && index < 0) {
+      friendsData.insert(0, updateData);
+    } else if (updateType == 'removed') {
+      friendsData.removeAt(index);
+    }
+    updateF.value += 1;
+  }
+}

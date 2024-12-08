@@ -16,32 +16,24 @@ class ProfilePicture extends StatelessWidget {
       stalePeriod: const Duration(days: 30),
       maxNrOfCacheObjects: 100,
     ));
-
-    // return CircleAvatar(
-    //   backgroundImage: profileLink != ''
-    //       ? CachedNetworkImageProvider(profileLink,
-    //           cacheManager: profilePictureCache)
-    //       : const AssetImage('assets/images/default.png') as ImageProvider,
-    //   radius: profileRadius,
-    //   backgroundColor: Colors.grey.shade900,
-    // );
-    return profileLink != '' ? CachedNetworkImage(
-        imageUrl: profileLink,
-        cacheManager: profilePictureCache,
-        imageBuilder: (context, imageProvider) => CircleAvatar(
-              backgroundImage: imageProvider,
-              radius: profileRadius,
-            ),
-        placeholder: (context, url) => CircleAvatar(
-              backgroundImage: const AssetImage('assets/images/default.png'),
-              radius: profileRadius,
-            ),
-        errorWidget: (context, url, error) => CircleAvatar(
-              backgroundImage: const AssetImage('assets/images/default.png'),
-              radius: profileRadius,
-            )) : CircleAvatar(
-      backgroundImage: const AssetImage('assets/images/default.png'),
-      radius: profileRadius,
-    );
+    return profileLink != ''
+        ? CachedNetworkImage(
+            imageUrl: profileLink,
+            cacheManager: profilePictureCache,
+            imageBuilder: (context, imageProvider) => CircleAvatar(
+                  backgroundImage: imageProvider,
+                  radius: profileRadius,
+                ),
+            placeholder: (context, url) => imageErrorWidget(profileRadius),
+            errorWidget: (context, url, error) =>
+                imageErrorWidget(profileRadius))
+        : imageErrorWidget(profileRadius);
   }
+}
+
+Widget imageErrorWidget(profileRadius) {
+  return CircleAvatar(
+    backgroundImage: const AssetImage('assets/images/default.png'),
+    radius: profileRadius,
+  );
 }

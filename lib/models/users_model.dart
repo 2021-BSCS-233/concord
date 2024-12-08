@@ -13,6 +13,8 @@ class UsersModel {
   String pronouns;
   String aboutMe;
   List<String> friends;
+  List<String> preference;
+  List<String> followingPosts;
   @JsonKey(includeToJson: false, includeFromJson: false)
   String? id;
 
@@ -26,6 +28,8 @@ class UsersModel {
       required this.pronouns,
       required this.aboutMe,
       required this.friends,
+        required this.preference,
+        required this.followingPosts,
       this.id});
 
   factory UsersModel.fromJson(Map<String, dynamic> json) => _$UsersModelFromJson(json);

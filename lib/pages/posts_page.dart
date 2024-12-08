@@ -1,8 +1,12 @@
+import 'package:concord/controllers/posts_controller.dart';
+import 'package:concord/widgets/post_tile.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-//this page is not in use for now
 class PostsPage extends StatelessWidget {
-  const PostsPage({super.key});
+  final PostsController postsController = Get.put(PostsController());
+
+  PostsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -25,8 +29,49 @@ class PostsPage extends StatelessWidget {
             dividerColor: Colors.transparent,
           ),
         ),
-        body: Container(),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {},
+          child: const Icon(Icons.add),
+        ),
+        body: FutureBuilder<Widget>(
+          future: postsData(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return snapshot.data!;
+            } else if (snapshot.hasError) {
+              debugPrint('${snapshot.error}');
+              return const Material(
+                color: Colors.transparent,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("We could not access our services"),
+                      Text("Check your connection or try again later")
+                    ],
+                  ),
+                ),
+              );
+            }
+            return const Center(child: CircularProgressIndicator());
+          },
+        ),
       ),
     );
+  }
+
+  Future<Widget> postsData() async {
+    return TabBarView(children: [
+      Container(
+        padding: const EdgeInsets.only(left: 10, right: 10),
+        child: ListView.builder(
+            itemCount: postsController.postsData.length,
+            shrinkWrap: true,
+            itemBuilder: (context, index) {
+              return PostTile(postData: postsController.postsData[index]);
+            }),
+      ),
+      const Center(child: Text('Follower specific posts')),
+    ]);
   }
 }

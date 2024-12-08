@@ -13,9 +13,8 @@ MessagesModel _$MessagesModelFromJson(Map<String, dynamic> json) =>
       edited: json['edited'] as bool,
       timeStamp: MessagesModel._customDateFromJson(json['timeStamp']),
       attachments: (json['attachments'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          [],
+          ?.map((e) => e as String)
+          .toList(),
     );
 
 Map<String, dynamic> _$MessagesModelToJson(MessagesModel instance) =>
