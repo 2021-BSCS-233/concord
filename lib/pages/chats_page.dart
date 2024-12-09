@@ -23,7 +23,7 @@ class ChatsPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'messages'.tr,
-          style: TextStyle(
+          style: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Color(0xD0FFFFFF),
               fontSize: 22),
@@ -109,7 +109,7 @@ class ChatsPage extends StatelessWidget {
                             margin: const EdgeInsets.all(5),
                             height: 80,
                             width: 80,
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                                 color: Color(0xAA18181F),
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(15))),
@@ -176,18 +176,8 @@ class ChatsPage extends StatelessWidget {
                         itemCount: chatsController.chatsData.length,
                         shrinkWrap: true,
                         itemBuilder: (context, index) {
-                          return chatsController.chatsData[index].chatType ==
-                                  'dm'
-                              ? DmChatTile(
-                                  chatData: chatsController.chatsData[index])
-                              : SizedBox(
-                                  height: 50,
-                                  width: 100,
-                                  child: Center(
-                                    child: Text(
-                                        'add support for ${chatsController.chatsData[index].chatType}'),
-                                  ),
-                                );
+                          return DmChatTile(
+                              chatData: chatsController.chatsData[index]);
                         },
                       )),
           ),

@@ -8,8 +8,8 @@ class ChatsController extends GetxController {
   List<ChatsModel> chatsData = [];
 
   getInitialData(currentUserId) async {
-    await chatsListener(currentUserId, updateChats);
-    chatsData = await getInitialChats(currentUserId);
+    await chatsListenerFirebase(currentUserId, updateChats);
+    chatsData = await getInitialChatsFirebase(currentUserId);
     initial = false;
   }
 

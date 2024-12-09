@@ -39,14 +39,14 @@ Future<void> main() async {
     translations: Messages(),
     locale: Get.locale,
     fallbackLocale: const Locale('en', ''),
-    home: const Loading(),
+    home: const InitialLoading(), // default is suppose to be InitialLoading() any other page is debugging
   ));
 }
 
 bool initialMain = true;
 
-class Loading extends StatelessWidget {
-  const Loading({super.key});
+class InitialLoading extends StatelessWidget {
+  const InitialLoading({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +75,7 @@ class Loading extends StatelessWidget {
 
   Future<Widget> _buildContent(BuildContext context) async {
     bool response = false;
-    initialMain ? (response = await autoLogin()) : null;
+    initialMain ? (response = await autoLoginFirebase()) : null;
     if (response) {
       return Home();
     } else {
@@ -91,7 +91,7 @@ class Home extends StatelessWidget {
     super.key,
   }) {
     mainController.selectedIndex.value = 0;
-    profileListener(mainController.currentUserData.id);
+    profileListenerFirebase(mainController.currentUserData.id);
   }
 
   @override
@@ -101,7 +101,7 @@ class Home extends StatelessWidget {
         mainController: mainController,
       ),
       PostsPage(),
-      NotificationsPage(),
+      const NotificationsPage(),
       ProfilePage()
     ];
 
@@ -168,7 +168,7 @@ class Home extends StatelessWidget {
                   mainController.showProfile.value = false;
                 },
                 child: Container(
-                  color: Color(0xC01D1D1F),
+                  color: const Color(0xC01D1D1F),
                   height: MediaQuery.of(context).size.height,
                   width: double.infinity,
                 ),

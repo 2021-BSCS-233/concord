@@ -74,7 +74,7 @@ class ProfilePage extends StatelessWidget {
                           child: Container(
                               height: 35,
                               width: 35,
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                   shape: BoxShape.circle,
                                   color: Colors.black54),
                               child: const Icon(
@@ -92,7 +92,7 @@ class ProfilePage extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   width: double.infinity,
                   height: 168,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                       color: Color(0xFF121218),
                       borderRadius: BorderRadius.all(Radius.circular(15))),
                   child: Column(
@@ -136,7 +136,7 @@ class ProfilePage extends StatelessWidget {
                               child: Container(
                                   height: 38,
                                   width: 140,
-                                  padding: EdgeInsets.symmetric(horizontal: 10),
+                                  padding: const EdgeInsets.symmetric(horizontal: 10),
                                   decoration: BoxDecoration(
                                       color: Colors.blueAccent.shade400,
                                       borderRadius: const BorderRadius.all(
@@ -165,11 +165,11 @@ class ProfilePage extends StatelessWidget {
                               child: Container(
                                 height: 38,
                                 width: 140,
-                                padding: EdgeInsets.symmetric(horizontal: 10),
+                                padding: const EdgeInsets.symmetric(horizontal: 10),
                                 decoration: BoxDecoration(
                                     color: Colors.blueAccent.shade400,
                                     borderRadius:
-                                        BorderRadius.all(Radius.circular(20))),
+                                        const BorderRadius.all(Radius.circular(20))),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceEvenly,
@@ -200,7 +200,7 @@ class ProfilePage extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   width: double.infinity,
                   // height: 200,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                       color: Color(0xFF121218),
                       borderRadius: BorderRadius.all(Radius.circular(15))),
                   child: Column(

@@ -17,7 +17,7 @@ class LogInPage extends StatelessWidget {
       children: [
         Scaffold(
           appBar: AppBar(
-            title: Text(
+            title: const Text(
               'Log In',
               style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
             ),
@@ -33,28 +33,28 @@ class LogInPage extends StatelessWidget {
                   const SizedBox(
                     height: 30,
                   ),
-                  Text(
+                  const Text(
                     'Welcome back!',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 25,
                     ),
                   ),
-                  Text('We\'re excited to see you again!'),
+                  const Text('We\'re excited to see you again!'),
                   const SizedBox(
                     height: 40,
                   ),
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Container(
-                        margin: EdgeInsets.only(left: 5, bottom: 5),
-                        child: Text(
+                        margin: const EdgeInsets.only(left: 5, bottom: 5),
+                        child: const Text(
                           'ACCOUNT INFORMATION',
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 10),
                         )),
                   ),
-                  InputField(
+                  CustomInputField(
                     fieldLabel: 'Email',
                     controller: logInController.logInEmailTextController,
                     fieldRadius: 2,
@@ -64,7 +64,7 @@ class LogInPage extends StatelessWidget {
                     contentTopPadding: 13,
                     suffixIcon: Icons.all_inclusive,
                   ),
-                  InputField(
+                  CustomInputField(
                     fieldLabel: 'Password',
                     controller: logInController.logInPassTextController,
                     fieldRadius: 2,
@@ -92,8 +92,8 @@ class LogInPage extends StatelessWidget {
                       width: double.infinity,
                       decoration: BoxDecoration(
                           color: Colors.blueAccent.shade700,
-                          borderRadius: BorderRadius.all(Radius.circular(5))),
-                      child: Center(child: Text('Log In')),
+                          borderRadius: const BorderRadius.all(Radius.circular(5))),
+                      child: const Center(child: Text('Log In')),
                     ),
                   ),
                   const SizedBox(height: 20,),
@@ -128,7 +128,7 @@ class LogInPage extends StatelessWidget {
                       }
                     : () {},
                 child: Container(
-                  color: Color(0xC01D1D1F),
+                  color: const Color(0xC01D1D1F),
                   height: MediaQuery.of(context).size.height,
                   width: double.infinity,
                   child: const Center(child: CircularProgressIndicator()),
@@ -141,20 +141,20 @@ class LogInPage extends StatelessWidget {
                 visible: logInController.showMessageLogIn.value,
                 child: Center(
                   child: Container(
-                    padding: EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(20),
                     height: 200,
                     width: 300,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                         color: Color(0xFF121218),
                         borderRadius: BorderRadius.all(Radius.circular(15))),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('LogIn Failed',
+                        const Text('LogIn Failed',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 18)),
                         const SizedBox(height: 5),
-                        Text('Email or Password is Wrong',
+                        const Text('Email or Password is Wrong',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 15)),
                         const SizedBox(height: 35),
@@ -170,7 +170,7 @@ class LogInPage extends StatelessWidget {
                                 color: Colors.blueAccent.shade700,
                                 borderRadius: const BorderRadius.all(
                                     Radius.circular(10))),
-                            child: Center(
+                            child: const Center(
                               child: Text(
                                 'Close',
                                 style: TextStyle(

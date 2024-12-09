@@ -1,32 +1,24 @@
 import 'dart:io';
-
-import 'package:concord/models/chats_model.dart';
+import 'package:concord/models/posts_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:core';
-import 'package:concord/widgets/profile_picture.dart';
 import 'package:concord/widgets/message_tile.dart';
 import 'package:concord/widgets/popup_menus.dart';
 import 'package:concord/widgets/input_field.dart';
-import 'package:concord/widgets/status_icons.dart';
 import 'package:concord/controllers/main_controller.dart';
-import 'package:concord/controllers/chat_controller.dart';
+import 'package:concord/controllers/post_controller.dart';
 
-class ChatPage extends StatelessWidget {
+class PostPage extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
-  late final ChatController chatController = Get.put(ChatController());
-  final ChatsModel chatData;
+  late final PostController postController = Get.put(PostController());
+  final PostsModel postData;
 
-  ChatPage({super.key, required this.chatData}) {
-    chatController.chatId = chatData.id!;
-    chatController.initial = true;
-    chatController.userMap[mainController.currentUserData.id] =
+  PostPage({super.key, required this.postData}) {
+    postController.postId = postData.id!;
+    postController.initial = true;
+    postController.userMap[mainController.currentUserData.id] =
         mainController.currentUserData;
-    if (chatData.chatType == 'dm') {
-      for (var user in chatData.receiverData!) {
-        chatController.userMap[user.id] = user;
-      }
-    }
   }
 
   @override
@@ -35,45 +27,13 @@ class ChatPage extends StatelessWidget {
       children: [
         Scaffold(
           appBar: AppBar(
-            title: Row(
-              children: [
-                chatData.chatType == 'dm'
-                    ? Stack(
-                        children: [
-                          ProfilePicture(
-                            profileLink:
-                                chatData.receiverData![0].profilePicture,
-                            profileRadius: 17,
-                          ),
-                          Positioned(
-                            bottom: -2,
-                            right: -2,
-                            child: StatusIcon(
-                              iconType:
-                                  chatData.receiverData![0].status == 'Online'
-                                      ? chatData.receiverData![0].displayStatus
-                                      : chatData.receiverData![0].status,
-                              iconSize: 16.0,
-                              iconBorder: 3,
-                            ),
-                          ),
-                        ],
-                      )
-                    : const SizedBox(),
-                SizedBox(
-                  width: chatData.chatType == 'dm' ? 10 : 0,
-                ),
-                Text(
-                  chatData.chatType == 'dm'
-                      ? chatData.receiverData![0].displayName
-                      : chatData.chatGroupName!,
-                  style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFFEEEEEE)),
-                )
-              ],
-            ),
+            title: Text(postData.title,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xD0FFFFFF),
+                )),
           ),
           body: Container(
             padding: const EdgeInsets.only(bottom: 5),
@@ -94,7 +54,8 @@ class ChatPage extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text("We could not access our services"),
-                                Text("Check your connection or try again later")
+                                Text(
+                                    "Check your connection or try again later")
                               ],
                             ),
                           ));
@@ -106,8 +67,8 @@ class ChatPage extends StatelessWidget {
                   height: 10,
                 ),
                 Obx(() => Visibility(
-                    visible: chatController.attachmentVisible.value &&
-                        chatController.updateA == chatController.updateA,
+                    visible: postController.attachmentVisible.value &&
+                        postController.updateA == postController.updateA,
                     child: Column(
                       children: [
                         Container(
@@ -115,7 +76,7 @@ class ChatPage extends StatelessWidget {
                           width: double.infinity,
                           color: Colors.grey.shade900,
                           child: ListView.builder(
-                              itemCount: chatController.attachments.length,
+                              itemCount: postController.attachments.length,
                               scrollDirection: Axis.horizontal,
                               itemBuilder: (context, index) {
                                 return Stack(
@@ -131,7 +92,7 @@ class ChatPage extends StatelessWidget {
                                           child: Image(
                                               fit: BoxFit.cover,
                                               image: FileImage(File(
-                                                  chatController
+                                                  postController
                                                       .attachments[index]
                                                       .path))),
                                         ),
@@ -142,7 +103,7 @@ class ChatPage extends StatelessWidget {
                                       right: 2,
                                       child: InkWell(
                                         onTap: () {
-                                          chatController
+                                          postController
                                               .removeAttachment(index);
                                         },
                                         child: Container(
@@ -170,7 +131,7 @@ class ChatPage extends StatelessWidget {
                       width: 40,
                       child: TextButton(
                         onPressed: () {
-                          chatController.addAttachments();
+                          postController.addAttachments();
                         },
                         style: ButtonStyle(
                           padding: WidgetStateProperty.all<EdgeInsets>(
@@ -185,19 +146,18 @@ class ChatPage extends StatelessWidget {
                     ),
                     Expanded(
                       child: CustomInputField(
-                        fieldFocusNode: chatController.chatFocusNode,
+                        fieldFocusNode: postController.postFocusNode,
                         fieldRadius: 20,
-                        fieldLabel: 'messageTo'.trParams(
-                            {'name': chatData.receiverData![0].displayName}),
-                        controller: chatController.chatFieldTextController,
+                        fieldLabel: 'Send a message in "${postData.title}"',
+                        controller: postController.postFieldTextController,
                         suffixIcon: Icons.all_inclusive,
                         fieldColor: const Color(0xFF151515),
-                        onChange: chatController.sendVisibility,
+                        onChange: postController.sendVisibility,
                         maxLines: 4,
                       ),
                     ),
                     Obx(() => Visibility(
-                          visible: chatController.sendVisible.value,
+                          visible: postController.sendVisible.value,
                           child: Container(
                             decoration: BoxDecoration(
                                 shape: BoxShape.circle,
@@ -206,7 +166,7 @@ class ChatPage extends StatelessWidget {
                             height: 40,
                             child: TextButton(
                               onPressed: () {
-                                chatController.sendMessage(
+                                postController.sendMessage(
                                     mainController.currentUserData.id);
                               },
                               style: ButtonStyle(
@@ -231,12 +191,12 @@ class ChatPage extends StatelessWidget {
           ),
         ),
         Obx(() => Visibility(
-              visible: chatController.showMenu.value ||
-                  chatController.showProfile.value,
+              visible: postController.showMenu.value ||
+                  postController.showProfile.value,
               child: GestureDetector(
                 onTap: () {
-                  chatController.showMenu.value = false;
-                  chatController.showProfile.value = false;
+                  postController.showMenu.value = false;
+                  postController.showProfile.value = false;
                 },
                 child: Container(
                   color: const Color(0xCA1D1D1F),
@@ -248,29 +208,30 @@ class ChatPage extends StatelessWidget {
         Obx(() => AnimatedPositioned(
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeInOut,
-              bottom: chatController.showMenu.value
+              bottom: postController.showMenu.value
                   ? 0.0
                   : -MediaQuery.of(context).size.height,
               left: 0.0,
               right: 0.0,
-              child: chatController.chatContent.isNotEmpty
-                  ? ChatMessagePopup(
-                      chatId: chatData.id!,
-                    )
-                  : Container(),
+              child: Container()
+              // child: postController.postContent.isNotEmpty
+              //     ? ChatMessagePopup(
+              //         chatId: postData.id!,
+              //       )
+              //     : Container(),
             )),
         Obx(() => AnimatedPositioned(
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeInOut,
-              bottom: chatController.showProfile.value
+              bottom: postController.showProfile.value
                   ? 0.0
                   : -MediaQuery.of(context).size.height,
               left: 0.0,
               right: 0.0,
-              child: chatController.chatContent.isNotEmpty
+              child: postController.postContent.isNotEmpty
                   ? ProfilePopup(
-                      selectedUser: chatController
-                          .chatContent[chatController.messageSelected].senderId)
+                      selectedUser: postController
+                          .postContent[postController.messageSelected].senderId)
                   : Container(),
             )),
       ],
@@ -278,86 +239,29 @@ class ChatPage extends StatelessWidget {
   }
 
   Future<Widget> messagesUI() async {
-    chatController.initial
-        ? await chatController.getMessages(chatData.id)
+    postController.initial
+        ? await postController.getPostMessages(postData.id!)
         : null;
     return Obx(
-      () => chatController.updateC.value == chatController.updateC.value &&
-              chatController.chatContent.isEmpty
-          ? Center(child: Text('chatEmpty'.tr))
-          : Expanded(
-              child: ListView.builder(
-                itemCount: chatController.chatContent.length,
-                shrinkWrap: true,
-                reverse: true,
-                itemBuilder: (context, index) {
-                  try {
-                    if (chatController.chatContent[index].senderId !=
-                        chatController.chatContent[index + 1].senderId) {
-                      return MessageTileFull(
-                        messageData: chatController.chatContent[index],
-                        sendingUser: chatController.userMap[
-                            chatController.chatContent[index].senderId],
-                        toggleMenu: () {
-                          chatController.toggleMenu(index);
-                        },
-                        toggleProfile: () {
-                          chatController.toggleProfile(index);
-                        },
-                      );
-                    } else {
-                      bool select = true;
-                      try {
-                        var time1 = chatController.chatContent[index].timeStamp;
-                        var time2 =
-                            chatController.chatContent[index + 1].timeStamp;
-                        var difference = time1!.difference(time2!);
-                        if (difference.inMinutes < 15) {
-                          select = true;
-                        } else {
-                          select = false;
-                        }
-                      } catch (e) {
-                        select = true;
-                      }
-                      if (select) {
-                        return MessageTileCompact(
-                            messageData: chatController.chatContent[index],
-                            sendingUser: chatController.userMap[
-                                chatController.chatContent[index].senderId],
-                            toggleMenu: () {
-                              chatController.toggleMenu(index);
-                            });
-                      } else {
-                        return MessageTileFull(
-                          messageData: chatController.chatContent[index],
-                          sendingUser: chatController.userMap[
-                              chatController.chatContent[index].senderId],
-                          toggleMenu: () {
-                            chatController.toggleMenu(index);
-                          },
-                          toggleProfile: () {
-                            chatController.toggleProfile(index);
-                          },
-                        );
-                      }
-                    }
-                  } catch (e) {
-                    return MessageTileFull(
-                      messageData: chatController.chatContent[index],
-                      sendingUser: chatController
-                          .userMap[chatController.chatContent[index].senderId],
-                      toggleMenu: () {
-                        chatController.toggleMenu(index);
-                      },
-                      toggleProfile: () {
-                        chatController.toggleProfile(index);
-                      },
-                    );
-                  }
-                },
-              ),
-            ),
+      () => Expanded(
+        child: ListView.builder(
+          itemCount: postController.postContent.length,
+          shrinkWrap: postController.updateP.value == 1 ? true : true,
+          itemBuilder: (context, index) {
+            return MessageTileFull(
+              messageData: postController.postContent[index],
+              sendingUser: postController
+                  .userMap[postController.postContent[index].senderId],
+              toggleMenu: () {
+                postController.toggleMenu(index);
+              },
+              toggleProfile: () {
+                postController.toggleProfile(index);
+              },
+            );
+          },
+        ),
+      ),
     );
   }
 }

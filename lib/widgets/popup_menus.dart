@@ -23,7 +23,7 @@ class UserGroupPopup extends StatelessWidget {
         backgroundColor: Colors.transparent,
         body: Container(
           height: double.infinity,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: Colors.black,
             borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
           ),
@@ -75,12 +75,12 @@ class UserGroupPopup extends StatelessWidget {
   }
 }
 
-class MessagePopup extends StatelessWidget {
+class ChatMessagePopup extends StatelessWidget {
   final String chatId;
   final MainController mainController = Get.find<MainController>();
   final ChatController chatController = Get.find<ChatController>();
 
-  MessagePopup({super.key, required this.chatId});
+  ChatMessagePopup({super.key, required this.chatId});
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +90,7 @@ class MessagePopup extends StatelessWidget {
         backgroundColor: Colors.transparent,
         body: Container(
           height: double.infinity,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: Colors.black,
             borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
           ),
@@ -103,7 +103,7 @@ class MessagePopup extends StatelessWidget {
                     height: 10,
                   ),
                   chatController
-                              .chatContent[chatController.messageSelected].id ==
+                              .chatContent[chatController.messageSelected].senderId ==
                           mainController.currentUserData.id
                       ? OptionTile(
                           action: () {
@@ -122,7 +122,7 @@ class MessagePopup extends StatelessWidget {
                       actionIcon: Icons.copy,
                       actionName: 'Copy Text'),
                   chatController
-                              .chatContent[chatController.messageSelected].id ==
+                              .chatContent[chatController.messageSelected].senderId ==
                           mainController.currentUserData.id
                       ? OptionTile(
                           action: () {
@@ -164,7 +164,7 @@ class ProfilePopup extends StatelessWidget {
   }
 
   Future<Widget> _buildContent(BuildContext context) async {
-    UsersModel userProfileData = await getUserProfile(selectedUser);
+    UsersModel userProfileData = await getUserProfileFirebase(selectedUser);
     return SizedBox(
       height: MediaQuery.of(context).size.height * 0.65,
       width: double.infinity,
@@ -173,7 +173,7 @@ class ProfilePopup extends StatelessWidget {
         body: SingleChildScrollView(
           child: Container(
             height: MediaQuery.of(context).size.height,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
                 color: Colors.black,
                 borderRadius: BorderRadius.all(Radius.circular(25))),
             child: Column(
@@ -238,7 +238,7 @@ class ProfilePopup extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   width: double.infinity,
                   height: 130,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                       color: Color(0xFF121218),
                       borderRadius: BorderRadius.all(Radius.circular(15))),
                   child: Column(
@@ -275,7 +275,7 @@ class ProfilePopup extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   width: double.infinity,
                   height: 200,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                       color: Color(0xFF121218),
                       borderRadius: BorderRadius.all(Radius.circular(15))),
                   child: Column(
@@ -337,10 +337,10 @@ class StatusPopup extends StatelessWidget {
           backgroundColor: Colors.transparent,
           body: Center(
             child: Container(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               height: double.infinity,
               width: double.infinity,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.black,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
               ),
@@ -370,7 +370,7 @@ class StatusPopup extends StatelessWidget {
                     ),
                     // height: 200,
                     width: double.infinity,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                         color: Color(0xFF121218),
                         borderRadius: BorderRadius.all(Radius.circular(15))),
                     child: Obx(() => Column(
@@ -385,7 +385,7 @@ class StatusPopup extends StatelessWidget {
                                     var temp = selectedValue.value;
                                     selectedValue.value = value as int;
                                     var result =
-                                        await updateStatusDisplay(id, 'Online');
+                                        await updateStatusDisplayFirebase(id, 'Online');
                                     if (!result) {
                                       selectedValue.value = temp;
                                     }
@@ -401,7 +401,7 @@ class StatusPopup extends StatelessWidget {
                                     var temp = selectedValue.value;
                                     selectedValue.value = value as int;
                                     var result =
-                                        await updateStatusDisplay(id, 'DND');
+                                        await updateStatusDisplayFirebase(id, 'DND');
                                     if (!result) {
                                       selectedValue.value = temp;
                                     }
@@ -417,7 +417,7 @@ class StatusPopup extends StatelessWidget {
                                     var temp = selectedValue.value;
                                     selectedValue.value = value as int;
                                     var result =
-                                        await updateStatusDisplay(id, 'Asleep');
+                                        await updateStatusDisplayFirebase(id, 'Asleep');
                                     if (!result) {
                                       selectedValue.value = temp;
                                     }
@@ -432,7 +432,7 @@ class StatusPopup extends StatelessWidget {
                                   onChanged: (value) async {
                                     var temp = selectedValue.value;
                                     selectedValue.value = value as int;
-                                    var result = await updateStatusDisplay(
+                                    var result = await updateStatusDisplayFirebase(
                                         id, 'Offline');
                                     if (!result) {
                                       selectedValue.value = temp;

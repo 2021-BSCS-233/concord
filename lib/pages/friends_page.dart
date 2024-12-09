@@ -21,7 +21,7 @@ class FriendsPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'friends'.tr,
-          style: TextStyle(
+          style: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Color(0xD0FFFFFF),
               fontSize: 22),
@@ -102,7 +102,7 @@ class FriendsPage extends StatelessWidget {
                 itemBuilder: (context, index) {
                   return Container(
                     margin: const EdgeInsets.only(top: 15),
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Color(0xFF121218),
                       borderRadius: BorderRadius.all(Radius.circular(20)),
                     ),
@@ -148,7 +148,7 @@ class FriendsPage extends StatelessWidget {
                                 color: Colors.red,
                               ),
                               onTap: () {
-                                removeFriend(
+                                removeFriendFirebase(
                                     mainController.currentUserData.id,
                                     friendsController.friendsData[index].id);
                               },

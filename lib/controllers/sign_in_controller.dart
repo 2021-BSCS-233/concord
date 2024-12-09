@@ -39,7 +39,7 @@ class SignInController extends GetxController {
           friends: [],
           preference: [],
           followingPosts: []);
-      var response = await signInUser(email, pass);
+      var response = await signInUserFirebase(email, pass);
       if (response?[0]) {
         await saveUserOnDevice(email, signInPassTextController.text.trim());
         showOverlaySignIn.value = false;

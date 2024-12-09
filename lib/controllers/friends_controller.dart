@@ -8,11 +8,11 @@ class FriendsController extends GetxController {
   List<UsersModel> friendsData = [];
 
   getInitialData(currentUserId) async {
-    await friendsListener(
+    await friendsListenerFirebase(
       currentUserId,
       updateFriends
     );
-    friendsData = await getInitialFriends(currentUserId);
+    friendsData = await getInitialFriendsFirebase(currentUserId);
     initial = false;
   }
 

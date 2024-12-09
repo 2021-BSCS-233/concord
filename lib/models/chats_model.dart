@@ -6,6 +6,8 @@ part 'chats_model.g.dart';
 @JsonSerializable()
 class ChatsModel {
   String chatType;
+  @JsonKey(defaultValue: '')
+  String? chatGroupName;
   String latestMessage;
   @JsonKey(fromJson: _customDateFromJson, toJson: _customDateToJson)
   DateTime timeStamp; // (json['timeStamp'] as Timestamp).toDate()
@@ -20,6 +22,7 @@ class ChatsModel {
       required this.latestMessage,
       required this.timeStamp,
       required this.users,
+      this.chatGroupName,
       this.receiverData,
       this.id});
 
@@ -28,9 +31,10 @@ class ChatsModel {
 
   Map<String, dynamic> toJson() => _$ChatsModelToJson(this);
 
-  static DateTime _customDateFromJson(dynamic json){
+  static DateTime _customDateFromJson(dynamic json) {
     return json.toDate();
   }
+
   static DateTime _customDateToJson(dynamic timeStamp) {
     return timeStamp;
   }

@@ -1,9 +1,12 @@
+import 'package:concord/controllers/main_controller.dart';
 import 'package:concord/controllers/posts_controller.dart';
+import 'package:concord/pages/new_post_page.dart';
 import 'package:concord/widgets/post_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class PostsPage extends StatelessWidget {
+  final MainController mainController = Get.find<MainController>();
   final PostsController postsController = Get.put(PostsController());
 
   PostsPage({super.key});
@@ -30,8 +33,15 @@ class PostsPage extends StatelessWidget {
           ),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {},
-          child: const Icon(Icons.add),
+          onPressed: () {
+            Get.to(NewPostPage(refreshContent: refreshContent,));
+          },
+          backgroundColor: Colors.blueAccent.shade400,
+          shape: const CircleBorder(),
+          child: const Icon(
+            Icons.add,
+            size: 35,
+          ),
         ),
         body: FutureBuilder<Widget>(
           future: postsData(),
@@ -59,19 +69,47 @@ class PostsPage extends StatelessWidget {
       ),
     );
   }
+  refreshContent() async {
+    await postsController.getInitialPosts(
+        mainController.currentUserData.id,
+        mainController.currentUserData.preference);
+  }
 
   Future<Widget> postsData() async {
+    postsController.initial
+        ? await refreshContent()
+        : null;
     return TabBarView(children: [
       Container(
         padding: const EdgeInsets.only(left: 10, right: 10),
-        child: ListView.builder(
-            itemCount: postsController.postsData.length,
-            shrinkWrap: true,
-            itemBuilder: (context, index) {
-              return PostTile(postData: postsController.postsData[index]);
-            }),
+        child: RefreshIndicator(
+          onRefresh: () async {
+            refreshContent();
+            await Future.delayed(const Duration(seconds: 2)); // Simulate a delay
+            return Future.value(null);
+          },
+          child: ListView.builder(
+              itemCount: postsController.publicPosts.length,
+              // shrinkWrap: true,
+              itemBuilder: (context, index) {
+                return PostTile(postData: postsController.publicPosts[index]);
+              }),
+        ),
       ),
-      const Center(child: Text('Follower specific posts')),
+      Container(
+        padding: const EdgeInsets.only(left: 10, right: 10),
+        child: RefreshIndicator(
+          onRefresh: () async {
+            return refreshContent();
+          },
+          child: ListView.builder(
+              itemCount: postsController.followingPosts.length,
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                return PostTile(postData: postsController.followingPosts[index]);
+              }),
+        ),
+      ),
     ]);
   }
 }

@@ -4,9 +4,9 @@ import 'package:get/get.dart';
 class SettingsController extends GetxController {
   var showMenu = false.obs;
 
-  TextEditingController usernameController = TextEditingController();
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+  TextEditingController usernameTextController = TextEditingController();
+  TextEditingController emailTextController = TextEditingController();
+  TextEditingController passwordTextController = TextEditingController();
 
   void toggleMenu() {
     showMenu.value = !showMenu.value;

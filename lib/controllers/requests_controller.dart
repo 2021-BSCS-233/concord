@@ -11,15 +11,15 @@ class RequestsController extends GetxController {
   List<RequestsModel> incomingRequestsData = [];
   List<RequestsModel> outgoingRequestsData = [];
   var fieldCheck = false.obs;
-  TextEditingController requestsFieldController = TextEditingController();
+  TextEditingController requestsFieldTextController = TextEditingController();
 
   void changing() {
-    fieldCheck.value = (requestsFieldController.text != '' ? true : false);
+    fieldCheck.value = (requestsFieldTextController.text != '' ? true : false);
   }
 
   getInitialData(currentUserId) async {
-    requestsListeners(currentUserId);
-    var result = await getInitialRequest(currentUserId);
+    requestsListenersFirebase(currentUserId);
+    var result = await getInitialRequestFirebase(currentUserId);
     incomingRequestsData = result[0];
     outgoingRequestsData = result[1];
     initial = false;

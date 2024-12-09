@@ -14,7 +14,7 @@ class LogInController extends GetxController {
     showOverlayLogIn.value = true;
     if (RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(email) &&
         RegExp(r'.{8,}').hasMatch(pass)) {
-      var response = await logInUser(email, pass);
+      var response = await logInUserFirebase(email, pass);
       if (response) {
         await saveUserOnDevice(email, pass);
         showOverlayLogIn.value = false;

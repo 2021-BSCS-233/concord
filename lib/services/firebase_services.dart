@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:concord/models/chats_model.dart';
 import 'package:concord/models/messages_model.dart';
+import 'package:concord/models/posts_model.dart';
 import 'package:concord/models/request_model.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -18,8 +19,10 @@ final CollectionReference requestsRef =
     FirebaseFirestore.instance.collection('requests');
 final CollectionReference chatsRef =
     FirebaseFirestore.instance.collection('chats');
+final CollectionReference postsRef =
+    FirebaseFirestore.instance.collection('posts');
 
-Future<List?> signInUser(email, pass) async {
+Future<List?> signInUserFirebase(email, pass) async {
   MainController mainController = Get.find<MainController>();
   try {
     var userCredential = await FirebaseAuth.instance
@@ -46,7 +49,7 @@ Future<List?> signInUser(email, pass) async {
   }
 }
 
-Future<bool> logInUser(String email, String pass) async {
+Future<bool> logInUserFirebase(String email, String pass) async {
   MainController mainController = Get.find<MainController>();
   try {
     var userCredential = await FirebaseAuth.instance
@@ -79,7 +82,7 @@ Future<void> saveUserOnDevice(email, pass) async {
   await prefs.setString('password', pass);
 }
 
-Future<bool> autoLogin() async {
+Future<bool> autoLoginFirebase() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   MainController mainController = Get.find<MainController>();
   var email = prefs.getString('email');
@@ -105,7 +108,7 @@ Future<bool> autoLogin() async {
         return false;
       }
     } catch (e) {
-      debugPrint("An error occurred: $e");
+      debugPrint("(catch) An error occurred: $e");
       return false;
     }
   } else {
@@ -114,7 +117,7 @@ Future<bool> autoLogin() async {
   }
 }
 
-void profileListener(currentUserId) {
+void profileListenerFirebase(currentUserId) {
   MainController mainController = Get.find<MainController>();
   usersRef.doc(currentUserId).snapshots().listen((event) {
     mainController.currentUserData =
@@ -124,7 +127,7 @@ void profileListener(currentUserId) {
   });
 }
 
-Future<void> updateProfile(
+Future<void> updateProfileFirebase(
     currentUserId, displayName, pronouns, aboutMe, image) async {
   var updateData = {
     'displayName': displayName,
@@ -149,7 +152,7 @@ Future<void> updateProfile(
   }
 }
 
-Future<bool> updateStatusDisplay(userId, displayStatus) async {
+Future<bool> updateStatusDisplayFirebase(userId, displayStatus) async {
   try {
     await usersRef.doc(userId).update({'displayStatus': displayStatus});
     return true;
@@ -158,7 +161,7 @@ Future<bool> updateStatusDisplay(userId, displayStatus) async {
   }
 }
 
-Future<List<UsersModel>> getInitialFriends(currentUserId) async {
+Future<List<UsersModel>> getInitialFriendsFirebase(currentUserId) async {
   var friendInstances = await FirebaseFirestore.instance
       .collection('users')
       .orderBy('displayName')
@@ -175,7 +178,8 @@ Future<List<UsersModel>> getInitialFriends(currentUserId) async {
   return friends;
 }
 
-Future<void> friendsListener(currentUserId,Function updateFriends) async {
+Future<void> friendsListenerFirebase(
+    currentUserId, Function updateFriends) async {
   FirebaseFirestore.instance
       .collection('users')
       .orderBy('displayName')
@@ -197,7 +201,7 @@ Future<void> friendsListener(currentUserId,Function updateFriends) async {
   });
 }
 
-Future<UsersModel> getUserProfile(userId) async {
+Future<UsersModel> getUserProfileFirebase(userId) async {
   var user = await usersRef.doc(userId).get();
   UsersModel userData =
       UsersModel.fromJson(user.data() as Map<String, dynamic>);
@@ -205,7 +209,7 @@ Future<UsersModel> getUserProfile(userId) async {
   return userData;
 }
 
-void removeFriend(currentUserId, friendId) {
+void removeFriendFirebase(currentUserId, friendId) {
   usersRef.doc(currentUserId).update({
     'friends': FieldValue.arrayRemove([friendId])
   });
@@ -214,14 +218,14 @@ void removeFriend(currentUserId, friendId) {
   });
 }
 
-getInitialRequest(currentUserId) async {
-  var incomingInstances = await FirebaseFirestore.instance
+getInitialRequestFirebase(currentUserId) async {
+  var incomingRequestInstances = await FirebaseFirestore.instance
       .collection('requests')
       .orderBy('timeStamp', descending: true)
       .where('receiverId', isEqualTo: currentUserId)
       .get();
   List<RequestsModel> incoming = [];
-  for (var doc in incomingInstances.docs) {
+  for (var doc in incomingRequestInstances.docs) {
     RequestsModel requestData = RequestsModel.fromJson(doc.data());
     requestData.id = doc.id;
     var user = await usersRef.doc(requestData.senderId).get();
@@ -233,15 +237,14 @@ getInitialRequest(currentUserId) async {
     }
     incoming.add(requestData);
   }
-  var outgoingInstances = await FirebaseFirestore.instance
+  var outgoingRequestInstances = await FirebaseFirestore.instance
       .collection('requests')
       .orderBy('timeStamp', descending: true)
       .where('senderId', isEqualTo: currentUserId)
       .get();
   List<RequestsModel> outgoing = [];
-  for (var doc in outgoingInstances.docs) {
-    RequestsModel requestData =
-        RequestsModel.fromJson(doc.data());
+  for (var doc in outgoingRequestInstances.docs) {
+    RequestsModel requestData = RequestsModel.fromJson(doc.data());
     requestData.id = doc.id;
     var user = await usersRef.doc(requestData.receiverId).get();
     if (user.data() != null) {
@@ -255,8 +258,7 @@ getInitialRequest(currentUserId) async {
   return [incoming, outgoing];
 }
 
-//TODO: Test requests
-void requestsListeners(currentUserId) {
+void requestsListenersFirebase(currentUserId) {
   RequestsController requestsController = Get.find<RequestsController>();
   FirebaseFirestore.instance
       .collection('requests')
@@ -314,7 +316,7 @@ void requestsListeners(currentUserId) {
   });
 }
 
-Future<void> sendRequest(currentUserId, receiverName) async {
+Future<void> sendRequestFirebase(currentUserId, receiverName) async {
   var ref = FirebaseFirestore.instance.collection('requests');
   var receiverRef =
       await usersRef.where('username', isEqualTo: receiverName).get();
@@ -337,7 +339,7 @@ Future<void> sendRequest(currentUserId, receiverName) async {
   }
 }
 
-Future<void> requestAction(requestId, action) async {
+Future<void> requestActionFirebase(requestId, action) async {
   try {
     var ref = FirebaseFirestore.instance.collection('requests').doc(requestId);
     var batch = FirebaseFirestore.instance.batch();
@@ -378,7 +380,7 @@ Future<void> requestAction(requestId, action) async {
   }
 }
 
-Future<List<ChatsModel>> getInitialChats(currentUserId) async {
+Future<List<ChatsModel>> getInitialChatsFirebase(currentUserId) async {
   var chatInstances = await FirebaseFirestore.instance
       .collection('chats')
       .orderBy('timeStamp', descending: true)
@@ -390,21 +392,30 @@ Future<List<ChatsModel>> getInitialChats(currentUserId) async {
     chatData.receiverData = [];
     chatData.id = doc.id;
     chatData.users.removeWhere((element) => element == currentUserId);
-    if (chatData.chatType == 'dm') {
-      var user = await usersRef.doc(chatData.users[0]).get();
-      if (user.data() != null) {
+    for (var user in chatData.users) {
+      var userData = await usersRef.doc(user).get();
+      if (userData.data() != null) {
         UsersModel temp =
-            UsersModel.fromJson(user.data() as Map<String, dynamic>);
-        temp.id = user.id;
+            UsersModel.fromJson(userData.data() as Map<String, dynamic>);
+        temp.id = userData.id;
         chatData.receiverData?.add(temp);
       }
-      chats.add(chatData);
     }
+    // if (chatData.chatType == 'dm') {
+    //   var user = await usersRef.doc(chatData.users[0]).get();
+    //   if (user.data() != null) {
+    //     UsersModel temp =
+    //         UsersModel.fromJson(user.data() as Map<String, dynamic>);
+    //     temp.id = user.id;
+    //     chatData.receiverData?.add(temp);
+    //   }
+    // }
+    chats.add(chatData);
   }
   return chats;
 }
 
-Future<void> chatsListener(currentUserId, updateChats) async {
+Future<void> chatsListenerFirebase(currentUserId, updateChats) async {
   FirebaseFirestore.instance
       .collection('chats')
       .orderBy('timeStamp', descending: true)
@@ -435,9 +446,10 @@ Future<void> chatsListener(currentUserId, updateChats) async {
   });
 }
 
-Future<List<MessagesModel>> getInitialMessages(chatId) async {
+Future<List<MessagesModel>> getInitialMessagesFirebase(
+    collection, chatId) async {
   var messageInstances = await FirebaseFirestore.instance
-      .collection('chats')
+      .collection(collection)
       .doc(chatId)
       .collection('messages')
       .orderBy('timeStamp', descending: true)
@@ -451,9 +463,10 @@ Future<List<MessagesModel>> getInitialMessages(chatId) async {
   return messages;
 }
 
-Future<void> messagesListener(chatId, Function updateMessages) async {
+Future<void> messagesListenerFirebase(
+    collection, chatId, Function updateMessages) async {
   FirebaseFirestore.instance
-      .collection('chats')
+      .collection(collection)
       .doc(chatId)
       .collection('messages')
       .orderBy('timeStamp', descending: true)
@@ -509,4 +522,71 @@ void editMessageFirebase(chatId, messageId, message) {
 
 void deleteMessageFirebase(chatId, messageId) {
   chatsRef.doc(chatId).collection('messages').doc(messageId).delete();
+}
+
+Future<List> getInitialPostsFirebase(currentUserId, preference) async {
+  List<PostsModel> publicPosts = [];
+  var publicPostsInstances = await postsRef
+      .orderBy('timeStamp', descending: true)
+      .where('categories', arrayContainsAny: preference)
+      .get();
+  for (var instance in publicPostsInstances.docs) {
+    PostsModel postData =
+        PostsModel.fromJson(instance.data() as Map<String, dynamic>);
+    postData.id = instance.id;
+    var posterData = await usersRef.doc(postData.poster).get();
+    postData.posterData =
+        UsersModel.fromJson(posterData.data() as Map<String, dynamic>);
+    postData.posterData!.id = posterData.id;
+    publicPosts.add(postData);
+  }
+  List<PostsModel> followingPosts = [];
+  var followingPostsInstances = await postsRef
+      .orderBy('timeStamp', descending: true)
+      .where('followers', arrayContains: currentUserId)
+      .limit(20)
+      .get();
+  for (var instance in followingPostsInstances.docs) {
+    PostsModel postData =
+        PostsModel.fromJson(instance.data() as Map<String, dynamic>);
+    postData.id = instance.id;
+    var posterData = await usersRef.doc(postData.poster).get();
+    postData.posterData =
+        UsersModel.fromJson(posterData.data() as Map<String, dynamic>);
+    postData.posterData!.id = posterData.id;
+    followingPosts.add(postData);
+  }
+  return [publicPosts, followingPosts];
+}
+
+Future<bool> sendPostFirebase(
+    PostsModel newPost, MessagesModel firstMessage, attachments) async {
+  try {
+    var docRef = await postsRef.add(newPost.toJson());
+    await sendPostMessageFirebase(docRef.id, firstMessage, attachments);
+    return true;
+  } catch (e) {
+    debugPrint('(catch)$e');
+    return false;
+  }
+}
+
+Future<void> sendPostMessageFirebase(
+    postId, MessagesModel messageData, attachments) async {
+  var postRef = postsRef.doc(postId);
+  var storageRef = FirebaseStorage.instance.ref();
+  List<String> fileLinks = [];
+
+  if (attachments.isNotEmpty) {
+    fileLinks =
+        await Future.wait(attachments.map<Future<String>>((attachment) async {
+      var attachmentRef = storageRef.child('attachments/${attachment.name}');
+      var task = await attachmentRef.putFile(File(attachment.path));
+      var downloadUrl = task.ref.getDownloadURL();
+      return downloadUrl;
+    }));
+  }
+  messageData.timeStamp = DateTime.now();
+  messageData.attachments = fileLinks;
+  postRef.collection('messages').add(messageData.toJson());
 }

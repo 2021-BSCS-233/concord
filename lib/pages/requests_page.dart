@@ -81,7 +81,7 @@ class RequestsPage extends StatelessWidget {
                   itemBuilder: (context, index) {
                     return Container(
                       margin: const EdgeInsets.only(top: 15),
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: Color(0xFF121218),
                         borderRadius: BorderRadius.all(Radius.circular(20)),
                       ),
@@ -114,7 +114,7 @@ class RequestsPage extends StatelessWidget {
                                       color: Colors.green,
                                     )),
                                 onTap: () async {
-                                  await requestAction(
+                                  await requestActionFirebase(
                                       requestsController
                                           .incomingRequestsData[index].id,
                                       'accept');
@@ -132,7 +132,7 @@ class RequestsPage extends StatelessWidget {
                                       color: Colors.red,
                                     )),
                                 onTap: () {
-                                  requestAction(
+                                  requestActionFirebase(
                                       requestsController
                                           .incomingRequestsData[index].id,
                                       'deny');
@@ -146,15 +146,15 @@ class RequestsPage extends StatelessWidget {
                   })),
         ),
         Container(
-          padding: EdgeInsets.only(left: 10),
+          padding: const EdgeInsets.only(left: 10),
           child: Column(
             children: [
               Row(
                 children: [
                   Expanded(
-                    child: InputField(
+                    child: CustomInputField(
                       fieldLabel: 'Add Friend',
-                      controller: requestsController.requestsFieldController,
+                      controller: requestsController.requestsFieldTextController,
                       prefixIcon: CupertinoIcons.person_add,
                       onChange: requestsController.changing,
                       contentTopPadding: 10,
@@ -171,12 +171,12 @@ class RequestsPage extends StatelessWidget {
                           child: TextButton(
                             onPressed: () {
                               requestsController.fieldCheck.value = false;
-                              sendRequest(
+                              sendRequestFirebase(
                                   mainController.currentUserData.id,
                                   requestsController
-                                      .requestsFieldController.text
+                                      .requestsFieldTextController.text
                                       .trim());
-                              requestsController.requestsFieldController.text =
+                              requestsController.requestsFieldTextController.text =
                                   '';
                             },
                             style: ButtonStyle(
@@ -207,7 +207,7 @@ class RequestsPage extends StatelessWidget {
                             itemBuilder: (context, index) {
                               return Container(
                                 margin: const EdgeInsets.only(top: 15),
-                                decoration: BoxDecoration(
+                                decoration: const BoxDecoration(
                                   color: Color(0xFF121218),
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(20)),
@@ -243,7 +243,7 @@ class RequestsPage extends StatelessWidget {
                                           color: Colors.red,
                                         )),
                                     onTap: () {
-                                      requestAction(
+                                      requestActionFirebase(
                                           requestsController
                                               .outgoingRequestsData[index].id,
                                           'deny');

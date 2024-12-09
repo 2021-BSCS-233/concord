@@ -14,7 +14,7 @@ class OptionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         // color: Color(0xFF18181D),
         color: Color(0xFF121218),
         borderRadius: BorderRadius.all(Radius.circular(20)),

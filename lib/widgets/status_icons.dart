@@ -41,7 +41,7 @@ class StatusIcon extends StatelessWidget {
           child: Container(
             height: size / 6,
             width: size / 2.2,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(2)),
               color: Colors.black,
             ),

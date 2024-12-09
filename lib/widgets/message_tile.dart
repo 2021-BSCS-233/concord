@@ -66,7 +66,7 @@ class MessageTileFull extends StatelessWidget {
                         onTap: () {},
                         child: Text(
                           sendingUser.displayName,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                               color: Color(0xFFEEEEEE)),
@@ -87,7 +87,7 @@ class MessageTileFull extends StatelessWidget {
                       : RichText(
                           text: TextSpan(
                           text: messageData.message,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w400,
                               color: Color(0xFFDEDEE2)),
@@ -118,7 +118,7 @@ class MessageTileFull extends StatelessWidget {
 
 class MessageTileCompact extends StatelessWidget {
   final MessagesModel messageData;
-  final Map sendingUser;
+  final UsersModel sendingUser;
   final Function toggleMenu;
 
   const MessageTileCompact(
@@ -146,34 +146,36 @@ class MessageTileCompact extends StatelessWidget {
               height: 15,
               width: 48,
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                messageData.message == ''
-                    ? const SizedBox()
-                    : RichText(
-                        text: TextSpan(
-                          text: messageData.message,
-                          style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0xFFDEDEE2)),
-                          children: messageData.edited
-                              ? [
-                                  TextSpan(
-                                      text: ' (edited)',
-                                      style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey.shade400)),
-                                ]
-                              : null,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  messageData.message == ''
+                      ? const SizedBox()
+                      : RichText(
+                          text: TextSpan(
+                            text: messageData.message,
+                            style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xFFDEDEE2)),
+                            children: messageData.edited
+                                ? [
+                                    TextSpan(
+                                        text: ' (edited)',
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey.shade400)),
+                                  ]
+                                : null,
+                          ),
                         ),
-                      ),
-                messageData.attachments!.isEmpty
-                    ? const SizedBox()
-                    : Attachments(attachments: messageData.attachments!)
-              ],
+                  messageData.attachments!.isEmpty
+                      ? const SizedBox()
+                      : Attachments(attachments: messageData.attachments!)
+                ],
+              ),
             ),
           ],
         ),

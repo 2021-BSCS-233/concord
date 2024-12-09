@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:concord/main.dart';
 import 'package:get/get.dart';
 import 'package:concord/widgets/input_field.dart';
-import 'package:concord/controllers/signin_controller.dart';
+import 'package:concord/controllers/sign_in_controller.dart';
 
 class SignInPage extends StatelessWidget {
   final SignInController signInController = Get.put(SignInController());
@@ -16,7 +16,7 @@ class SignInPage extends StatelessWidget {
       children: [
         Scaffold(
           appBar: AppBar(
-            title: Text(
+            title: const Text(
               'Create Account',
               style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
             ),
@@ -32,14 +32,14 @@ class SignInPage extends StatelessWidget {
                   const SizedBox(
                     height: 30,
                   ),
-                  Text(
+                  const Text(
                     'Welcome To Concord!',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 25,
                     ),
                   ),
-                  Text('We\'re excited to see you join us!'),
+                  const Text('We\'re excited to see you join us!'),
                   const SizedBox(
                     height: 40,
                   ),
@@ -47,13 +47,13 @@ class SignInPage extends StatelessWidget {
                     alignment: Alignment.centerLeft,
                     child: Container(
                         margin: const EdgeInsets.only(left: 5, bottom: 5),
-                        child: Text(
+                        child: const Text(
                           'ACCOUNT INFORMATION',
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 10),
                         )),
                   ),
-                  InputField(
+                  CustomInputField(
                     fieldLabel: 'Username',
                     controller: signInController.signInUsernameTextController,
                     fieldRadius: 2,
@@ -64,7 +64,7 @@ class SignInPage extends StatelessWidget {
                     suffixIcon: Icons.all_inclusive,
                     maxLength: 20,
                   ),
-                  InputField(
+                  CustomInputField(
                     fieldLabel: 'Display Name',
                     controller: signInController.signInDisplayTextController,
                     fieldRadius: 2,
@@ -74,7 +74,7 @@ class SignInPage extends StatelessWidget {
                     contentTopPadding: 13,
                     suffixIcon: Icons.all_inclusive,
                   ),
-                  InputField(
+                  CustomInputField(
                     fieldLabel: 'Email',
                     controller: signInController.signInEmailTextController,
                     fieldRadius: 2,
@@ -84,7 +84,7 @@ class SignInPage extends StatelessWidget {
                     contentTopPadding: 13,
                     suffixIcon: Icons.all_inclusive,
                   ),
-                  InputField(
+                  CustomInputField(
                     fieldLabel: 'Password',
                     controller: signInController.signInPassTextController,
                     fieldRadius: 2,
@@ -112,8 +112,8 @@ class SignInPage extends StatelessWidget {
                       width: double.infinity,
                       decoration: BoxDecoration(
                           color: Colors.blueAccent.shade700,
-                          borderRadius: BorderRadius.all(Radius.circular(5))),
-                      child: Center(child: Text('Sign In')),
+                          borderRadius: const BorderRadius.all(Radius.circular(5))),
+                      child: const Center(child: Text('Sign In')),
                     ),
                   ),
                 ],
@@ -134,7 +134,7 @@ class SignInPage extends StatelessWidget {
                       }
                     : () {},
                 child: Container(
-                  color: Color(0xC01D1D1F),
+                  color: const Color(0xC01D1D1F),
                   height: MediaQuery.of(context).size.height,
                   width: double.infinity,
                   child: const Center(child: CircularProgressIndicator()),
@@ -147,22 +147,22 @@ class SignInPage extends StatelessWidget {
                 visible: signInController.showMessageSignIn.value,
                 child: Center(
                   child: Container(
-                    padding: EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(20),
                     height: signInController.messageHeightSignIn,
                     width: 300,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                         color: Color(0xFF121218),
                         borderRadius: BorderRadius.all(Radius.circular(15))),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('SignIn Failed',
+                        const Text('SignIn Failed',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 18)),
                         const SizedBox(height: 5),
                         Text(signInController.failMessage,
                             // textAlign: TextAlign.center,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 15)),
                         const SizedBox(height: 35),
                         InkWell(
@@ -178,8 +178,8 @@ class SignInPage extends StatelessWidget {
                             decoration: BoxDecoration(
                                 color: Colors.blueAccent.shade700,
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
-                            child: Center(
+                                    const BorderRadius.all(Radius.circular(10))),
+                            child: const Center(
                               child: Text(
                                 'Close',
                                 style: TextStyle(

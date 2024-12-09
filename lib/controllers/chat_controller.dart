@@ -20,7 +20,7 @@ class ChatController extends GetxController {
   var sendVisible = false.obs;
   var attachmentVisible = false.obs;
   final chatFocusNode = FocusNode();
-  TextEditingController chatFieldController = TextEditingController();
+  TextEditingController chatFieldTextController = TextEditingController();
 
   // ChatController({required this.chatId});
 
@@ -39,10 +39,10 @@ class ChatController extends GetxController {
   }
 
   void sendVisibility() {
-    if (!editMode && chatFieldController.text.trim() != '') {
+    if (!editMode && chatFieldTextController.text.trim() != '') {
       sendVisible.value = true;
     } else if (editMode &&
-        chatFieldController.text.trim() !=
+        chatFieldTextController.text.trim() !=
             chatContent[messageSelected].message) {
       sendVisible.value = true;
     } else {
@@ -51,8 +51,8 @@ class ChatController extends GetxController {
   }
 
   getMessages(chatId) async {
-    await messagesListener(chatId, updateMessages);
-    chatContent = await getInitialMessages(chatId);
+    await messagesListenerFirebase('chats', chatId, updateMessages);
+    chatContent = await getInitialMessagesFirebase('chats', chatId);
     initial = false;
   }
 
@@ -64,17 +64,17 @@ class ChatController extends GetxController {
     } else {
       MessagesModel messageData = MessagesModel(
           senderId: currentUserId,
-          message: chatFieldController.text.trim(),
+          message: chatFieldTextController.text.trim(),
           edited: false);
       sendMessageFirebase(chatId, messageData, attachments);
     }
-    chatFieldController.clear();
+    chatFieldTextController.clear();
     attachments = [];
   }
 
   sendEditMessage() {
     editMessageFirebase(chatId, chatContent[messageSelected].id,
-        chatFieldController.text.trim());
+        chatFieldTextController.text.trim());
     chatFocusNode.unfocus();
     editMode = false;
   }
@@ -95,7 +95,7 @@ class ChatController extends GetxController {
   editMessage() {
     showMenu.value = false;
     editMode = true;
-    chatFieldController.text = chatContent[messageSelected].message;
+    chatFieldTextController.text = chatContent[messageSelected].message;
     chatFocusNode.requestFocus();
   }
 

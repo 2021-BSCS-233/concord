@@ -1,5 +1,7 @@
 import 'package:concord/models/posts_model.dart';
+import 'package:concord/pages/post_page.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class PostTile extends StatelessWidget {
   final PostsModel postData;
@@ -60,6 +62,9 @@ class PostTile extends StatelessWidget {
             ),
           ),
           ListTile(
+            onTap: (){
+              Get.to(PostPage(postData: postData));
+            },
             contentPadding: EdgeInsets.zero,
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,7 +82,7 @@ class PostTile extends StatelessWidget {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(right: 10),
-                      child: Text(timeDifference, style: TextStyle(fontSize: 12),),
+                      child: Text(timeDifference, style: const TextStyle(fontSize: 12),),
                     ),
                   ],
                 ),

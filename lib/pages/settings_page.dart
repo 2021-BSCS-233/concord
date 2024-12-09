@@ -14,9 +14,9 @@ class SettingsPage extends StatelessWidget {
       Get.find<LocalizationController>();
 
   SettingsPage({super.key}) {
-    editSettingsController.usernameController.text =
+    editSettingsController.usernameTextController.text =
         mainController.currentUserData.username;
-    editSettingsController.emailController.text =
+    editSettingsController.emailTextController.text =
         mainController.currentUserData.email;
   }
 
@@ -50,12 +50,12 @@ class SettingsPage extends StatelessWidget {
                             color: Colors.grey.shade400,
                             fontSize: 12)),
                     TextFormField(
-                      controller: editSettingsController.usernameController,
+                      controller: editSettingsController.usernameTextController,
                       decoration: InputDecoration(
                         contentPadding:
-                            EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                            const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                         floatingLabelBehavior: FloatingLabelBehavior.never,
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
                         labelText:
                             mainController.currentUserData.displayName,
                       ),
@@ -69,12 +69,12 @@ class SettingsPage extends StatelessWidget {
                             color: Colors.grey.shade400,
                             fontSize: 12)),
                     TextFormField(
-                      controller: editSettingsController.emailController,
+                      controller: editSettingsController.emailTextController,
                       decoration: InputDecoration(
                         contentPadding:
-                            EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                            const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                         floatingLabelBehavior: FloatingLabelBehavior.never,
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
                         labelText: mainController.currentUserData.email,
                       ),
                     ),
@@ -94,7 +94,7 @@ class SettingsPage extends StatelessWidget {
                             decoration: BoxDecoration(
                                 color: Colors.blueAccent.shade700,
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
+                                    const BorderRadius.all(Radius.circular(10))),
                             child: Center(
                               child: Text(
                                 'changePass'.tr,
@@ -195,7 +195,7 @@ class SettingsPage extends StatelessWidget {
                   editSettingsController.toggleMenu();
                 },
                 child: Container(
-                  color: Color(0xC01D1D1F),
+                  color: const Color(0xC01D1D1F),
                   height: MediaQuery.of(context).size.height,
                   width: double.infinity,
                 ),
@@ -210,7 +210,7 @@ class SettingsPage extends StatelessWidget {
                     child: Container(
                       height: 400,
                       width: 300,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                           color: Color(0xFF121218),
                           borderRadius: BorderRadius.all(Radius.circular(15))),
                       child: Column(
@@ -223,7 +223,7 @@ class SettingsPage extends StatelessWidget {
                                   fontSize: 12)),
                           TextFormField(
                             controller:
-                                editSettingsController.passwordController,
+                                editSettingsController.passwordTextController,
                             decoration: const InputDecoration(
                               contentPadding: EdgeInsets.symmetric(
                                   vertical: 5, horizontal: 10),
@@ -242,7 +242,7 @@ class SettingsPage extends StatelessWidget {
                                   fontSize: 12)),
                           TextFormField(
                             controller:
-                                editSettingsController.passwordController,
+                                editSettingsController.passwordTextController,
                             decoration: const InputDecoration(
                               contentPadding: EdgeInsets.symmetric(
                                   vertical: 5, horizontal: 10),

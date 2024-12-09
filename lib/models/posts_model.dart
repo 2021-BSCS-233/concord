@@ -16,6 +16,8 @@ class PostsModel {
   @JsonKey(includeToJson: false, includeFromJson: false)
   UsersModel? posterData;
   @JsonKey(includeToJson: false, includeFromJson: false)
+  List<UsersModel>? receiverData;
+  @JsonKey(includeToJson: false, includeFromJson: false)
   String? id;
 
   PostsModel(
@@ -27,6 +29,7 @@ class PostsModel {
         required this.followers,
         required this.timeStamp,
         this.posterData,
+        this.receiverData,
         this.id});
 
   factory PostsModel.fromJson(Map<String, dynamic> json) =>

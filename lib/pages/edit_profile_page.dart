@@ -3,7 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:concord/controllers/main_controller.dart';
-import 'package:concord/controllers/editprofile_controller.dart';
+import 'package:concord/controllers/edit_profile_controller.dart';
 import 'package:concord/widgets/status_icons.dart';
 import 'package:concord/services/firebase_services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -17,11 +17,11 @@ class EditProfilePage extends StatelessWidget {
   EditProfilePage({
     super.key,
   }) {
-    editProfileController.displayController.text =
+    editProfileController.displayTextController.text =
         mainController.currentUserData.displayName;
-    editProfileController.pronounceController.text =
+    editProfileController.pronounceTextController.text =
         mainController.currentUserData.pronouns;
-    editProfileController.aboutMeController.text =
+    editProfileController.aboutMeTextController.text =
         mainController.currentUserData.aboutMe;
     editProfileController.image = null;
   }
@@ -29,7 +29,7 @@ class EditProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF121218),
+      backgroundColor: const Color(0xFF121218),
       appBar: AppBar(
         title: Text(
           'editProfile'.tr,
@@ -39,13 +39,13 @@ class EditProfilePage extends StatelessWidget {
         actions: [
           InkWell(
             onTap: () async {
-              await updateProfile(
+              await updateProfileFirebase(
                   mainController.currentUserData.id,
-                  editProfileController.displayController.text.trim() != ''
-                      ? editProfileController.displayController.text.trim()
+                  editProfileController.displayTextController.text.trim() != ''
+                      ? editProfileController.displayTextController.text.trim()
                       : mainController.currentUserData.displayName,
-                  editProfileController.pronounceController.text.trim(),
-                  editProfileController.aboutMeController.text.trim(),
+                  editProfileController.pronounceTextController.text.trim(),
+                  editProfileController.aboutMeTextController.text.trim(),
                   editProfileController.image);
               Get.back();
             },
@@ -105,7 +105,7 @@ class EditProfilePage extends StatelessWidget {
                               color: Colors.transparent,
                               shape: BoxShape.circle,
                               border: Border.all(
-                                  width: 6, color: Color(0xFF121218))),
+                                  width: 6, color: const Color(0xFF121218))),
                           child: Obx(() => CircleAvatar(
                                 backgroundImage: editProfileController
                                                 .updateP.value ==
@@ -141,7 +141,7 @@ class EditProfilePage extends StatelessWidget {
                             child: Container(
                               height: 24,
                               width: 24,
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                   shape: BoxShape.circle,
                                   color: Color(0xFF121218)),
                               child: Icon(
@@ -161,7 +161,7 @@ class EditProfilePage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 18),
               alignment: Alignment.centerLeft,
               width: double.infinity,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                   color: Colors.black,
                   borderRadius: BorderRadius.all(Radius.circular(15))),
               child: SizedBox(
@@ -175,7 +175,7 @@ class EditProfilePage extends StatelessWidget {
                             color: Colors.grey.shade400,
                             fontSize: 12)),
                     TextFormField(
-                      controller: editProfileController.displayController,
+                      controller: editProfileController.displayTextController,
                       decoration: InputDecoration(
                         contentPadding: const EdgeInsets.symmetric(
                             vertical: 5, horizontal: 10),
@@ -195,7 +195,7 @@ class EditProfilePage extends StatelessWidget {
                             fontSize: 12)),
                     TextFormField(
                       maxLength: 40,
-                      controller: editProfileController.pronounceController,
+                      controller: editProfileController.pronounceTextController,
                       decoration: InputDecoration(
                           contentPadding: const EdgeInsets.symmetric(
                               vertical: 5, horizontal: 10),
@@ -213,7 +213,7 @@ class EditProfilePage extends StatelessWidget {
                             color: Colors.grey.shade400,
                             fontSize: 12)),
                     TextFormField(
-                      controller: editProfileController.aboutMeController,
+                      controller: editProfileController.aboutMeTextController,
                       maxLines: 7,
                       maxLength: 190,
                       decoration: InputDecoration(

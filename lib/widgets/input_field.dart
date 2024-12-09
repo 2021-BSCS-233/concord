@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class InputField extends StatelessWidget {
+class CustomInputField extends StatelessWidget {
   final IconData? prefixIcon;
   final IconData? suffixIcon;
   final Color? fieldColor;
@@ -20,7 +20,7 @@ class InputField extends StatelessWidget {
   final int? maxLines;
   final FocusNode? fieldFocusNode;
 
-  const InputField(
+  const CustomInputField(
       {super.key,
       required this.fieldLabel,
       required this.controller,
@@ -88,13 +88,13 @@ class InputField extends StatelessWidget {
                   : suffixIcon != null
                       ? Icon(suffixIcon)
                       : null,
-          fillColor: fieldColor ?? Color(0xFF202020),
+          fillColor: fieldColor ?? const Color(0xFF202020),
           filled: true,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(fieldRadius ?? 25)),
             borderSide: BorderSide.none,
           ),
-          label: Text(fieldLabel),
+          label: Text(fieldLabel, overflow: TextOverflow.ellipsis,),
           hintText: '',
           floatingLabelBehavior: FloatingLabelBehavior.never,
         ),

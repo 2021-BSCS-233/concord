@@ -49,25 +49,55 @@ class DmChatTile extends StatelessWidget {
         },
         dense: true,
         contentPadding: EdgeInsets.zero,
-        leading: Stack(
-          children: [
-            ProfilePicture(
-              profileLink: chatData.receiverData![0].profilePicture,
-              profileRadius: 20,
+        leading: chatData.chatType == 'dm'
+            ? Stack(
+                children: [
+                  ProfilePicture(
+                    profileLink: chatData.receiverData![0].profilePicture,
+                    profileRadius: 20,
+                  ),
+                  Positioned(
+                    bottom: -2,
+                    right: -2,
+                    child: StatusIcon(
+                      iconType: chatData.receiverData![0].status == 'Online'
+                          ? chatData.receiverData![0].displayStatus
+                          : chatData.receiverData![0].status,
+                      iconSize: 16.0,
+                      iconBorder: 3,
+                    ),
+                  ),
+                ],
+              )
+            : SizedBox(
+          height: 40,
+              width: 40,
+              child: Stack(
+                  children: [
+                    ProfilePicture(
+                      profileLink: chatData.receiverData![0].profilePicture,
+                      profileRadius: 15,
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: Container(
+                        height: 32,
+                        width: 32,
+                        decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.black, border: Border.all(width: 2)),
+                        child: ProfilePicture(
+                          profileLink: chatData.receiverData![1].profilePicture,
+                          profileRadius: 15,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
             ),
-            Positioned(
-              bottom: -1,
-              right: -1,
-              child: StatusIcon(
-                iconType: chatData.receiverData![0].status == 'Online'
-                    ? chatData.receiverData![0].displayStatus
-                    : chatData.receiverData![0].status,
-              ),
-            ),
-          ],
-        ),
         title: Text(
-          chatData.receiverData![0].displayName,
+          chatData.chatType == 'dm'
+              ? chatData.receiverData![0].displayName
+              : chatData.chatGroupName!,
           style: const TextStyle(
               overflow: TextOverflow.ellipsis,
               fontSize: 16,
