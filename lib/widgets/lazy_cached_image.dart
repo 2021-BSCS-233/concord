@@ -20,23 +20,26 @@ class LazyCachedImage extends StatelessWidget {
       onTap: () {
         Get.to(ImagePage(url: url));
       },
-      child: CachedNetworkImage(
-        imageUrl: url,
-        fit: BoxFit.cover,
-        errorWidget: (context, url, error) =>
-            Image.asset('assets/images/placeholder1.jpg'),
-        imageBuilder: (context, imageProvider) => FadeInImage(
-            fit: BoxFit.cover,
-            placeholder: const AssetImage('assets/images/placeholder1.jpg'),
-            image: imageProvider),
-      ),
-
-      // child: FadeInImage(
-      //   image: CachedNetworkImageProvider(url,
-      //       cacheManager: generalImageCache,scale: 0.5, errorListener: (error){print('error loading image $error');}),
-      //   placeholder: const AssetImage('assets/images/placeholder1.jpg'),
+      // child: CachedNetworkImage(
+      //   imageUrl: url,
       //   fit: BoxFit.cover,
+      //   errorWidget: (context, url, error) =>
+      //       Image.asset('assets/images/placeholder1.jpg'),
+      //   imageBuilder: (context, imageProvider) => FadeInImage(
+      //       fit: BoxFit.cover,
+      //       placeholder: const AssetImage('assets/images/placeholder1.jpg'),
+      //       image: imageProvider),
       // ),
+
+      child: FadeInImage(
+        image: CachedNetworkImageProvider(
+          url,
+          cacheManager: generalImageCache,
+          scale: 0.5,
+        ),
+        placeholder: const AssetImage('assets/images/placeholder1.jpg'),
+        fit: BoxFit.cover,
+      ),
     );
   }
 }
@@ -52,13 +55,17 @@ class ImagePage extends StatelessWidget {
       appBar: AppBar(),
       body: Center(
         child: InteractiveViewer(
-            child: CachedNetworkImage(
-          imageUrl: url,
-          cacheManager: generalImageCache,
-          fit: BoxFit.contain,
-          placeholder: (context, url) => const CircularProgressIndicator(),
-          errorWidget: (context, url, error) => const Icon(Icons.error),
-        )),
+            child: SizedBox(
+              height: double.infinity,
+              width: double.infinity,
+              child: CachedNetworkImage(
+                        imageUrl: url,
+                        cacheManager: generalImageCache,
+                        fit: BoxFit.contain,
+                        placeholder: (context, url) => const CircularProgressIndicator(),
+                        errorWidget: (context, url, error) => const Icon(Icons.error),
+                      ),
+            )),
       ),
     );
   }

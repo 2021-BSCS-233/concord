@@ -5,6 +5,7 @@ import 'package:concord/services/firebase_services.dart';
 class LogInController extends GetxController {
   TextEditingController logInEmailTextController = TextEditingController();
   TextEditingController logInPassTextController = TextEditingController();
+  var hidePassword = true.obs;
   var showOverlayLogIn = false.obs;
   var showMessageLogIn = false.obs;
 

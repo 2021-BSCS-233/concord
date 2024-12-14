@@ -12,6 +12,7 @@ class ChatsModel {
   @JsonKey(fromJson: _customDateFromJson, toJson: _customDateToJson)
   DateTime timeStamp; // (json['timeStamp'] as Timestamp).toDate()
   List<String> users;
+  List<String> visible;
   @JsonKey(includeToJson: false, includeFromJson: false)
   String? id;
   @JsonKey(includeToJson: false, includeFromJson: false)
@@ -22,6 +23,7 @@ class ChatsModel {
       required this.latestMessage,
       required this.timeStamp,
       required this.users,
+      required this.visible,
       this.chatGroupName,
       this.receiverData,
       this.id});

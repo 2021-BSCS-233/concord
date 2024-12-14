@@ -1,12 +1,14 @@
+import 'package:concord/controllers/main_controller.dart';
 import 'package:concord/models/posts_model.dart';
 import 'package:concord/pages/post_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class PostTile extends StatelessWidget {
+  final MainController mainController = Get.find<MainController>();
   final PostsModel postData;
 
-  const PostTile({super.key, required this.postData});
+  PostTile({super.key, required this.postData});
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +65,9 @@ class PostTile extends StatelessWidget {
           ),
           ListTile(
             onTap: (){
-              Get.to(PostPage(postData: postData));
+              Get.to(PostPage(postData: postData))?.then((value){
+                mainController.chatListenerRef?.cancel();
+              });
             },
             contentPadding: EdgeInsets.zero,
             title: Column(

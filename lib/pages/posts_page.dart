@@ -2,6 +2,7 @@ import 'package:concord/controllers/main_controller.dart';
 import 'package:concord/controllers/posts_controller.dart';
 import 'package:concord/pages/new_post_page.dart';
 import 'package:concord/widgets/post_tile.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -34,13 +35,15 @@ class PostsPage extends StatelessWidget {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            Get.to(NewPostPage(refreshContent: refreshContent,));
+            Get.to(NewPostPage())?.then((value) {
+              refreshContent();
+            });
           },
           backgroundColor: Colors.blueAccent.shade400,
           shape: const CircleBorder(),
           child: const Icon(
-            Icons.add,
-            size: 35,
+            CupertinoIcons.add,
+            size: 30,
           ),
         ),
         body: FutureBuilder<Widget>(
@@ -69,47 +72,51 @@ class PostsPage extends StatelessWidget {
       ),
     );
   }
+
   refreshContent() async {
-    await postsController.getInitialPosts(
-        mainController.currentUserData.id,
+    await postsController.getInitialPosts(mainController.currentUserData.id,
         mainController.currentUserData.preference);
+    postsController.updateP += 1;
   }
 
   Future<Widget> postsData() async {
-    postsController.initial
-        ? await refreshContent()
-        : null;
-    return TabBarView(children: [
-      Container(
-        padding: const EdgeInsets.only(left: 10, right: 10),
-        child: RefreshIndicator(
-          onRefresh: () async {
-            refreshContent();
-            await Future.delayed(const Duration(seconds: 2)); // Simulate a delay
-            return Future.value(null);
-          },
-          child: ListView.builder(
-              itemCount: postsController.publicPosts.length,
-              // shrinkWrap: true,
-              itemBuilder: (context, index) {
-                return PostTile(postData: postsController.publicPosts[index]);
-              }),
-        ),
-      ),
-      Container(
-        padding: const EdgeInsets.only(left: 10, right: 10),
-        child: RefreshIndicator(
-          onRefresh: () async {
-            return refreshContent();
-          },
-          child: ListView.builder(
-              itemCount: postsController.followingPosts.length,
-              shrinkWrap: true,
-              itemBuilder: (context, index) {
-                return PostTile(postData: postsController.followingPosts[index]);
-              }),
-        ),
-      ),
-    ]);
+    postsController.initial ? await refreshContent() : null;
+    return Obx(() => TabBarView(children: [
+          Container(
+            padding: const EdgeInsets.only(left: 10, right: 10),
+            child: RefreshIndicator(
+              onRefresh: () async {
+                refreshContent();
+                await Future.delayed(
+                    const Duration(seconds: 2)); // Simulate a delay
+                return Future.value(null);
+              },
+              child: ListView.builder(
+                  itemCount: postsController.updateP.value != -1
+                      ? postsController.publicPosts.length
+                      : 0,
+                  // shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    return PostTile(
+                        postData: postsController.publicPosts[index]);
+                  }),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.only(left: 10, right: 10),
+            child: RefreshIndicator(
+              onRefresh: () async {
+                return refreshContent();
+              },
+              child: ListView.builder(
+                  itemCount: postsController.followingPosts.length,
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    return PostTile(
+                        postData: postsController.followingPosts[index]);
+                  }),
+            ),
+          ),
+        ]));
   }
 }

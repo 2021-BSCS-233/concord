@@ -6,9 +6,8 @@ import 'package:get/get.dart';
 class NewPostPage extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
   final NewPostController newPostController = Get.put(NewPostController());
-  final Function refreshContent;
 
-  NewPostPage({super.key, required this.refreshContent});
+  NewPostPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +26,6 @@ class NewPostPage extends StatelessWidget {
           var result =
               await newPostController.sendPost(mainController.currentUserData.id);
           if(result){
-            refreshContent();
             Get.delete<NewPostController>();
             Get.back();
           }

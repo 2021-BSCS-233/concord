@@ -84,16 +84,20 @@ class SignInPage extends StatelessWidget {
                     contentTopPadding: 13,
                     suffixIcon: Icons.all_inclusive,
                   ),
-                  CustomInputField(
-                    fieldLabel: 'Password',
-                    controller: signInController.signInPassTextController,
-                    fieldRadius: 2,
-                    horizontalMargin: 0,
-                    verticalMargin: 2,
-                    fieldHeight: 50,
-                    contentTopPadding: 13,
-                    suffixIcon: CupertinoIcons.eye,
-                  ),
+                  Obx(() => CustomInputField(
+                        fieldLabel: 'Password',
+                        controller: signInController.signInPassTextController,
+                        fieldRadius: 2,
+                        horizontalMargin: 0,
+                        verticalMargin: 2,
+                        fieldHeight: 50,
+                        contentTopPadding: 13,
+                        hidden: signInController.hidePassword.value,
+                        hideLetters: () {
+                          signInController.hidePassword.value =
+                              !(signInController.hidePassword.value);
+                        },
+                      )),
                   const SizedBox(
                     height: 40,
                   ),
@@ -112,7 +116,8 @@ class SignInPage extends StatelessWidget {
                       width: double.infinity,
                       decoration: BoxDecoration(
                           color: Colors.blueAccent.shade700,
-                          borderRadius: const BorderRadius.all(Radius.circular(5))),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(5))),
                       child: const Center(child: Text('Sign In')),
                     ),
                   ),
@@ -177,8 +182,8 @@ class SignInPage extends StatelessWidget {
                             width: 130,
                             decoration: BoxDecoration(
                                 color: Colors.blueAccent.shade700,
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(10))),
+                                borderRadius: const BorderRadius.all(
+                                    Radius.circular(10))),
                             child: const Center(
                               child: Text(
                                 'Close',

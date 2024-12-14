@@ -183,14 +183,7 @@ class Home extends StatelessWidget {
               left: 0.0,
               right: 0.0,
               child: mainController.selectedIndex.value == 0
-                  ? UserGroupPopup(
-                      tileContent: [
-                        mainController.selectedId,
-                        mainController.selectedUsername,
-                        mainController.selectedUserPic,
-                        mainController.selectedChatType
-                      ],
-                    )
+                  ? UserGroupPopup()
                   : mainController.selectedIndex.value == 3
                       ? StatusPopup(
                           id: mainController.currentUserData.id!,
@@ -205,9 +198,9 @@ class Home extends StatelessWidget {
                   : -MediaQuery.of(context).size.height,
               left: 0.0,
               right: 0.0,
-              child: mainController.selectedId == ''
+              child: mainController.selectedChatId == ''
                   ? Container()
-                  : ProfilePopup(selectedUser: mainController.selectedId),
+                  : ProfilePopup(selectedUser: mainController.selectedUserId),
             ))
       ],
     );

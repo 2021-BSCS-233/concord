@@ -1,5 +1,7 @@
 import 'package:concord/pages/friends_page.dart';
+import 'package:concord/pages/new_group_page.dart';
 import 'package:concord/widgets/profile_picture.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:concord/widgets/dm_chat_tile.dart';
@@ -36,7 +38,7 @@ class ChatsPage extends StatelessWidget {
             },
             child: SizedBox(
               height: 40,
-              width: 120,
+              width: 100,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -53,6 +55,17 @@ class ChatsPage extends StatelessWidget {
             width: 25,
           )
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Get.to(NewGroupPage());
+        },
+        backgroundColor: Colors.blueAccent.shade400,
+        shape: const CircleBorder(),
+        child: const Icon(
+          Icons.add_comment,
+          size: 28,
+        ),
       ),
       body: FutureBuilder<Widget>(
         future: chatsUI(),

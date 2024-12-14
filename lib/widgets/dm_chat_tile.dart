@@ -37,12 +37,17 @@ class DmChatTile extends StatelessWidget {
       child: ListTile(
         titleAlignment: ListTileTitleAlignment.top,
         onTap: () {
-          Get.to(ChatPage(chatData: chatData));
+          Get.to(ChatPage(chatData: chatData))?.then((value) {
+            mainController.chatListenerRef?.cancel();
+          });
         },
         onLongPress: () {
           mainController.toggleMenu([
             chatData.id,
-            chatData.receiverData![0].username,
+            chatData.receiverData![0].id,
+            chatData.chatType == 'dm'
+                ? chatData.receiverData![0].username
+                : chatData.chatGroupName,
             chatData.receiverData![0].profilePicture,
             chatData.chatType
           ]);
@@ -70,9 +75,9 @@ class DmChatTile extends StatelessWidget {
                 ],
               )
             : SizedBox(
-          height: 40,
-              width: 40,
-              child: Stack(
+                height: 40,
+                width: 40,
+                child: Stack(
                   children: [
                     ProfilePicture(
                       profileLink: chatData.receiverData![0].profilePicture,
@@ -84,7 +89,10 @@ class DmChatTile extends StatelessWidget {
                       child: Container(
                         height: 32,
                         width: 32,
-                        decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.black, border: Border.all(width: 2)),
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.black,
+                            border: Border.all(width: 2)),
                         child: ProfilePicture(
                           profileLink: chatData.receiverData![1].profilePicture,
                           profileRadius: 15,
@@ -93,7 +101,7 @@ class DmChatTile extends StatelessWidget {
                     ),
                   ],
                 ),
-            ),
+              ),
         title: Text(
           chatData.chatType == 'dm'
               ? chatData.receiverData![0].displayName

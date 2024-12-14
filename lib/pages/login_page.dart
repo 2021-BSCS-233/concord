@@ -64,16 +64,20 @@ class LogInPage extends StatelessWidget {
                     contentTopPadding: 13,
                     suffixIcon: Icons.all_inclusive,
                   ),
-                  CustomInputField(
-                    fieldLabel: 'Password',
-                    controller: logInController.logInPassTextController,
-                    fieldRadius: 2,
-                    horizontalMargin: 0,
-                    verticalMargin: 2,
-                    fieldHeight: 50,
-                    contentTopPadding: 13,
-                    suffixIcon: CupertinoIcons.eye,
-                  ),
+                  Obx(() => CustomInputField(
+                        fieldLabel: 'Password',
+                        controller: logInController.logInPassTextController,
+                        fieldRadius: 2,
+                        horizontalMargin: 0,
+                        verticalMargin: 2,
+                        fieldHeight: 50,
+                        contentTopPadding: 13,
+                        hidden: logInController.hidePassword.value,
+                        hideLetters: () {
+                          logInController.hidePassword.value =
+                              !(logInController.hidePassword.value);
+                        },
+                      )),
                   const SizedBox(
                     height: 40,
                   ),
@@ -92,24 +96,28 @@ class LogInPage extends StatelessWidget {
                       width: double.infinity,
                       decoration: BoxDecoration(
                           color: Colors.blueAccent.shade700,
-                          borderRadius: const BorderRadius.all(Radius.circular(5))),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(5))),
                       child: const Center(child: Text('Log In')),
                     ),
                   ),
-                  const SizedBox(height: 20,),
-                  InkWell(
-                    enableFeedback: false,
-                    onTap: () {
-                      Get.to(SignInPage());
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 10, bottom: 10),
-                      child: Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            'Create Account',
-                            style: TextStyle(color: Colors.blueAccent.shade200),
-                          )),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: InkWell(
+                      enableFeedback: false,
+                      onTap: () {
+                        Get.to(SignInPage());
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 10, bottom: 10, left: 10),
+                        child: Text(
+                          'Create Account',
+                          style: TextStyle(color: Colors.blueAccent.shade200),
+                        ),
+                      ),
                     ),
                   ),
                 ],

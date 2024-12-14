@@ -5,6 +5,6 @@ class EditProfileController extends GetxController {
   TextEditingController displayTextController = TextEditingController();
   TextEditingController pronounceTextController = TextEditingController();
   TextEditingController aboutMeTextController = TextEditingController();
-  var image;
+  String image = '';
   var updateP = 0.obs;
 }

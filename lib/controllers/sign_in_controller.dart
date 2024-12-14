@@ -10,7 +10,7 @@ class SignInController extends GetxController {
   TextEditingController signInDisplayTextController = TextEditingController();
   TextEditingController signInEmailTextController = TextEditingController();
   TextEditingController signInPassTextController = TextEditingController();
-
+  var hidePassword = true.obs;
   var showOverlaySignIn = false.obs;
   var showMessageSignIn = false.obs;
   double messageHeightSignIn = 250;

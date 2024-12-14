@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:concord/models/chats_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -18,16 +17,17 @@ class ChatPage extends StatelessWidget {
   final ChatsModel chatData;
 
   ChatPage({super.key, required this.chatData}) {
+    chatController.userMap.clear();
     chatController.chatId = chatData.id!;
     chatController.initial = true;
     chatController.userMap[mainController.currentUserData.id] =
         mainController.currentUserData;
-    if (chatData.chatType == 'dm') {
-      for (var user in chatData.receiverData!) {
-        chatController.userMap[user.id] = user;
-      }
+    for (var user in chatData.receiverData!) {
+      chatController.userMap[user.id] = user;
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +67,8 @@ class ChatPage extends StatelessWidget {
                   chatData.chatType == 'dm'
                       ? chatData.receiverData![0].displayName
                       : chatData.chatGroupName!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
@@ -187,8 +189,11 @@ class ChatPage extends StatelessWidget {
                       child: CustomInputField(
                         fieldFocusNode: chatController.chatFocusNode,
                         fieldRadius: 20,
-                        fieldLabel: 'messageTo'.trParams(
-                            {'name': chatData.receiverData![0].displayName}),
+                        fieldLabel: 'messageTo'.trParams({
+                          'name': chatData.chatType == 'dm'
+                              ? chatData.receiverData![0].displayName
+                              : chatData.chatGroupName!
+                        }),
                         controller: chatController.chatFieldTextController,
                         suffixIcon: Icons.all_inclusive,
                         fieldColor: const Color(0xFF151515),
@@ -286,49 +291,21 @@ class ChatPage extends StatelessWidget {
               chatController.chatContent.isEmpty
           ? Center(child: Text('chatEmpty'.tr))
           : Expanded(
-              child: ListView.builder(
-                itemCount: chatController.chatContent.length,
-                shrinkWrap: true,
-                reverse: true,
-                itemBuilder: (context, index) {
-                  try {
-                    if (chatController.chatContent[index].senderId !=
-                        chatController.chatContent[index + 1].senderId) {
-                      return MessageTileFull(
-                        messageData: chatController.chatContent[index],
-                        sendingUser: chatController.userMap[
-                            chatController.chatContent[index].senderId],
-                        toggleMenu: () {
-                          chatController.toggleMenu(index);
-                        },
-                        toggleProfile: () {
-                          chatController.toggleProfile(index);
-                        },
-                      );
-                    } else {
-                      bool select = true;
-                      try {
-                        var time1 = chatController.chatContent[index].timeStamp;
-                        var time2 =
-                            chatController.chatContent[index + 1].timeStamp;
-                        var difference = time1!.difference(time2!);
-                        if (difference.inMinutes < 15) {
-                          select = true;
-                        } else {
-                          select = false;
-                        }
-                      } catch (e) {
-                        select = true;
-                      }
-                      if (select) {
-                        return MessageTileCompact(
-                            messageData: chatController.chatContent[index],
-                            sendingUser: chatController.userMap[
-                                chatController.chatContent[index].senderId],
-                            toggleMenu: () {
-                              chatController.toggleMenu(index);
-                            });
-                      } else {
+              child: NotificationListener(
+                onNotification: (ScrollNotification notification) {
+                  if (notification.metrics.pixels == 0) {
+                    debugPrint('load');
+                  }
+                  return true;
+                },
+                child: ListView.builder(
+                  itemCount: chatController.chatContent.length,
+                  shrinkWrap: true,
+                  reverse: true,
+                  itemBuilder: (context, index) {
+                    try {
+                      if (chatController.chatContent[index].senderId !=
+                          chatController.chatContent[index + 1].senderId) {
                         return MessageTileFull(
                           messageData: chatController.chatContent[index],
                           sendingUser: chatController.userMap[
@@ -340,22 +317,58 @@ class ChatPage extends StatelessWidget {
                             chatController.toggleProfile(index);
                           },
                         );
+                      } else {
+                        bool select = true;
+                        try {
+                          var time1 = chatController.chatContent[index].timeStamp;
+                          var time2 =
+                              chatController.chatContent[index + 1].timeStamp;
+                          var difference = time1!.difference(time2!);
+                          if (difference.inMinutes < 15) {
+                            select = true;
+                          } else {
+                            select = false;
+                          }
+                        } catch (e) {
+                          select = true;
+                        }
+                        if (select) {
+                          return MessageTileCompact(
+                              messageData: chatController.chatContent[index],
+                              sendingUser: chatController.userMap[
+                                  chatController.chatContent[index].senderId],
+                              toggleMenu: () {
+                                chatController.toggleMenu(index);
+                              });
+                        } else {
+                          return MessageTileFull(
+                            messageData: chatController.chatContent[index],
+                            sendingUser: chatController.userMap[
+                                chatController.chatContent[index].senderId],
+                            toggleMenu: () {
+                              chatController.toggleMenu(index);
+                            },
+                            toggleProfile: () {
+                              chatController.toggleProfile(index);
+                            },
+                          );
+                        }
                       }
+                    } catch (e) {
+                      return MessageTileFull(
+                        messageData: chatController.chatContent[index],
+                        sendingUser: chatController
+                            .userMap[chatController.chatContent[index].senderId],
+                        toggleMenu: () {
+                          chatController.toggleMenu(index);
+                        },
+                        toggleProfile: () {
+                          chatController.toggleProfile(index);
+                        },
+                      );
                     }
-                  } catch (e) {
-                    return MessageTileFull(
-                      messageData: chatController.chatContent[index],
-                      sendingUser: chatController
-                          .userMap[chatController.chatContent[index].senderId],
-                      toggleMenu: () {
-                        chatController.toggleMenu(index);
-                      },
-                      toggleProfile: () {
-                        chatController.toggleProfile(index);
-                      },
-                    );
-                  }
-                },
+                  },
+                ),
               ),
             ),
     );

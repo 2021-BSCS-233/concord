@@ -15,6 +15,7 @@ class CustomInputField extends StatelessWidget {
   final double? contentTopPadding;
   final Function? onChange;
   final Function? hideLetters;
+  final bool? hidden;
   final List<TextInputFormatter>? inputFormats;
   final int? maxLength;
   final int? maxLines;
@@ -30,6 +31,7 @@ class CustomInputField extends StatelessWidget {
       this.fieldHeight,
       this.onChange,
       this.hideLetters,
+      this.hidden,
       this.inputFormats,
       this.fieldRadius,
       this.horizontalMargin,
@@ -41,7 +43,6 @@ class CustomInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool hidden = true;
     return Container(
       margin: EdgeInsets.symmetric(
           horizontal: horizontalMargin ?? 5, vertical: verticalMargin ?? 0),
@@ -55,7 +56,7 @@ class CustomInputField extends StatelessWidget {
         onChanged: (e) {
           onChange != null ? onChange!() : null;
         },
-        obscureText: suffixIcon == CupertinoIcons.eye ? hidden : false,
+        obscureText: hidden ?? false,
         controller: controller,
         decoration: InputDecoration(
           counterText: '',
@@ -73,12 +74,14 @@ class CustomInputField extends StatelessWidget {
               : prefixIcon != null
                   ? Icon(prefixIcon)
                   : null,
-          suffixIcon: suffixIcon == CupertinoIcons.eye
+          suffixIcon: hideLetters != null
               ? InkWell(
                   onTap: () {
-                    hidden = !hidden;
+                    hideLetters!();
                   },
-                  child: const Icon(CupertinoIcons.eye),
+                  child: hidden!
+                      ? const Icon(CupertinoIcons.eye)
+                      : const Icon(CupertinoIcons.eye_slash),
                 )
               : suffixIcon == Icons.all_inclusive
                   ? Icon(
@@ -94,7 +97,10 @@ class CustomInputField extends StatelessWidget {
             borderRadius: BorderRadius.all(Radius.circular(fieldRadius ?? 25)),
             borderSide: BorderSide.none,
           ),
-          label: Text(fieldLabel, overflow: TextOverflow.ellipsis,),
+          label: Text(
+            fieldLabel,
+            overflow: TextOverflow.ellipsis,
+          ),
           hintText: '',
           floatingLabelBehavior: FloatingLabelBehavior.never,
         ),

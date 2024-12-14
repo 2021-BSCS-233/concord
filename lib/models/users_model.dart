@@ -7,6 +7,7 @@ class UsersModel {
   String username;
   String email;
   String displayName;
+  @JsonKey(defaultValue: '')
   String profilePicture;
   String status;
   String displayStatus;

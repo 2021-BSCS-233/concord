@@ -19,6 +19,10 @@ class PostPage extends StatelessWidget {
     postController.initial = true;
     postController.userMap[mainController.currentUserData.id] =
         mainController.currentUserData;
+    postController.userMap[postData.posterData!.id] = postData.posterData;
+    for (var user in postData.receiverData!) {
+      postController.userMap[user.id] = user;
+    }
   }
 
   @override
@@ -28,6 +32,7 @@ class PostPage extends StatelessWidget {
         Scaffold(
           appBar: AppBar(
             title: Text(postData.title,
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontSize: 16,
@@ -54,8 +59,7 @@ class PostPage extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text("We could not access our services"),
-                                Text(
-                                    "Check your connection or try again later")
+                                Text("Check your connection or try again later")
                               ],
                             ),
                           ));
@@ -206,19 +210,19 @@ class PostPage extends StatelessWidget {
               ),
             )),
         Obx(() => AnimatedPositioned(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeInOut,
-              bottom: postController.showMenu.value
-                  ? 0.0
-                  : -MediaQuery.of(context).size.height,
-              left: 0.0,
-              right: 0.0,
-              child: Container()
-              // child: postController.postContent.isNotEmpty
-              //     ? ChatMessagePopup(
-              //         chatId: postData.id!,
-              //       )
-              //     : Container(),
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            bottom: postController.showMenu.value
+                ? 0.0
+                : -MediaQuery.of(context).size.height,
+            left: 0.0,
+            right: 0.0,
+            child: Container()
+            // child: postController.postContent.isNotEmpty
+            //     ? ChatMessagePopup(
+            //         chatId: postData.id!,
+            //       )
+            //     : Container(),
             )),
         Obx(() => AnimatedPositioned(
               duration: const Duration(milliseconds: 200),

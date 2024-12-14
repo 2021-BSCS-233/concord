@@ -23,7 +23,7 @@ class EditProfilePage extends StatelessWidget {
         mainController.currentUserData.pronouns;
     editProfileController.aboutMeTextController.text =
         mainController.currentUserData.aboutMe;
-    editProfileController.image = null;
+    editProfileController.image = '';
   }
 
   @override
@@ -91,7 +91,7 @@ class EditProfilePage extends StatelessWidget {
                     onTap: () async {
                       var result = await ImagePicker()
                           .pickImage(source: ImageSource.gallery);
-                      editProfileController.image = result?.path;
+                      editProfileController.image = result!.path;
                       // var result = await FilePicker.platform.pickFiles(type: FileType.image);
                       // editProfileController.image = result?.files.single.path;
                       editProfileController.updateP.value += 1;
@@ -111,7 +111,7 @@ class EditProfilePage extends StatelessWidget {
                                                 .updateP.value ==
                                             editProfileController
                                                 .updateP.value &&
-                                        editProfileController.image != null
+                                        editProfileController.image != ''
                                     ? FileImage(
                                         File(editProfileController.image))
                                     : mainController.currentUserData.profilePicture !=

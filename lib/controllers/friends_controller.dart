@@ -1,17 +1,17 @@
+import 'package:concord/controllers/main_controller.dart';
 import 'package:concord/models/users_model.dart';
 import 'package:get/get.dart';
 import 'package:concord/services/firebase_services.dart';
 
 class FriendsController extends GetxController {
+  MainController mainController = Get.find<MainController>();
   bool initial = true;
   var updateF = 0.obs;
   List<UsersModel> friendsData = [];
 
   getInitialData(currentUserId) async {
-    await friendsListenerFirebase(
-      currentUserId,
-      updateFriends
-    );
+    mainController.friendsListenerRef =
+        friendsListenerFirebase(currentUserId, updateFriends);
     friendsData = await getInitialFriendsFirebase(currentUserId);
     initial = false;
   }

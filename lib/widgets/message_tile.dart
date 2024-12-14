@@ -221,11 +221,15 @@ class Attachments extends StatelessWidget {
                           padding: attachments.length == 3
                               ? const EdgeInsets.fromLTRB(0, 0, 3, 0)
                               : null,
-                          height: 200,
-                          width: attachments.length == 3
-                              ? swSize * 0.5
-                              : swSize * 0.8,
-                          child: LazyCachedImage(url: attachments[0],)),
+                          height: attachments.length == 1 ? null : 200,
+                          width: attachments.length == 1
+                              ? null
+                              : attachments.length == 3
+                                  ? swSize * 0.5
+                                  : swSize * 0.8,
+                          child: LazyCachedImage(
+                            url: attachments[0],
+                          )),
                     ),
                     attachments.length == 3
                         ? Column(
@@ -235,11 +239,15 @@ class Attachments extends StatelessWidget {
                                       const EdgeInsets.fromLTRB(0, 0, 0, 3),
                                   height: 102,
                                   width: 95,
-                                  child: LazyCachedImage(url: attachments[1],)),
+                                  child: LazyCachedImage(
+                                    url: attachments[1],
+                                  )),
                               SizedBox(
                                   height: 98,
                                   width: 95,
-                                  child: LazyCachedImage(url: attachments[2],)),
+                                  child: LazyCachedImage(
+                                    url: attachments[2],
+                                  )),
                             ],
                           )
                         : const SizedBox(),
@@ -254,14 +262,18 @@ class Attachments extends StatelessWidget {
                           padding: const EdgeInsets.fromLTRB(0, 0, 3, 3),
                           height: attachments.length == 4 ? 100 : 200,
                           width: swSize * 0.4,
-                          child: LazyCachedImage(url: attachments[0],)),
+                          child: LazyCachedImage(
+                            url: attachments[0],
+                          )),
                     ),
                     Flexible(
                       child: Container(
                           padding: const EdgeInsets.fromLTRB(0, 0, 0, 3),
                           height: attachments.length == 4 ? 100 : 200,
                           width: swSize * 0.4,
-                          child: LazyCachedImage(url: attachments[1],)),
+                          child: LazyCachedImage(
+                            url: attachments[1],
+                          )),
                     ),
                   ],
                 )
@@ -274,14 +286,18 @@ class Attachments extends StatelessWidget {
                           padding: const EdgeInsets.fromLTRB(0, 0, 3, 3),
                           height: 100,
                           width: swSize * 0.4,
-                          child: LazyCachedImage(url: attachments[2],)),
+                          child: LazyCachedImage(
+                            url: attachments[2],
+                          )),
                     ),
                     Flexible(
                       child: Container(
                           padding: const EdgeInsets.fromLTRB(0, 0, 0, 3),
                           height: 100,
                           width: swSize * 0.4,
-                          child: LazyCachedImage(url: attachments[3],)),
+                          child: LazyCachedImage(
+                            url: attachments[3],
+                          )),
                     ),
                   ],
                 )
@@ -290,14 +306,17 @@ class Attachments extends StatelessWidget {
               ? GridView.builder(
                   itemCount: size,
                   shrinkWrap: true,
-                  physics: const ScrollPhysics(parent: NeverScrollableScrollPhysics()),
+                  physics: const ScrollPhysics(
+                      parent: NeverScrollableScrollPhysics()),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
                     crossAxisSpacing: 4,
                     mainAxisSpacing: 3,
                   ),
                   itemBuilder: (context, index) {
-                    return LazyCachedImage(url: attachments[index],);
+                    return LazyCachedImage(
+                      url: attachments[index],
+                    );
                   })
               : const SizedBox()
         ],

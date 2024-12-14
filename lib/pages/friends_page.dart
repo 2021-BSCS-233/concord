@@ -1,3 +1,4 @@
+import 'package:concord/pages/chat_page.dart';
 import 'package:concord/widgets/profile_picture.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -113,7 +114,8 @@ class FriendsPage extends StatelessWidget {
                               friendsController.friendsData[index].id);
                         },
                         child: ProfilePicture(
-                          profileLink: friendsController.friendsData[index].profilePicture,
+                          profileLink: friendsController
+                              .friendsData[index].profilePicture,
                           profileRadius: 20,
                         ),
                       ),
@@ -129,13 +131,11 @@ class FriendsPage extends StatelessWidget {
                               enableFeedback: true,
                               child: const Icon(
                                   CupertinoIcons.chat_bubble_text_fill),
-                              onTap: () {
-                                // Get.to(Chat(
-                                //   chatId: friendsData[index]['chat_id'],
-                                //   otherUsersData: friendsData[index],
-                                //   currentUserData: currentUserData,
-                                //   chatType: 'dm',
-                                // ));
+                              onTap: () async {
+                                var chatData = await getFriendChatFirebase(
+                                    mainController.currentUserData.id,
+                                    friendsController.friendsData[index].id);
+                                Get.to(ChatPage(chatData: chatData));
                               },
                             ),
                             const SizedBox(

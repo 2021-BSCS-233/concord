@@ -1,10 +1,8 @@
-import 'package:concord/pages/login_page.dart';
 import "package:flutter/material.dart";
 import 'package:get/get.dart';
 import 'package:concord/controllers/language_controller.dart';
 import 'package:concord/controllers/main_controller.dart';
 import 'package:concord/controllers/settings_controller.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
@@ -157,17 +155,7 @@ class SettingsPage extends StatelessWidget {
                 ),
                 InkWell(
                   onTap: () async {
-                    final SharedPreferences prefs =
-                        await SharedPreferences.getInstance();
-                    await prefs.remove('email');
-                    await prefs.remove('password');
-                    Get.deleteAll();
-                    // Get.delete<ChatsController>();
-                    // Get.delete<FriendsController>();
-                    // Get.delete<RequestsController>();
-                    // Get.delete<EditProfileController>();
-                    // Get.delete<SettingsController>();
-                    Get.offAll(LogInPage());
+                    mainController.logOut();
                   },
                   child: Container(
                     height: 45,

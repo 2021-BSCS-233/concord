@@ -1,3 +1,4 @@
+import 'package:concord/controllers/main_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -5,6 +6,7 @@ import 'package:concord/models/messages_model.dart';
 import 'package:concord/services/firebase_services.dart';
 
 class PostController extends GetxController {
+  MainController mainController = Get.find<MainController>();
   String postId = '';
   List<MessagesModel> postContent = [];
   Map userMap = {};
@@ -50,7 +52,8 @@ class PostController extends GetxController {
   }
 
   getPostMessages(postId) async {
-    await messagesListenerFirebase('posts', postId, updateMessages);
+    mainController.chatListenerRef =
+        messagesListenerFirebase('posts', postId, updateMessages);
     postContent = await getInitialMessagesFirebase('posts', postId);
     initial = false;
   }
@@ -65,14 +68,14 @@ class PostController extends GetxController {
           senderId: currentUserId,
           message: postFieldTextController.text.trim(),
           edited: false);
-      sendMessageFirebase(postId, messageData, attachments);
+      sendMessageFirebase('posts',postId, messageData, attachments);
     }
     postFieldTextController.clear();
     attachments = [];
   }
 
   sendEditMessage() {
-    editMessageFirebase(postId, postContent[messageSelected].id,
+    editMessageFirebase('posts',postId, postContent[messageSelected].id,
         postFieldTextController.text.trim());
     postFocusNode.unfocus();
     editMode = false;
@@ -81,7 +84,7 @@ class PostController extends GetxController {
   updateMessages(MessagesModel updateData, updateType) {
     var index = postContent.indexWhere((map) => map.id == updateData.id);
     if (updateType == 'added' && index < 0) {
-      postContent.insert(0, updateData);
+      postContent.add(updateData);
     } else if (updateType == 'modified') {
       postContent[index].message = updateData.message;
       postContent[index].edited = true;
@@ -99,7 +102,7 @@ class PostController extends GetxController {
   }
 
   deleteMessage() {
-    deleteMessageFirebase(postId, postContent[messageSelected].id);
+    deleteMessageFirebase('posts',postId, postContent[messageSelected].id);
     showMenu.value = false;
   }
 

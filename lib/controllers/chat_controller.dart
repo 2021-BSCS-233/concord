@@ -1,3 +1,4 @@
+import 'package:concord/controllers/main_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -5,6 +6,7 @@ import 'package:concord/models/messages_model.dart';
 import 'package:concord/services/firebase_services.dart';
 
 class ChatController extends GetxController {
+  MainController mainController = Get.find<MainController>();
   String chatId = '';
   List<MessagesModel> chatContent = [];
   Map userMap = {};
@@ -51,7 +53,8 @@ class ChatController extends GetxController {
   }
 
   getMessages(chatId) async {
-    await messagesListenerFirebase('chats', chatId, updateMessages);
+    mainController.chatListenerRef =
+        messagesListenerFirebase('chats', chatId, updateMessages);
     chatContent = await getInitialMessagesFirebase('chats', chatId);
     initial = false;
   }
@@ -66,14 +69,14 @@ class ChatController extends GetxController {
           senderId: currentUserId,
           message: chatFieldTextController.text.trim(),
           edited: false);
-      sendMessageFirebase(chatId, messageData, attachments);
+      sendMessageFirebase('chats',chatId, messageData, attachments);
     }
     chatFieldTextController.clear();
     attachments = [];
   }
 
   sendEditMessage() {
-    editMessageFirebase(chatId, chatContent[messageSelected].id,
+    editMessageFirebase('chats',chatId, chatContent[messageSelected].id,
         chatFieldTextController.text.trim());
     chatFocusNode.unfocus();
     editMode = false;
@@ -83,10 +86,10 @@ class ChatController extends GetxController {
     var index = chatContent.indexWhere((map) => map.id == updateData.id);
     if (updateType == 'added' && index < 0) {
       chatContent.insert(0, updateData);
-    } else if (updateType == 'modified') {
+    } else if (updateType == 'modified' && !(index < 0)) {
       chatContent[index].message = updateData.message;
       chatContent[index].edited = true;
-    } else if (updateType == 'removed') {
+    } else if (updateType == 'removed' && !(index < 0)) {
       chatContent.removeAt(index);
     }
     updateC.value += 1;
@@ -100,16 +103,13 @@ class ChatController extends GetxController {
   }
 
   deleteMessage() {
-    deleteMessageFirebase(chatId, chatContent[messageSelected].id);
+    deleteMessageFirebase('chats',chatId, chatContent[messageSelected].id);
     showMenu.value = false;
   }
 
   addAttachments() async {
-    var results = await ImagePicker().pickMultiImage();
-    if (results != []) {
-      for (var result in results) {
-        attachments.add(result);
-      }
+    attachments = await ImagePicker().pickMultiImage();
+    if (attachments.isNotEmpty) {
       attachmentVisible.value = true;
       sendVisible.value = true;
       updateA.value += 1;
@@ -117,7 +117,6 @@ class ChatController extends GetxController {
       attachmentVisible.value = false;
       sendVisible.value = false;
       updateA.value += 1;
-      debugPrint('nothing selected');
     }
   }
 

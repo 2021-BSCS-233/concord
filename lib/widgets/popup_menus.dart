@@ -11,9 +11,11 @@ import 'package:concord/widgets/status_icons.dart';
 import 'package:concord/widgets/option_tile.dart';
 
 class UserGroupPopup extends StatelessWidget {
-  final List tileContent;
+  final MainController mainController = Get.find<MainController>();
 
-  const UserGroupPopup({super.key, required this.tileContent});
+  // final List tileContent;
+
+  UserGroupPopup({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -34,35 +36,43 @@ class UserGroupPopup extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 10),
                   child: ListTile(
-                    leading: ProfilePicture(
-                      profileLink: tileContent[2],
-                      profileRadius: 25,
-                    ),
+                    leading: mainController.selectedChatType == 'dm'
+                        ? ProfilePicture(
+                            profileLink: mainController.selectedUserPic,
+                            profileRadius: 25,
+                          )
+                        : null,
                     title: Text(
-                      '@${tileContent[1]}',
+                      mainController.selectedChatType == 'dm'
+                          ? '@${mainController.selectedUsername}'
+                          : mainController.selectedUsername,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     onTap: () {},
                   ),
                 ),
+                mainController.selectedChatType == 'dm'
+                    ? OptionTile(
+                        action: () {
+                          mainController.showMenu.value = false;
+                          mainController.showProfile.value = true;
+                        },
+                        actionIcon: Icons.person,
+                        actionName: 'Profile')
+                    : const SizedBox(),
+                mainController.selectedChatType == 'dm'
+                    ? OptionTile(
+                        action: () {
+                          hideChatFirebase(mainController.selectedChatId,
+                              mainController.currentUserData.id);
+                        },
+                        actionIcon: Icons.remove_circle_outline,
+                        actionName: 'Close DM')
+                    : const SizedBox(),
                 OptionTile(
                     action: () {
                       debugPrint(
-                          'Profile action on ${tileContent[0]}, chat type ${tileContent[3]}');
-                    },
-                    actionIcon: Icons.person,
-                    actionName: 'Profile'),
-                OptionTile(
-                    action: () {
-                      debugPrint(
-                          'Close Action on ${tileContent[0]}, chat type ${tileContent[3]}');
-                    },
-                    actionIcon: Icons.remove_circle_outline,
-                    actionName: 'Close DM'),
-                OptionTile(
-                    action: () {
-                      debugPrint(
-                          'MAR action on ${tileContent[0]}, chat type ${tileContent[3]}');
+                          'MAR action on ${mainController.selectedChatId}, chat type ${mainController.selectedChatType}');
                     },
                     actionIcon: CupertinoIcons.eye,
                     actionName: 'Mark As Read'),
@@ -102,8 +112,8 @@ class ChatMessagePopup extends StatelessWidget {
                   const SizedBox(
                     height: 10,
                   ),
-                  chatController
-                              .chatContent[chatController.messageSelected].senderId ==
+                  chatController.chatContent[chatController.messageSelected]
+                              .senderId ==
                           mainController.currentUserData.id
                       ? OptionTile(
                           action: () {
@@ -121,8 +131,8 @@ class ChatMessagePopup extends StatelessWidget {
                       },
                       actionIcon: Icons.copy,
                       actionName: 'Copy Text'),
-                  chatController
-                              .chatContent[chatController.messageSelected].senderId ==
+                  chatController.chatContent[chatController.messageSelected]
+                              .senderId ==
                           mainController.currentUserData.id
                       ? OptionTile(
                           action: () {
@@ -213,8 +223,7 @@ class ProfilePopup extends StatelessWidget {
                                 border:
                                     Border.all(width: 6, color: Colors.black)),
                             child: ProfilePicture(
-                                profileLink:
-                                    userProfileData.profilePicture),
+                                profileLink: userProfileData.profilePicture),
                           ),
                           Positioned(
                             bottom: 3,
@@ -233,8 +242,10 @@ class ProfilePopup extends StatelessWidget {
                   ],
                 ),
                 Container(
-                  margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 18),
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 18),
                   alignment: Alignment.centerLeft,
                   width: double.infinity,
                   height: 130,
@@ -261,7 +272,8 @@ class ProfilePopup extends StatelessWidget {
                       ),
                       Text(
                         userProfileData.pronouns,
-                        style: const TextStyle(fontSize: 15, color: Colors.grey),
+                        style:
+                            const TextStyle(fontSize: 15, color: Colors.grey),
                       ),
                       const SizedBox(
                         height: 16,
@@ -270,8 +282,10 @@ class ProfilePopup extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                   alignment: Alignment.centerLeft,
                   width: double.infinity,
                   height: 200,
@@ -385,7 +399,8 @@ class StatusPopup extends StatelessWidget {
                                     var temp = selectedValue.value;
                                     selectedValue.value = value as int;
                                     var result =
-                                        await updateStatusDisplayFirebase(id, 'Online');
+                                        await updateStatusDisplayFirebase(
+                                            id, 'Online');
                                     if (!result) {
                                       selectedValue.value = temp;
                                     }
@@ -401,7 +416,8 @@ class StatusPopup extends StatelessWidget {
                                     var temp = selectedValue.value;
                                     selectedValue.value = value as int;
                                     var result =
-                                        await updateStatusDisplayFirebase(id, 'DND');
+                                        await updateStatusDisplayFirebase(
+                                            id, 'DND');
                                     if (!result) {
                                       selectedValue.value = temp;
                                     }
@@ -417,7 +433,8 @@ class StatusPopup extends StatelessWidget {
                                     var temp = selectedValue.value;
                                     selectedValue.value = value as int;
                                     var result =
-                                        await updateStatusDisplayFirebase(id, 'Asleep');
+                                        await updateStatusDisplayFirebase(
+                                            id, 'Asleep');
                                     if (!result) {
                                       selectedValue.value = temp;
                                     }
@@ -432,8 +449,9 @@ class StatusPopup extends StatelessWidget {
                                   onChanged: (value) async {
                                     var temp = selectedValue.value;
                                     selectedValue.value = value as int;
-                                    var result = await updateStatusDisplayFirebase(
-                                        id, 'Offline');
+                                    var result =
+                                        await updateStatusDisplayFirebase(
+                                            id, 'Offline');
                                     if (!result) {
                                       selectedValue.value = temp;
                                     }

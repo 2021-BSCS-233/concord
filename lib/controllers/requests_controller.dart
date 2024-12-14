@@ -1,10 +1,11 @@
+import 'package:concord/controllers/main_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-
 import 'package:concord/models/request_model.dart';
 import 'package:concord/services/firebase_services.dart';
 
 class RequestsController extends GetxController {
+  MainController mainController = Get.find<MainController>();
   var updateI = 0.obs;
   var updateO = 0.obs;
   var initial = true;
@@ -18,7 +19,8 @@ class RequestsController extends GetxController {
   }
 
   getInitialData(currentUserId) async {
-    requestsListenersFirebase(currentUserId);
+    mainController.requestListenerRef =
+        requestsListenersFirebase(currentUserId);
     var result = await getInitialRequestFirebase(currentUserId);
     incomingRequestsData = result[0];
     outgoingRequestsData = result[1];
@@ -27,7 +29,7 @@ class RequestsController extends GetxController {
 
   updateIncomingRequests(RequestsModel updateData, updateType) {
     var index =
-    incomingRequestsData.indexWhere((map) => map.id == updateData.id);
+        incomingRequestsData.indexWhere((map) => map.id == updateData.id);
     if (updateType == 'added' && index < 0) {
       incomingRequestsData.insert(0, updateData);
     } else if (updateType == 'removed') {
@@ -38,7 +40,7 @@ class RequestsController extends GetxController {
 
   updateOutgoingRequests(RequestsModel updateData, updateType) {
     var index =
-    outgoingRequestsData.indexWhere((map) => map.id == updateData.id);
+        outgoingRequestsData.indexWhere((map) => map.id == updateData.id);
     if (updateType == 'added' && index < 0) {
       outgoingRequestsData.insert(0, updateData);
     } else if (updateType == 'removed') {
