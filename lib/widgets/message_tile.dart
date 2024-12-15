@@ -42,7 +42,7 @@ class MessageTileFull extends StatelessWidget {
         children: [
           InkWell(
             onTap: () {
-              toggleProfile();
+              toggleProfile(messageData);
             },
             child: ProfilePicture(
               profileLink: sendingUser.profilePicture,
@@ -53,7 +53,7 @@ class MessageTileFull extends StatelessWidget {
           Expanded(
             child: InkWell(
               onLongPress: () {
-                toggleMenu();
+                toggleMenu(messageData);
               },
               splashColor: Colors.black,
               child: Column(
@@ -133,7 +133,7 @@ class MessageTileCompact extends StatelessWidget {
       margin: const EdgeInsets.only(left: 20, right: 20, top: 0, bottom: 1),
       child: InkWell(
         onLongPress: () {
-          toggleMenu();
+          toggleMenu(messageData);
         },
         // enableFeedback: false,
         splashColor: Colors.black,

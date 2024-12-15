@@ -186,7 +186,6 @@ StreamSubscription friendsListenerFirebase(
       .collection('users')
       .orderBy('displayName')
       .where('friends', arrayContains: currentUserId)
-      .limit(10)
       .snapshots()
       .map((snapshot) => snapshot.docChanges)
       .listen((event) {
@@ -268,7 +267,6 @@ List<StreamSubscription> requestsListenersFirebase(currentUserId) {
         .collection('requests')
         .orderBy('timeStamp', descending: true)
         .where('receiverId', isEqualTo: currentUserId)
-        .limit(5)
         .snapshots()
         .map((snapshot) => snapshot.docChanges)
         .listen((event) async {
@@ -417,7 +415,6 @@ StreamSubscription chatsListenerFirebase(currentUserId, updateChats) {
       .collection('chats')
       .orderBy('timeStamp', descending: true)
       .where('visible', arrayContains: currentUserId)
-      .limit(10)
       .snapshots()
       .map((snapshot) => snapshot.docChanges)
       .listen((event) async {
@@ -496,7 +493,7 @@ Future<bool> hideChatFirebase(chatId, currentUserId) async {
     return false;
   }
 }
-
+DateTime? currentTime;
 Future<List<MessagesModel>> getInitialMessagesFirebase(
     collection, chatId) async {
   var messageInstances = await FirebaseFirestore.instance
@@ -506,6 +503,7 @@ Future<List<MessagesModel>> getInitialMessagesFirebase(
       .orderBy('timeStamp', descending: collection == 'chats' ? true : false)
       .limit(50)
       .get();
+  currentTime = DateTime.now();
   List<MessagesModel> messages = [];
   for (var message in messageInstances.docs) {
     MessagesModel messageData = MessagesModel.fromJson(message.data());
@@ -517,12 +515,12 @@ Future<List<MessagesModel>> getInitialMessagesFirebase(
 
 StreamSubscription messagesListenerFirebase(
     collection, chatId, Function updateMessages) {
+  currentTime ??= DateTime.now();
   return FirebaseFirestore.instance
       .collection(collection)
       .doc(chatId)
       .collection('messages')
-      .orderBy('timeStamp', descending: collection == 'chats' ? true : false)
-      .limit(5)
+      .orderBy('timeStamp', descending: true)
       .snapshots()
       .map((snapshot) => snapshot.docChanges)
       .listen((event) async {
@@ -530,7 +528,10 @@ StreamSubscription messagesListenerFirebase(
       MessagesModel updateData = MessagesModel.fromJson(change.doc.data()!);
       updateData.id = change.doc.id;
       if (change.type == DocumentChangeType.added) {
-        updateMessages(updateData, 'added');
+        if (updateData.timeStamp!.isAfter(currentTime!) ||
+            updateData.timeStamp!.isAtSameMomentAs(currentTime!)) {
+          updateMessages(updateData, 'added');
+        }
       } else if (change.type == DocumentChangeType.modified) {
         updateMessages(updateData, 'modified');
       } else if (change.type == DocumentChangeType.removed) {
@@ -538,6 +539,28 @@ StreamSubscription messagesListenerFirebase(
       }
     }
   });
+}
+
+getMessageHistoryFirebase(collection, chatId, MessagesModel lastMessage) async {
+  var messageInstances = await FirebaseFirestore.instance
+      .collection(collection)
+      .doc(chatId)
+      .collection('messages')
+      .orderBy('timeStamp', descending: collection == 'chats' ? true : false)
+      .where('timeStamp', isLessThan: lastMessage.timeStamp)
+      .limit(20)
+      .get();
+  List<MessagesModel> messages = [];
+  var historyRemaining = true;
+  if (messageInstances.docs.length < 20) {
+    historyRemaining = false;
+  }
+  for (var message in messageInstances.docs) {
+    MessagesModel messageData = MessagesModel.fromJson(message.data());
+    messageData.id = message.id;
+    messages.add(messageData);
+  }
+  return [messages, historyRemaining];
 }
 
 Future<void> sendMessageFirebase(
@@ -583,12 +606,17 @@ void editMessageFirebase(collection, chatId, messageId, message) {
   });
 }
 
-void deleteMessageFirebase(collection, chatId, messageId) {
+void deleteMessageFirebase(collection, chatId, MessagesModel message) {
+  if (message.attachments != null) {
+    for (String attachment in message.attachments!) {
+      FirebaseStorage.instance.refFromURL(attachment).delete();
+    }
+  }
   FirebaseFirestore.instance
       .collection(collection)
       .doc(chatId)
       .collection('messages')
-      .doc(messageId)
+      .doc(message.id)
       .delete();
 }
 

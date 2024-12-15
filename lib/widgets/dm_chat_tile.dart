@@ -18,10 +18,9 @@ class DmChatTile extends StatelessWidget {
     var time2 = DateTime.now();
     var difference = time2.difference(time1);
     String timeDifference = '';
-    // if (difference.inMinutes < 1) {
-    //   timeDifference = '<1m';
-    // } else
-    if (difference.inHours < 1) {
+    if (difference.inMinutes < 1) {
+      timeDifference = '<1m';
+    } else if (difference.inHours < 1) {
       timeDifference = '${difference.inMinutes}m';
     } else if (difference.inDays < 1) {
       timeDifference = '${difference.inHours}h';

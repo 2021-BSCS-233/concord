@@ -112,8 +112,7 @@ class ChatMessagePopup extends StatelessWidget {
                   const SizedBox(
                     height: 10,
                   ),
-                  chatController.chatContent[chatController.messageSelected]
-                              .senderId ==
+                  chatController.messageSelected!.senderId ==
                           mainController.currentUserData.id
                       ? OptionTile(
                           action: () {
@@ -125,14 +124,11 @@ class ChatMessagePopup extends StatelessWidget {
                   OptionTile(
                       action: () async {
                         await Clipboard.setData(ClipboardData(
-                            text: chatController
-                                .chatContent[chatController.messageSelected]
-                                .message));
+                            text: chatController.messageSelected!.message));
                       },
                       actionIcon: Icons.copy,
                       actionName: 'Copy Text'),
-                  chatController.chatContent[chatController.messageSelected]
-                              .senderId ==
+                  chatController.messageSelected!.senderId ==
                           mainController.currentUserData.id
                       ? OptionTile(
                           action: () {

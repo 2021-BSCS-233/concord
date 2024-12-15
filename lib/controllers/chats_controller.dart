@@ -10,9 +10,9 @@ class ChatsController extends GetxController {
   List<ChatsModel> chatsData = [];
 
   getInitialData(currentUserId) async {
+    chatsData = await getInitialChatsFirebase(currentUserId);
     mainController.chatsListenerRef =
         chatsListenerFirebase(currentUserId, updateChats);
-    chatsData = await getInitialChatsFirebase(currentUserId);
     initial = false;
   }
 

@@ -19,9 +19,9 @@ class RequestsController extends GetxController {
   }
 
   getInitialData(currentUserId) async {
+    var result = await getInitialRequestFirebase(currentUserId);
     mainController.requestListenerRef =
         requestsListenersFirebase(currentUserId);
-    var result = await getInitialRequestFirebase(currentUserId);
     incomingRequestsData = result[0];
     outgoingRequestsData = result[1];
     initial = false;

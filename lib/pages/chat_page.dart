@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:concord/models/chats_model.dart';
+import 'package:concord/models/messages_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:core';
@@ -17,17 +18,17 @@ class ChatPage extends StatelessWidget {
   final ChatsModel chatData;
 
   ChatPage({super.key, required this.chatData}) {
+    chatController.chatHistory.clear();
+    chatController.historyRemaining = true;
     chatController.userMap.clear();
     chatController.chatId = chatData.id!;
     chatController.initial = true;
-    chatController.userMap[mainController.currentUserData.id] =
+    chatController.userMap[mainController.currentUserData.id!] =
         mainController.currentUserData;
     for (var user in chatData.receiverData!) {
-      chatController.userMap[user.id] = user;
+      chatController.userMap[user.id!] = user;
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -104,9 +105,7 @@ class ChatPage extends StatelessWidget {
                     return const Center(child: CircularProgressIndicator());
                   },
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
+                const SizedBox(height: 10),
                 Obx(() => Visibility(
                     visible: chatController.attachmentVisible.value &&
                         chatController.updateA == chatController.updateA,
@@ -274,8 +273,7 @@ class ChatPage extends StatelessWidget {
               right: 0.0,
               child: chatController.chatContent.isNotEmpty
                   ? ProfilePopup(
-                      selectedUser: chatController
-                          .chatContent[chatController.messageSelected].senderId)
+                      selectedUser: chatController.messageSelected!.senderId)
                   : Container(),
             )),
       ],
@@ -283,94 +281,123 @@ class ChatPage extends StatelessWidget {
   }
 
   Future<Widget> messagesUI() async {
-    chatController.initial
-        ? await chatController.getMessages(chatData.id)
-        : null;
+    chatController.initial ? await chatController.getMessages() : null;
     return Obx(
       () => chatController.updateC.value == chatController.updateC.value &&
               chatController.chatContent.isEmpty
           ? Center(child: Text('chatEmpty'.tr))
           : Expanded(
-              child: NotificationListener(
-                onNotification: (ScrollNotification notification) {
-                  if (notification.metrics.pixels == 0) {
-                    debugPrint('load');
+              child: RefreshIndicator(
+                // onNotification: (ScrollNotification notification) {
+                //   if (notification is ScrollUpdateNotification) {
+                //     if (notification.metrics.pixels ==
+                //             notification.metrics.maxScrollExtent &&
+                //         chatController.chatContent.length == 50 &&
+                //         chatController.historyRemaining) {
+                //       if (chatController.debounceTimer?.isActive ?? false) {
+                //         return true;
+                //       }
+                //       debugPrint('loading history');
+                //       chatController.getMessageHistory();
+                //       chatController.debounceTimer =
+                //           Timer(const Duration(seconds: 2), () {
+                //         chatController.debounceTimer = null;
+                //       });
+                //     } else if (!(chatController.historyRemaining)) {
+                //       debugPrint(
+                //           'nothing more to load ${chatController.chatHistory.length}, ${chatController.chatContent.length}');
+                //     }
+                //   }
+                //   return true;
+                // },
+                onRefresh: () async {
+                  if (chatController.chatContent.length > 49 &&
+                      chatController.historyRemaining) {
+                    return await chatController.getMessageHistory();
                   }
-                  return true;
+                  return Future.value(null);
                 },
-                child: ListView.builder(
-                  itemCount: chatController.chatContent.length,
-                  shrinkWrap: true,
-                  reverse: true,
-                  itemBuilder: (context, index) {
-                    try {
-                      if (chatController.chatContent[index].senderId !=
-                          chatController.chatContent[index + 1].senderId) {
-                        return MessageTileFull(
-                          messageData: chatController.chatContent[index],
-                          sendingUser: chatController.userMap[
-                              chatController.chatContent[index].senderId],
-                          toggleMenu: () {
-                            chatController.toggleMenu(index);
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: SingleChildScrollView(
+                    reverse: true,
+                    child: Column(
+                      children: [
+                        ListView.builder(
+                          itemCount: chatController.chatHistory.length,
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          reverse: true,
+                          itemBuilder: (context, index) {
+                            return messageBuilder(
+                                chatController.chatHistory, index);
                           },
-                          toggleProfile: () {
-                            chatController.toggleProfile(index);
+                        ),
+                        ListView.builder(
+                          itemCount: chatController.chatContent.length,
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          reverse: true,
+                          itemBuilder: (context, index) {
+                            return messageBuilder(
+                                chatController.chatContent, index);
                           },
-                        );
-                      } else {
-                        bool select = true;
-                        try {
-                          var time1 = chatController.chatContent[index].timeStamp;
-                          var time2 =
-                              chatController.chatContent[index + 1].timeStamp;
-                          var difference = time1!.difference(time2!);
-                          if (difference.inMinutes < 15) {
-                            select = true;
-                          } else {
-                            select = false;
-                          }
-                        } catch (e) {
-                          select = true;
-                        }
-                        if (select) {
-                          return MessageTileCompact(
-                              messageData: chatController.chatContent[index],
-                              sendingUser: chatController.userMap[
-                                  chatController.chatContent[index].senderId],
-                              toggleMenu: () {
-                                chatController.toggleMenu(index);
-                              });
-                        } else {
-                          return MessageTileFull(
-                            messageData: chatController.chatContent[index],
-                            sendingUser: chatController.userMap[
-                                chatController.chatContent[index].senderId],
-                            toggleMenu: () {
-                              chatController.toggleMenu(index);
-                            },
-                            toggleProfile: () {
-                              chatController.toggleProfile(index);
-                            },
-                          );
-                        }
-                      }
-                    } catch (e) {
-                      return MessageTileFull(
-                        messageData: chatController.chatContent[index],
-                        sendingUser: chatController
-                            .userMap[chatController.chatContent[index].senderId],
-                        toggleMenu: () {
-                          chatController.toggleMenu(index);
-                        },
-                        toggleProfile: () {
-                          chatController.toggleProfile(index);
-                        },
-                      );
-                    }
-                  },
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
     );
+  }
+
+  messageBuilder(List<MessagesModel> content, index) {
+    try {
+      if (content[index].senderId != content[index + 1].senderId) {
+        return MessageTileFull(
+          messageData: content[index],
+          sendingUser: chatController.userMap[content[index].senderId]!,
+          toggleMenu: chatController.toggleMenu,
+          toggleProfile: chatController.toggleProfile
+        );
+      } else {
+        bool select = true;
+        try {
+          var time1 = content[index].timeStamp;
+          var time2 = content[index + 1].timeStamp;
+          var difference = time1!.difference(time2!);
+          if (difference.inMinutes < 15) {
+            select = true;
+          } else {
+            select = false;
+          }
+        } catch (e) {
+          select = true;
+        }
+        if (select) {
+          return MessageTileCompact(
+              messageData: content[index],
+              sendingUser: chatController.userMap[content[index].senderId]!,
+              toggleMenu: chatController.toggleMenu);
+        } else {
+          return MessageTileFull(
+            messageData: content[index],
+            sendingUser: chatController.userMap[content[index].senderId]!,
+            toggleMenu: chatController.toggleMenu,
+            toggleProfile: chatController.toggleProfile,
+          );
+        }
+      }
+    } catch (e) {
+      return MessageTileFull(
+        messageData: content[index],
+        sendingUser: chatController.userMap[content[index].senderId]!,
+        toggleMenu: chatController.toggleMenu,
+        toggleProfile: () {
+          chatController.toggleProfile(index);
+        },
+      );
+    }
   }
 }

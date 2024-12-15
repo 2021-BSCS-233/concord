@@ -52,9 +52,9 @@ class PostController extends GetxController {
   }
 
   getPostMessages(postId) async {
+    postContent = await getInitialMessagesFirebase('posts', postId);
     mainController.chatListenerRef =
         messagesListenerFirebase('posts', postId, updateMessages);
-    postContent = await getInitialMessagesFirebase('posts', postId);
     initial = false;
   }
 
@@ -102,7 +102,7 @@ class PostController extends GetxController {
   }
 
   deleteMessage() {
-    deleteMessageFirebase('posts',postId, postContent[messageSelected].id);
+    deleteMessageFirebase('posts',postId, postContent[messageSelected]);
     showMenu.value = false;
   }
 
