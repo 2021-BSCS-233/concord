@@ -94,7 +94,7 @@ class EditProfilePage extends StatelessWidget {
                       editProfileController.image = result!.path;
                       // var result = await FilePicker.platform.pickFiles(type: FileType.image);
                       // editProfileController.image = result?.files.single.path;
-                      editProfileController.updateP.value += 1;
+                      editProfileController.update(['profilePicture']);
                     },
                     child: Stack(
                       children: [
@@ -106,31 +106,33 @@ class EditProfilePage extends StatelessWidget {
                               shape: BoxShape.circle,
                               border: Border.all(
                                   width: 6, color: const Color(0xFF121218))),
-                          child: Obx(() => CircleAvatar(
-                                backgroundImage: editProfileController
-                                                .updateP.value ==
-                                            editProfileController
-                                                .updateP.value &&
-                                        editProfileController.image != ''
-                                    ? FileImage(
-                                        File(editProfileController.image))
-                                    : mainController.currentUserData.profilePicture !=
-                                            ''
-                                        ? CachedNetworkImageProvider(
-                                            mainController.currentUserData.profilePicture)
-                                        : const AssetImage(
-                                                'assets/images/default.png')
-                                            as ImageProvider,
-                                // radius: 10,
-                                backgroundColor: Colors.grey.shade900,
-                              )),
+                          child: GetBuilder(
+                              init: editProfileController,
+                              id: 'profilePicture',
+                              builder: (controller) {
+                                return CircleAvatar(
+                                  backgroundImage: controller.image != ''
+                                      ? FileImage(File(controller.image))
+                                      : mainController.currentUserData
+                                                  .profilePicture !=
+                                              ''
+                                          ? CachedNetworkImageProvider(
+                                              mainController.currentUserData
+                                                  .profilePicture)
+                                          : const AssetImage(
+                                                  'assets/images/default.png')
+                                              as ImageProvider,
+                                  // radius: 10,
+                                  backgroundColor: Colors.grey.shade900,
+                                );
+                              }),
                         ),
                         Positioned(
                           bottom: 3,
                           right: 3,
                           child: StatusIcon(
-                            iconType: mainController
-                                .currentUserData.displayStatus,
+                            iconType:
+                                mainController.currentUserData.displayStatus,
                             iconSize: 24,
                             iconBorder: 4,
                           ),
@@ -181,8 +183,7 @@ class EditProfilePage extends StatelessWidget {
                             vertical: 5, horizontal: 10),
                         floatingLabelBehavior: FloatingLabelBehavior.never,
                         border: const OutlineInputBorder(),
-                        labelText:
-                            mainController.currentUserData.displayName,
+                        labelText: mainController.currentUserData.displayName,
                       ),
                     ),
                     const SizedBox(
@@ -201,8 +202,7 @@ class EditProfilePage extends StatelessWidget {
                               vertical: 5, horizontal: 10),
                           floatingLabelBehavior: FloatingLabelBehavior.never,
                           border: const OutlineInputBorder(),
-                          labelText:
-                              mainController.currentUserData.pronouns),
+                          labelText: mainController.currentUserData.pronouns),
                     ),
                     const SizedBox(
                       height: 20,

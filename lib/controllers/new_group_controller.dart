@@ -9,7 +9,6 @@ class NewGroupController extends GetxController {
   TextEditingController groupNameTextController = TextEditingController();
   List<UsersModel> friendsData;
   List<bool> markedUsers = [];
-  var updateL = 0.obs;
 
   NewGroupController({required this.friendsData}) {
     markedUsers.addAll(List.generate(friendsData.length, (_) => false));

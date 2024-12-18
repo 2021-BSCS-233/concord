@@ -20,6 +20,7 @@ class NewPostController extends GetxController {
         attachments: [],
         categories: categories,
         followers: [posterId],
+        participants: [posterId],
         timeStamp: DateTime.now());
     MessagesModel firstMessage = MessagesModel(
         senderId: posterId,

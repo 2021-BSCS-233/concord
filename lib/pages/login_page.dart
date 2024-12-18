@@ -1,5 +1,4 @@
 import 'package:concord/pages/signin_page.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:concord/main.dart';
 import 'package:get/get.dart';
@@ -137,8 +136,6 @@ class LogInPage extends StatelessWidget {
                     : () {},
                 child: Container(
                   color: const Color(0xC01D1D1F),
-                  height: MediaQuery.of(context).size.height,
-                  width: double.infinity,
                   child: const Center(child: CircularProgressIndicator()),
                 ),
               ),

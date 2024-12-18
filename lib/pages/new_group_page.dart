@@ -75,30 +75,32 @@ class NewGroupPage extends StatelessWidget {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             Expanded(
-              child: Obx(() => ListView.builder(
-                    itemCount: newGroupController.updateL.value != -1
-                        ? newGroupController.friendsData.length
-                        : 0,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        leading: ProfilePicture(
-                          profileLink: newGroupController
-                              .friendsData[index].profilePicture,
-                          profileRadius: 20,
-                        ),
-                        title: Text(
-                          newGroupController.friendsData[index].displayName,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        trailing: Checkbox(
-                            value: newGroupController.markedUsers[index],
-                            onChanged: (value) {
-                              newGroupController.markedUsers[index] = value!;
-                              newGroupController.updateL.value += 1;
-                            }),
-                      );
-                    },
-                  )),
+              child: GetBuilder(
+                  init: newGroupController,
+                  builder: (controller) {
+                    return ListView.builder(
+                      itemCount: controller.friendsData.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          leading: ProfilePicture(
+                            profileLink:
+                                controller.friendsData[index].profilePicture,
+                            profileRadius: 20,
+                          ),
+                          title: Text(
+                            controller.friendsData[index].displayName,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          trailing: Checkbox(
+                              value: controller.markedUsers[index],
+                              onChanged: (value) {
+                                controller.markedUsers[index] = value!;
+                                controller.update();
+                              }),
+                        );
+                      },
+                    );
+                  }),
             )
           ],
         ),

@@ -125,7 +125,7 @@ void profileListenerFirebase(currentUserId) {
     mainController.currentUserData =
         UsersModel.fromJson(event.data() as Map<String, dynamic>);
     mainController.currentUserData.id = event.id;
-    mainController.updateM.value += 1;
+    mainController.update(['profileSection']);
   });
 }
 
@@ -259,7 +259,7 @@ getInitialRequestFirebase(currentUserId) async {
   }
   return [incoming, outgoing];
 }
-
+//TODO: change to use one listener
 List<StreamSubscription> requestsListenersFirebase(currentUserId) {
   RequestsController requestsController = Get.find<RequestsController>();
   return [
@@ -493,7 +493,9 @@ Future<bool> hideChatFirebase(chatId, currentUserId) async {
     return false;
   }
 }
+
 DateTime? currentTime;
+
 Future<List<MessagesModel>> getInitialMessagesFirebase(
     collection, chatId) async {
   var messageInstances = await FirebaseFirestore.instance
@@ -631,15 +633,15 @@ Future<List> getInitialPostsFirebase(currentUserId, preference) async {
         PostsModel.fromJson(instance.data() as Map<String, dynamic>);
     postData.receiverData = [];
     postData.id = instance.id;
-    postData.followers.removeWhere((element) => element == currentUserId);
-    postData.followers.removeWhere((element) => element == postData.poster);
+    postData.participants.removeWhere((element) => element == currentUserId);
+    postData.participants.removeWhere((element) => element == postData.poster);
     var posterData = await usersRef.doc(postData.poster).get();
     postData.posterData =
         UsersModel.fromJson(posterData.data() as Map<String, dynamic>);
     postData.posterData!.id = posterData.id;
     publicPosts.add(postData);
-    for (var follower in postData.followers) {
-      postData.receiverData?.add(await getUserProfileFirebase(follower));
+    for (var participant in postData.participants) {
+      postData.receiverData?.add(await getUserProfileFirebase(participant));
     }
   }
   List<PostsModel> followingPosts = [];
@@ -652,16 +654,16 @@ Future<List> getInitialPostsFirebase(currentUserId, preference) async {
     PostsModel postData =
         PostsModel.fromJson(instance.data() as Map<String, dynamic>);
     postData.id = instance.id;
-    postData.followers.removeWhere((element) => element == currentUserId);
-    postData.followers.removeWhere((element) => element == postData.poster);
+    postData.participants.removeWhere((element) => element == currentUserId);
+    postData.participants.removeWhere((element) => element == postData.poster);
     var posterData = await usersRef.doc(postData.poster).get();
     postData.posterData =
         UsersModel.fromJson(posterData.data() as Map<String, dynamic>);
     postData.posterData!.id = posterData.id;
     postData.receiverData = [];
     followingPosts.add(postData);
-    for (var follower in postData.followers) {
-      postData.receiverData?.add(await getUserProfileFirebase(follower));
+    for (var participant in postData.participants) {
+      postData.receiverData?.add(await getUserProfileFirebase(participant));
     }
   }
   return [publicPosts, followingPosts];
@@ -671,30 +673,10 @@ Future<bool> sendPostFirebase(
     PostsModel newPost, MessagesModel firstMessage, attachments) async {
   try {
     var docRef = await postsRef.add(newPost.toJson());
-    await sendPostMessageFirebase(docRef.id, firstMessage, attachments);
+    await sendMessageFirebase('posts', docRef.id, firstMessage, attachments);
     return true;
   } catch (e) {
     debugPrint('(catch)$e');
     return false;
   }
-}
-
-Future<void> sendPostMessageFirebase(
-    postId, MessagesModel messageData, attachments) async {
-  var postRef = postsRef.doc(postId);
-  var storageRef = FirebaseStorage.instance.ref();
-  List<String> fileLinks = [];
-
-  if (attachments.isNotEmpty) {
-    fileLinks =
-        await Future.wait(attachments.map<Future<String>>((attachment) async {
-      var attachmentRef = storageRef.child('attachments/${attachment.name}');
-      var task = await attachmentRef.putFile(File(attachment.path));
-      var downloadUrl = task.ref.getDownloadURL();
-      return downloadUrl;
-    }));
-  }
-  messageData.timeStamp = DateTime.now();
-  messageData.attachments = fileLinks;
-  postRef.collection('messages').add(messageData.toJson());
 }

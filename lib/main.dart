@@ -39,7 +39,8 @@ Future<void> main() async {
     translations: Messages(),
     locale: Get.locale,
     fallbackLocale: const Locale('en', ''),
-    home: const InitialLoading(), // default is suppose to be InitialLoading() any other page is debugging
+    home:
+        const InitialLoading(), // default is suppose to be InitialLoading() any other page is debugging
   ));
 }
 
@@ -104,6 +105,7 @@ class Home extends StatelessWidget {
       const NotificationsPage(),
       ProfilePage()
     ];
+    var shSize = MediaQuery.sizeOf(context).height;
 
     return Stack(
       children: [
@@ -131,29 +133,33 @@ class Home extends StatelessWidget {
                         icon: Icon(Icons.notifications),
                         label: 'Notifications'),
                     BottomNavigationBarItem(
-                        icon: Obx(() => SizedBox(
-                              height:
-                                  mainController.updateM.value == 1 ? 26 : 26,
-                              width: 32,
-                              child: Stack(
-                                children: [
-                                  ProfilePicture(
-                                    profileLink: mainController
-                                        .currentUserData.profilePicture,
-                                    profileRadius: 11.5,
-                                  ),
-                                  Positioned(
-                                    bottom: -1,
-                                    right: -1,
-                                    child: StatusIcon(
-                                      iconType: mainController
-                                          .currentUserData.displayStatus,
-                                      borderColor: const Color(0xFF222222),
+                        icon: GetBuilder(
+                            init: mainController,
+                            id: 'profileSection',
+                            builder: (controller) {
+                              return SizedBox(
+                                height: 26,
+                                width: 32,
+                                child: Stack(
+                                  children: [
+                                    ProfilePicture(
+                                      profileLink: controller
+                                          .currentUserData.profilePicture,
+                                      profileRadius: 11.5,
                                     ),
-                                  ),
-                                ],
-                              ),
-                            )),
+                                    Positioned(
+                                      bottom: -1,
+                                      right: -1,
+                                      child: StatusIcon(
+                                        iconType: controller
+                                            .currentUserData.displayStatus,
+                                        borderColor: const Color(0xFF222222),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }),
                         label: 'profile'.tr),
                   ],
                 )),
@@ -169,17 +175,13 @@ class Home extends StatelessWidget {
                 },
                 child: Container(
                   color: const Color(0xC01D1D1F),
-                  height: MediaQuery.of(context).size.height,
-                  width: double.infinity,
                 ),
               ),
             )),
         Obx(() => AnimatedPositioned(
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeInOut,
-              bottom: mainController.showMenu.value
-                  ? 0.0
-                  : -MediaQuery.of(context).size.height,
+              bottom: mainController.showMenu.value ? 0.0 : -shSize,
               left: 0.0,
               right: 0.0,
               child: mainController.selectedIndex.value == 0
@@ -193,12 +195,10 @@ class Home extends StatelessWidget {
         Obx(() => AnimatedPositioned(
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeInOut,
-              bottom: mainController.showProfile.value
-                  ? 0.0
-                  : -MediaQuery.of(context).size.height,
+              bottom: mainController.showProfile.value ? 0.0 : -shSize,
               left: 0.0,
               right: 0.0,
-              child: mainController.selectedChatId == ''
+              child: mainController.selectedUserId == ''
                   ? Container()
                   : ProfilePopup(selectedUser: mainController.selectedUserId),
             ))

@@ -18,6 +18,9 @@ PostsModel _$PostsModelFromJson(Map<String, dynamic> json) => PostsModel(
           .toList(),
       followers:
           (json['followers'] as List<dynamic>).map((e) => e as String).toList(),
+      participants: (json['participants'] as List<dynamic>)
+          .map((e) => e as String)
+          .toList(),
       timeStamp: PostsModel._customDateFromJson(json['timeStamp']),
     );
 
@@ -29,5 +32,6 @@ Map<String, dynamic> _$PostsModelToJson(PostsModel instance) =>
       'attachments': instance.attachments,
       'categories': instance.categories,
       'followers': instance.followers,
+      'participants': instance.participants,
       'timeStamp': PostsModel._customDateToJson(instance.timeStamp),
     };

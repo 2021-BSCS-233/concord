@@ -4,11 +4,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:concord/controllers/chat_controller.dart';
+import 'package:concord/controllers/chat_post_controller.dart';
 import 'package:concord/controllers/main_controller.dart';
 import 'package:concord/services/firebase_services.dart';
 import 'package:concord/widgets/status_icons.dart';
 import 'package:concord/widgets/option_tile.dart';
+
 
 class UserGroupPopup extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
@@ -20,7 +21,7 @@ class UserGroupPopup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.56,
+      height: MediaQuery.sizeOf(context).height * 0.56,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Container(
@@ -95,7 +96,7 @@ class ChatMessagePopup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.56,
+      height: MediaQuery.sizeOf(context).height * 0.56,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Container(
@@ -112,11 +113,11 @@ class ChatMessagePopup extends StatelessWidget {
                   const SizedBox(
                     height: 10,
                   ),
-                  chatController.messageSelected!.senderId ==
+                  chatController.messageSelected.senderId ==
                           mainController.currentUserData.id
                       ? OptionTile(
                           action: () {
-                            chatController.editMessage();
+                            chatController.enterEditMode();
                           },
                           actionIcon: Icons.edit,
                           actionName: 'Edit Message')
@@ -124,11 +125,11 @@ class ChatMessagePopup extends StatelessWidget {
                   OptionTile(
                       action: () async {
                         await Clipboard.setData(ClipboardData(
-                            text: chatController.messageSelected!.message));
+                            text: chatController.messageSelected.message));
                       },
                       actionIcon: Icons.copy,
                       actionName: 'Copy Text'),
-                  chatController.messageSelected!.senderId ==
+                  chatController.messageSelected.senderId ==
                           mainController.currentUserData.id
                       ? OptionTile(
                           action: () {
@@ -136,6 +137,68 @@ class ChatMessagePopup extends StatelessWidget {
                           },
                           actionIcon: CupertinoIcons.delete,
                           actionName: 'Delete Message')
+                      : const SizedBox(),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class PostMessagePopup extends StatelessWidget {
+  final String postId;
+  final MainController mainController = Get.find<MainController>();
+  final PostController postController = Get.find<PostController>();
+
+  PostMessagePopup({super.key, required this.postId});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: MediaQuery.sizeOf(context).height * 0.56,
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Container(
+          height: double.infinity,
+          decoration: const BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  postController.messageSelected.senderId ==
+                      mainController.currentUserData.id
+                      ? OptionTile(
+                      action: () {
+                        postController.enterEditMode();
+                      },
+                      actionIcon: Icons.edit,
+                      actionName: 'Edit Message')
+                      : const SizedBox(),
+                  OptionTile(
+                      action: () async {
+                        await Clipboard.setData(ClipboardData(
+                            text: postController.messageSelected.message));
+                      },
+                      actionIcon: Icons.copy,
+                      actionName: 'Copy Text'),
+                  postController.messageSelected.senderId ==
+                      mainController.currentUserData.id
+                      ? OptionTile(
+                      action: () {
+                        postController.deleteMessage();
+                      },
+                      actionIcon: CupertinoIcons.delete,
+                      actionName: 'Delete Message')
                       : const SizedBox(),
                 ],
               ),
@@ -163,22 +226,23 @@ class ProfilePopup extends StatelessWidget {
           return Text("${snapshot.error}");
         }
         return Container();
-        // height: MediaQuery.of(context).size.height * 0.65,
+        // height: MediaQuery.sizeOf(context).height * 0.65,
         // child: CircularProgressIndicator());
       },
     );
   }
 
   Future<Widget> _buildContent(BuildContext context) async {
+    var shSize = MediaQuery.sizeOf(context).height;
     UsersModel userProfileData = await getUserProfileFirebase(selectedUser);
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.65,
+      height: shSize * 0.65,
       width: double.infinity,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: SingleChildScrollView(
           child: Container(
-            height: MediaQuery.of(context).size.height,
+            height: shSize,
             decoration: const BoxDecoration(
                 color: Colors.black,
                 borderRadius: BorderRadius.all(Radius.circular(25))),
@@ -341,7 +405,7 @@ class StatusPopup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.5,
+      height: MediaQuery.sizeOf(context).height * 0.5,
       width: double.infinity,
       child: Scaffold(
           backgroundColor: Colors.transparent,

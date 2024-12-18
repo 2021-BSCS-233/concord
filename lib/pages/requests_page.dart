@@ -70,80 +70,94 @@ class RequestsPage extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.only(left: 10),
-          child: Obx(() => requestsController.updateI.value ==
-                      requestsController.updateI.value &&
-                  requestsController.incomingRequestsData.isEmpty
-              ? Center(
-                  child: Text('incomingEmpty'.tr),
-                )
-              : ListView.builder(
-                  itemCount: requestsController.incomingRequestsData.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      margin: const EdgeInsets.only(top: 15),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF121218),
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                      ),
-                      child: ListTile(
-                        dense: true,
-                        leading: ProfilePicture(
-                          profileLink: requestsController
-                              .incomingRequestsData[index].user!.profilePicture,
-                          profileRadius: 17,
-                        ),
-                        title: Text(
-                          requestsController
-                              .incomingRequestsData[index].user!.displayName,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16),
-                        ),
-                        subtitle: Text(requestsController
-                            .incomingRequestsData[index].user!.username),
-                        trailing: SizedBox(
-                          width: 100,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              InkWell(
-                                child: const SizedBox(
-                                    width: 35,
-                                    height: 40,
-                                    child: Icon(
-                                      Icons.check,
-                                      color: Colors.green,
-                                    )),
-                                onTap: () async {
-                                  await requestActionFirebase(
-                                      requestsController
-                                          .incomingRequestsData[index].id,
-                                      'accept');
-                                },
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              InkWell(
-                                child: const SizedBox(
-                                    width: 35,
-                                    height: 40,
-                                    child: Icon(
-                                      Icons.close,
-                                      color: Colors.red,
-                                    )),
-                                onTap: () {
-                                  requestActionFirebase(
-                                      requestsController
-                                          .incomingRequestsData[index].id,
-                                      'deny');
-                                },
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  })),
+          child: GetBuilder(
+              init: requestsController,
+              id: 'IRSection',
+              builder: (controller) {
+                return controller.incomingRequestsData.isEmpty
+                    ? Center(
+                        child: Text('incomingEmpty'.tr),
+                      )
+                    : Expanded(
+                        child: ListView.builder(
+                            itemCount: controller.incomingRequestsData.length,
+                            itemBuilder: (context, index) {
+                              return Container(
+                                margin: const EdgeInsets.only(top: 15),
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFF121218),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20)),
+                                ),
+                                child: ListTile(
+                                  dense: true,
+                                  leading: ProfilePicture(
+                                    profileLink: controller
+                                        .incomingRequestsData[index]
+                                        .user!
+                                        .profilePicture,
+                                    profileRadius: 17,
+                                  ),
+                                  title: Text(
+                                    controller.incomingRequestsData[index].user!
+                                        .displayName,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16),
+                                  ),
+                                  subtitle: Text(controller
+                                      .incomingRequestsData[index]
+                                      .user!
+                                      .username),
+                                  trailing: SizedBox(
+                                    width: 100,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        InkWell(
+                                          child: const SizedBox(
+                                              width: 35,
+                                              height: 40,
+                                              child: Icon(
+                                                Icons.check,
+                                                color: Colors.green,
+                                              )),
+                                          onTap: () async {
+                                            await requestActionFirebase(
+                                                controller
+                                                    .incomingRequestsData[index]
+                                                    .id,
+                                                'accept');
+                                          },
+                                        ),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        InkWell(
+                                          child: const SizedBox(
+                                              width: 35,
+                                              height: 40,
+                                              child: Icon(
+                                                Icons.close,
+                                                color: Colors.red,
+                                              )),
+                                          onTap: () {
+                                            requestActionFirebase(
+                                                controller
+                                                    .incomingRequestsData[index]
+                                                    .id,
+                                                'deny');
+                                          },
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }),
+                      );
+              }),
         ),
         Container(
           padding: const EdgeInsets.only(left: 10),
@@ -154,7 +168,8 @@ class RequestsPage extends StatelessWidget {
                   Expanded(
                     child: CustomInputField(
                       fieldLabel: 'Add Friend',
-                      controller: requestsController.requestsFieldTextController,
+                      controller:
+                          requestsController.requestsFieldTextController,
                       prefixIcon: CupertinoIcons.person_add,
                       onChange: requestsController.changing,
                       contentTopPadding: 10,
@@ -176,8 +191,8 @@ class RequestsPage extends StatelessWidget {
                                   requestsController
                                       .requestsFieldTextController.text
                                       .trim());
-                              requestsController.requestsFieldTextController.text =
-                                  '';
+                              requestsController
+                                  .requestsFieldTextController.text = '';
                             },
                             style: ButtonStyle(
                               padding: WidgetStateProperty.all<EdgeInsets>(
@@ -193,66 +208,66 @@ class RequestsPage extends StatelessWidget {
                       ))
                 ],
               ),
-              Obx(() => Expanded(
-                    child: requestsController.updateO.value ==
-                                requestsController.updateO.value &&
-                            requestsController.outgoingRequestsData.isEmpty
-                        ? Center(
-                            child: Text('outgoingEmpty'.tr),
-                          )
-                        : ListView.builder(
-                            itemCount:
-                                requestsController.outgoingRequestsData.length,
-                            shrinkWrap: true,
-                            itemBuilder: (context, index) {
-                              return Container(
-                                margin: const EdgeInsets.only(top: 15),
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFF121218),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(20)),
-                                ),
-                                child: ListTile(
-                                  dense: true,
-                                  leading: ProfilePicture(
-                                    profileLink: requestsController
+              GetBuilder(
+                  init: requestsController,
+                  id: 'ORSection',
+                  builder: (controller) {
+                    return Expanded(
+                      child: controller.outgoingRequestsData.isEmpty
+                          ? Center(
+                              child: Text('outgoingEmpty'.tr),
+                            )
+                          : ListView.builder(
+                              itemCount: controller.outgoingRequestsData.length,
+                              shrinkWrap: true,
+                              itemBuilder: (context, index) {
+                                return Container(
+                                  margin: const EdgeInsets.only(top: 15),
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFF121218),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20)),
+                                  ),
+                                  child: ListTile(
+                                    dense: true,
+                                    leading: ProfilePicture(
+                                      profileLink: controller
+                                          .outgoingRequestsData[index]
+                                          .user!
+                                          .profilePicture,
+                                      profileRadius: 17,
+                                    ),
+                                    title: Text(
+                                      controller.outgoingRequestsData[index]
+                                          .user!.displayName,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16),
+                                    ),
+                                    subtitle: Text(controller
                                         .outgoingRequestsData[index]
                                         .user!
-                                        .profilePicture,
-                                    profileRadius: 17,
+                                        .username),
+                                    trailing: InkWell(
+                                      child: const SizedBox(
+                                          width: 40,
+                                          height: 40,
+                                          child: Icon(
+                                            Icons.close,
+                                            color: Colors.red,
+                                          )),
+                                      onTap: () {
+                                        requestActionFirebase(
+                                            controller
+                                                .outgoingRequestsData[index].id,
+                                            'deny');
+                                      },
+                                    ),
                                   ),
-                                  title: Text(
-                                    requestsController
-                                        .outgoingRequestsData[index]
-                                        .user!
-                                        .displayName,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16),
-                                  ),
-                                  subtitle: Text(requestsController
-                                      .outgoingRequestsData[index]
-                                      .user!
-                                      .username),
-                                  trailing: InkWell(
-                                    child: const SizedBox(
-                                        width: 40,
-                                        height: 40,
-                                        child: Icon(
-                                          Icons.close,
-                                          color: Colors.red,
-                                        )),
-                                    onTap: () {
-                                      requestActionFirebase(
-                                          requestsController
-                                              .outgoingRequestsData[index].id,
-                                          'deny');
-                                    },
-                                  ),
-                                ),
-                              );
-                            }),
-                  )),
+                                );
+                              }),
+                    );
+                  }),
             ],
           ),
         ),

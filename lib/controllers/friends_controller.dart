@@ -6,7 +6,6 @@ import 'package:concord/services/firebase_services.dart';
 class FriendsController extends GetxController {
   MainController mainController = Get.find<MainController>();
   bool initial = true;
-  var updateF = 0.obs;
   List<UsersModel> friendsData = [];
 
   getInitialData(currentUserId) async {
@@ -25,6 +24,6 @@ class FriendsController extends GetxController {
     } else if (updateType == 'removed') {
       friendsData.removeAt(index);
     }
-    updateF.value += 1;
+    update(['friendsSection']);
   }
 }

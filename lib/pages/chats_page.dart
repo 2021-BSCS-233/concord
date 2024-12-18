@@ -1,7 +1,6 @@
 import 'package:concord/pages/friends_page.dart';
 import 'package:concord/pages/new_group_page.dart';
 import 'package:concord/widgets/profile_picture.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:concord/widgets/dm_chat_tile.dart';
@@ -105,95 +104,96 @@ class ChatsPage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(
         children: [
-          Obx(
-            () => SizedBox(
-                width: double.infinity,
-                height: friendsController.friendsData.isEmpty ? 0 : 90,
-                child: friendsController.updateF.value ==
-                            friendsController.updateF.value &&
-                        friendsController.friendsData.isEmpty
-                    ? const SizedBox()
-                    : ListView.builder(
-                        itemCount: friendsController.friendsData.length,
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) {
-                          return Container(
-                            margin: const EdgeInsets.all(5),
-                            height: 80,
-                            width: 80,
-                            decoration: const BoxDecoration(
-                                color: Color(0xAA18181F),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15))),
-                            child: Center(
-                              child: InkWell(
-                                onTap: () {
-                                  mainController.toggleProfile(
-                                      friendsController.friendsData[index].id);
-                                },
-                                child: Stack(
-                                  children: [
-                                    SizedBox(
-                                      height: 50,
-                                      width: 50,
-                                      child: ProfilePicture(
-                                          profileLink: friendsController
-                                              .friendsData[index]
-                                              .profilePicture),
+          GetBuilder(
+              init: friendsController,
+              id: 'friendsSection',
+              builder: (controller) {
+                return SizedBox(
+                    width: double.infinity,
+                    height: controller.friendsData.isEmpty ? 0 : 90,
+                    child: controller.friendsData.isEmpty
+                        ? const SizedBox()
+                        : ListView.builder(
+                            itemCount: controller.friendsData.length,
+                            shrinkWrap: true,
+                            scrollDirection: Axis.horizontal,
+                            itemBuilder: (context, index) {
+                              return Container(
+                                margin: const EdgeInsets.all(5),
+                                height: 80,
+                                width: 80,
+                                decoration: const BoxDecoration(
+                                    color: Color(0xAA18181F),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(15))),
+                                child: Center(
+                                  child: InkWell(
+                                    onTap: () {
+                                      mainController.toggleProfile(
+                                          controller.friendsData[index].id);
+                                    },
+                                    child: Stack(
+                                      children: [
+                                        SizedBox(
+                                          height: 50,
+                                          width: 50,
+                                          child: ProfilePicture(
+                                              profileLink: controller
+                                                  .friendsData[index]
+                                                  .profilePicture),
+                                        ),
+                                        Positioned(
+                                          bottom: -2,
+                                          right: -2,
+                                          child: StatusIcon(
+                                            iconType: controller
+                                                        .friendsData[index]
+                                                        .status ==
+                                                    'Online'
+                                                ? controller.friendsData[index]
+                                                    .displayStatus
+                                                : controller
+                                                    .friendsData[index].status,
+                                            iconSize: 17,
+                                            iconBorder: 3.5,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    Positioned(
-                                      bottom: -2,
-                                      right: -2,
-                                      child: StatusIcon(
-                                        iconType: friendsController
-                                                    .friendsData[index]
-                                                    .status ==
-                                                'Online'
-                                            ? friendsController
-                                                .friendsData[index]
-                                                .displayStatus
-                                            : friendsController
-                                                .friendsData[index].status,
-                                        iconSize: 17,
-                                        iconBorder: 3.5,
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
-                              ),
+                              );
+                            }));
+              }),
+          GetBuilder(
+              init: chatsController,
+              id: 'chatsSection',
+              builder: (controller) {
+                return Expanded(
+                    child: controller.chatsData.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'chatsEmpty'.tr,
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(
+                                  height: 90,
+                                )
+                              ],
                             ),
-                          );
-                        })),
-          ),
-          Obx(
-            () => Expanded(
-                child: chatsController.updateCs.value ==
-                            chatsController.updateCs.value &&
-                        chatsController.chatsData.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'chatsEmpty'.tr,
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(
-                              height: 90,
-                            )
-                          ],
-                        ),
-                      )
-                    : ListView.builder(
-                        itemCount: chatsController.chatsData.length,
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) {
-                          return DmChatTile(
-                              chatData: chatsController.chatsData[index]);
-                        },
-                      )),
-          ),
+                          )
+                        : ListView.builder(
+                            itemCount: controller.chatsData.length,
+                            shrinkWrap: true,
+                            itemBuilder: (context, index) {
+                              return DmChatTile(
+                                  chatData: controller.chatsData[index]);
+                            },
+                          ));
+              })
         ],
       ),
     );

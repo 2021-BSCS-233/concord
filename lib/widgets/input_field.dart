@@ -7,6 +7,7 @@ class CustomInputField extends StatelessWidget {
   final IconData? suffixIcon;
   final Color? fieldColor;
   final String fieldLabel;
+  final String? fieldHint;
   final TextEditingController controller;
   final double? fieldHeight;
   final double? fieldRadius;
@@ -25,6 +26,7 @@ class CustomInputField extends StatelessWidget {
       {super.key,
       required this.fieldLabel,
       required this.controller,
+      this.fieldHint,
       this.suffixIcon,
       this.prefixIcon,
       this.fieldColor,
@@ -65,7 +67,7 @@ class CustomInputField extends StatelessWidget {
               contentTopPadding == null ? 6.5 : contentTopPadding!, 5.0, 5.0),
           //made it so if you pass all_inclusive icon it becomes invisible as a
           //temp solution for this field height not working problem
-          //PS all_inclusive icon cuz its the least use apparently
+          //PS all_inclusive icon cuz its the least used apparently
           prefixIcon: prefixIcon == Icons.all_inclusive
               ? Icon(
                   prefixIcon,
@@ -101,7 +103,8 @@ class CustomInputField extends StatelessWidget {
             fieldLabel,
             overflow: TextOverflow.ellipsis,
           ),
-          hintText: '',
+          hintText: fieldHint ?? '',
+          hintStyle:TextStyle(fontWeight: FontWeight.normal, color: Colors.grey.shade600),
           floatingLabelBehavior: FloatingLabelBehavior.never,
         ),
       ),

@@ -6,8 +6,6 @@ import 'package:concord/services/firebase_services.dart';
 
 class RequestsController extends GetxController {
   MainController mainController = Get.find<MainController>();
-  var updateI = 0.obs;
-  var updateO = 0.obs;
   var initial = true;
   List<RequestsModel> incomingRequestsData = [];
   List<RequestsModel> outgoingRequestsData = [];
@@ -35,7 +33,7 @@ class RequestsController extends GetxController {
     } else if (updateType == 'removed') {
       incomingRequestsData.removeAt(index);
     }
-    updateI.value += 1;
+    update(['IRSection']);
   }
 
   updateOutgoingRequests(RequestsModel updateData, updateType) {
@@ -46,6 +44,6 @@ class RequestsController extends GetxController {
     } else if (updateType == 'removed') {
       outgoingRequestsData.removeAt(index);
     }
-    updateO.value += 1;
+    update(['ORSection']);
   }
 }

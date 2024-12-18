@@ -7,26 +7,28 @@ import 'package:concord/widgets/message_tile.dart';
 import 'package:concord/widgets/popup_menus.dart';
 import 'package:concord/widgets/input_field.dart';
 import 'package:concord/controllers/main_controller.dart';
-import 'package:concord/controllers/post_controller.dart';
+import 'package:concord/controllers/chat_post_controller.dart';
 
 class PostPage extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
-  late final PostController postController = Get.put(PostController());
+  late final PostController postController =
+      Get.put(PostController(collection: 'posts'));
   final PostsModel postData;
 
   PostPage({super.key, required this.postData}) {
-    postController.postId = postData.id!;
+    postController.chatId = postData.id!;
     postController.initial = true;
-    postController.userMap[mainController.currentUserData.id] =
+    postController.userMap[mainController.currentUserData.id!] =
         mainController.currentUserData;
-    postController.userMap[postData.posterData!.id] = postData.posterData;
+    postController.userMap[postData.posterData!.id!] = postData.posterData!;
     for (var user in postData.receiverData!) {
-      postController.userMap[user.id] = user;
+      postController.userMap[user.id!] = user;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    var shSize = MediaQuery.sizeOf(context).height;
     return Stack(
       children: [
         Scaffold(
@@ -71,64 +73,99 @@ class PostPage extends StatelessWidget {
                   height: 10,
                 ),
                 Obx(() => Visibility(
-                    visible: postController.attachmentVisible.value &&
-                        postController.updateA == postController.updateA,
-                    child: Column(
-                      children: [
-                        Container(
-                          height: 150,
-                          width: double.infinity,
-                          color: Colors.grey.shade900,
-                          child: ListView.builder(
-                              itemCount: postController.attachments.length,
-                              scrollDirection: Axis.horizontal,
-                              itemBuilder: (context, index) {
-                                return Stack(
-                                  children: [
-                                    Center(
-                                      child: Container(
-                                        margin: const EdgeInsets.all(10),
-                                        height: 120,
-                                        width: 100,
-                                        child: ClipRRect(
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(15)),
-                                          child: Image(
-                                              fit: BoxFit.cover,
-                                              image: FileImage(File(
-                                                  postController
-                                                      .attachments[index]
-                                                      .path))),
+                    visible: postController.attachmentVisible.value,
+                    child: Container(
+                      height: 150,
+                      width: double.infinity,
+                      color: Colors.grey.shade900,
+                      child: GetBuilder(
+                          init: postController,
+                          id: 'attachmentList',
+                          builder: (controller) {
+                            return ListView.builder(
+                                itemCount: controller.attachments.length,
+                                scrollDirection: Axis.horizontal,
+                                itemBuilder: (context, index) {
+                                  return Stack(
+                                    children: [
+                                      Center(
+                                        child: Container(
+                                          margin: const EdgeInsets.all(10),
+                                          height: 120,
+                                          width: 100,
+                                          child: ClipRRect(
+                                            borderRadius:
+                                            const BorderRadius.all(
+                                                Radius.circular(15)),
+                                            child: Image(
+                                                fit: BoxFit.cover,
+                                                image: FileImage(File(controller
+                                                    .attachments[index].path))),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Positioned(
-                                      top: 4,
-                                      right: 2,
-                                      child: InkWell(
-                                        onTap: () {
-                                          postController
-                                              .removeAttachment(index);
-                                        },
-                                        child: Container(
-                                            decoration: BoxDecoration(
-                                                color: Colors.grey.shade700,
-                                                borderRadius:
-                                                    const BorderRadius.all(
-                                                        Radius.circular(3))),
-                                            child: Icon(
-                                              Icons.delete,
-                                              color: Colors.grey.shade500,
-                                            )),
+                                      Positioned(
+                                        top: 4,
+                                        right: 2,
+                                        child: InkWell(
+                                          onTap: () {
+                                            controller.removeAttachment(index);
+                                          },
+                                          child: Container(
+                                              decoration: BoxDecoration(
+                                                  color: Colors.grey.shade700,
+                                                  borderRadius:
+                                                  const BorderRadius.all(
+                                                      Radius.circular(3))),
+                                              child: Icon(
+                                                Icons.delete,
+                                                color: Colors.grey.shade500,
+                                              )),
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                );
-                              }),
-                        ),
-                        const SizedBox(height: 5)
-                      ],
+                                    ],
+                                  );
+                                });
+                          }),
                     ))),
+                Obx(() => Visibility(
+                    visible: postController.editMode.value,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 13),
+                      color: const Color(0xFF151515),
+                      width: double.infinity,
+                      height: 38,
+                      child: Row(
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              postController.exitEditMode();
+                            },
+                            child: Container(
+                              height: 20,
+                              width: 20,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.grey.shade600,
+                              ),
+                              child: const Icon(
+                                Icons.close_rounded,
+                                size: 18,
+                                color: Color(0xFF151515),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 15,
+                          ),
+                          Text(
+                            'Editing Message',
+                            style: TextStyle(color: Colors.grey.shade500),
+                          ),
+                        ],
+                      ),
+                    ))),
+                const SizedBox(height: 5),
                 Row(
                   children: [
                     SizedBox(
@@ -150,10 +187,11 @@ class PostPage extends StatelessWidget {
                     ),
                     Expanded(
                       child: CustomInputField(
-                        fieldFocusNode: postController.postFocusNode,
+                        contentTopPadding: 10,
+                        fieldFocusNode: postController.chatFocusNode,
                         fieldRadius: 20,
                         fieldLabel: 'Send a message in "${postData.title}"',
-                        controller: postController.postFieldTextController,
+                        controller: postController.chatFieldTextController,
                         suffixIcon: Icons.all_inclusive,
                         fieldColor: const Color(0xFF151515),
                         onChange: postController.sendVisibility,
@@ -185,9 +223,7 @@ class PostPage extends StatelessWidget {
                             ),
                           ),
                         )),
-                    const SizedBox(
-                      width: 10,
-                    )
+                    const SizedBox(width: 10)
                   ],
                 )
               ],
@@ -204,38 +240,33 @@ class PostPage extends StatelessWidget {
                 },
                 child: Container(
                   color: const Color(0xCA1D1D1F),
-                  height: MediaQuery.of(context).size.height,
+                  height: shSize,
                   width: double.infinity,
                 ),
               ),
             )),
         Obx(() => AnimatedPositioned(
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.easeInOut,
-            bottom: postController.showMenu.value
-                ? 0.0
-                : -MediaQuery.of(context).size.height,
-            left: 0.0,
-            right: 0.0,
-            child: Container()
-            // child: postController.postContent.isNotEmpty
-            //     ? ChatMessagePopup(
-            //         chatId: postData.id!,
-            //       )
-            //     : Container(),
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInOut,
+              bottom: postController.showMenu.value ? 0.0 : -shSize,
+              left: 0.0,
+              right: 0.0,
+              // child: Container()
+              child: postController.chatContent.isNotEmpty
+                  ? PostMessagePopup(
+                      postId: postData.id!,
+                    )
+                  : Container(),
             )),
         Obx(() => AnimatedPositioned(
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeInOut,
-              bottom: postController.showProfile.value
-                  ? 0.0
-                  : -MediaQuery.of(context).size.height,
+              bottom: postController.showProfile.value ? 0.0 : -shSize,
               left: 0.0,
               right: 0.0,
-              child: postController.postContent.isNotEmpty
+              child: postController.chatContent.isNotEmpty
                   ? ProfilePopup(
-                      selectedUser: postController
-                          .postContent[postController.messageSelected].senderId)
+                      selectedUser: postController.messageSelected.senderId)
                   : Container(),
             )),
       ],
@@ -243,29 +274,41 @@ class PostPage extends StatelessWidget {
   }
 
   Future<Widget> messagesUI() async {
-    postController.initial
-        ? await postController.getPostMessages(postData.id!)
-        : null;
-    return Obx(
-      () => Expanded(
-        child: ListView.builder(
-          itemCount: postController.postContent.length,
-          shrinkWrap: postController.updateP.value == 1 ? true : true,
-          itemBuilder: (context, index) {
-            return MessageTileFull(
-              messageData: postController.postContent[index],
-              sendingUser: postController
-                  .userMap[postController.postContent[index].senderId],
-              toggleMenu: () {
-                postController.toggleMenu(index);
-              },
-              toggleProfile: () {
-                postController.toggleProfile(index);
-              },
-            );
-          },
+    postController.initial ? await postController.getMessages() : null;
+    return Expanded(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              GetBuilder(
+                init: postController,
+                id: 'chatSection',
+                builder: (val) {
+                  return ListView.builder(
+                    itemCount: postController.chatContent.length,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      return MessageTileFull(
+                          messageData: postController.chatContent[index],
+                          sendingUser: postController.userMap[
+                              postController.chatContent[index].senderId]!,
+                          toggleMenu: postController.toggleMenu,
+                          toggleProfile: postController.toggleProfile);
+                    },
+                  );
+                },
+              ),
+              Obx(() => ListView.builder(
+                  itemCount: postController.uploadCount.value,
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    return Container();
+                  })),
+            ],
+          ),
         ),
-      ),
+
     );
   }
 }

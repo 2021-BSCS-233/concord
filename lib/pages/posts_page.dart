@@ -76,7 +76,7 @@ class PostsPage extends StatelessWidget {
   refreshContent() async {
     await postsController.getInitialPosts(mainController.currentUserData.id,
         mainController.currentUserData.preference);
-    postsController.updateP += 1;
+    postsController.update();
   }
 
   Future<Widget> postsData() async {
@@ -85,37 +85,40 @@ class PostsPage extends StatelessWidget {
           Container(
             padding: const EdgeInsets.only(left: 10, right: 10),
             child: RefreshIndicator(
-              onRefresh: () async {
-                refreshContent();
-                await Future.delayed(
-                    const Duration(seconds: 2)); // Simulate a delay
-                return Future.value(null);
-              },
-              child: ListView.builder(
-                  itemCount: postsController.updateP.value != -1
-                      ? postsController.publicPosts.length
-                      : 0,
-                  // shrinkWrap: true,
-                  itemBuilder: (context, index) {
-                    return PostTile(
-                        postData: postsController.publicPosts[index]);
-                  }),
-            ),
+                onRefresh: () async {
+                  refreshContent();
+                  await Future.delayed(
+                      const Duration(seconds: 2)); // Simulate a delay
+                  return Future.value(null);
+                },
+                child: GetBuilder(
+                    init: postsController,
+                    builder: (controller) {
+                      return ListView.builder(
+                          itemCount: controller.publicPosts.length,
+                          itemBuilder: (context, index) {
+                            return PostTile(
+                                postData: controller.publicPosts[index]);
+                          });
+                    })),
           ),
           Container(
             padding: const EdgeInsets.only(left: 10, right: 10),
             child: RefreshIndicator(
-              onRefresh: () async {
-                return refreshContent();
-              },
-              child: ListView.builder(
-                  itemCount: postsController.followingPosts.length,
-                  shrinkWrap: true,
-                  itemBuilder: (context, index) {
-                    return PostTile(
-                        postData: postsController.followingPosts[index]);
-                  }),
-            ),
+                onRefresh: () async {
+                  return refreshContent();
+                },
+                child: GetBuilder(
+                    init: postsController,
+                    builder: (controller) {
+                      return ListView.builder(
+                          itemCount: controller.followingPosts.length,
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            return PostTile(
+                                postData: controller.followingPosts[index]);
+                          });
+                    })),
           ),
         ]));
   }

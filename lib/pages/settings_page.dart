@@ -184,8 +184,6 @@ class SettingsPage extends StatelessWidget {
                 },
                 child: Container(
                   color: const Color(0xC01D1D1F),
-                  height: MediaQuery.of(context).size.height,
-                  width: double.infinity,
                 ),
               ),
             )),

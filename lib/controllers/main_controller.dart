@@ -6,7 +6,6 @@ import 'package:concord/pages/login_page.dart';
 
 class MainController extends GetxController {
   late UsersModel currentUserData;
-  var updateM = 0.obs;
   var showMenu = false.obs;
   var showProfile = false.obs;
   var selectedIndex = 0.obs;
@@ -29,12 +28,12 @@ class MainController extends GetxController {
     selectedUsername = dataList[2];
     selectedUserPic = dataList[3];
     selectedChatType = dataList[4];
-    showMenu.value = !showMenu.value;
+    showMenu.value = true;
   }
 
   void toggleProfile(data) {
     selectedUserId = data;
-    showProfile.value = !showProfile.value;
+    showProfile.value = true;
   }
 
   logOut() async {

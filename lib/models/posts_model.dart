@@ -11,6 +11,7 @@ class PostsModel {
   List<String> attachments;
   List<String> categories;
   List<String> followers;
+  List<String> participants;
   @JsonKey(fromJson: _customDateFromJson, toJson: _customDateToJson)
   DateTime timeStamp;
   @JsonKey(includeToJson: false, includeFromJson: false)
@@ -27,6 +28,7 @@ class PostsModel {
         required this.attachments,
         required this.categories,
         required this.followers,
+        required this.participants,
         required this.timeStamp,
         this.posterData,
         this.receiverData,

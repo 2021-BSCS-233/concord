@@ -81,84 +81,89 @@ class FriendsPage extends StatelessWidget {
   }
 
   Future<Widget> friendsUI() async {
-    return Obx(() => friendsController.updateF.value ==
-                friendsController.updateF.value &&
-            friendsController.friendsData.isEmpty
-        ? Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'friendsEmpty'.tr,
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          )
-        : Container(
-            padding: const EdgeInsets.only(left: 10, right: 10),
-            child: ListView.builder(
-                itemCount: friendsController.friendsData.length,
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  return Container(
-                    margin: const EdgeInsets.only(top: 15),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF121218),
-                      borderRadius: BorderRadius.all(Radius.circular(20)),
-                    ),
-                    child: ListTile(
-                      leading: InkWell(
-                        onTap: () {
-                          mainController.toggleProfile(
-                              friendsController.friendsData[index].id);
-                        },
-                        child: ProfilePicture(
-                          profileLink: friendsController
-                              .friendsData[index].profilePicture,
-                          profileRadius: 20,
-                        ),
+    return GetBuilder(
+        init: friendsController,
+        id: 'friendsSection',
+        builder: (controller) {
+          return controller.friendsData.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'friendsEmpty'.tr,
+                        textAlign: TextAlign.center,
                       ),
-                      title: Text(
-                        friendsController.friendsData[index].displayName,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      trailing: SizedBox(
-                        width: 70,
-                        child: Row(
-                          children: [
-                            InkWell(
-                              enableFeedback: true,
-                              child: const Icon(
-                                  CupertinoIcons.chat_bubble_text_fill),
-                              onTap: () async {
-                                var chatData = await getFriendChatFirebase(
-                                    mainController.currentUserData.id,
-                                    friendsController.friendsData[index].id);
-                                Get.to(ChatPage(chatData: chatData));
-                              },
-                            ),
-                            const SizedBox(
-                              width: 20,
-                            ),
-                            InkWell(
-                              enableFeedback: true,
-                              child: const Icon(
-                                Icons.person_remove,
-                                color: Colors.red,
-                              ),
+                    ],
+                  ),
+                )
+              : Container(
+                  padding: const EdgeInsets.only(left: 10, right: 10),
+                  child: ListView.builder(
+                      itemCount: controller.friendsData.length,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        return Container(
+                          margin: const EdgeInsets.only(top: 15),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF121218),
+                            borderRadius: BorderRadius.all(Radius.circular(20)),
+                          ),
+                          child: ListTile(
+                            leading: InkWell(
                               onTap: () {
-                                removeFriendFirebase(
-                                    mainController.currentUserData.id,
-                                    friendsController.friendsData[index].id);
+                                mainController.toggleProfile(
+                                    controller.friendsData[index].id);
                               },
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                }),
-          ));
+                              child: ProfilePicture(
+                                profileLink: controller
+                                    .friendsData[index].profilePicture,
+                                profileRadius: 20,
+                              ),
+                            ),
+                            title: Text(
+                              controller.friendsData[index].displayName,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            trailing: SizedBox(
+                              width: 70,
+                              child: Row(
+                                children: [
+                                  InkWell(
+                                    enableFeedback: true,
+                                    child: const Icon(
+                                        CupertinoIcons.chat_bubble_text_fill),
+                                    onTap: () async {
+                                      var chatData =
+                                          await getFriendChatFirebase(
+                                              mainController.currentUserData.id,
+                                              controller.friendsData[index].id);
+                                      Get.to(ChatPage(chatData: chatData));
+                                    },
+                                  ),
+                                  const SizedBox(
+                                    width: 20,
+                                  ),
+                                  InkWell(
+                                    enableFeedback: true,
+                                    child: const Icon(
+                                      Icons.person_remove,
+                                      color: Colors.red,
+                                    ),
+                                    onTap: () {
+                                      removeFriendFirebase(
+                                          mainController.currentUserData.id,
+                                          controller.friendsData[index].id);
+                                    },
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+                );
+        });
   }
 }

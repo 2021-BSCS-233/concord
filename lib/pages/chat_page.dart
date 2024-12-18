@@ -10,11 +10,12 @@ import 'package:concord/widgets/popup_menus.dart';
 import 'package:concord/widgets/input_field.dart';
 import 'package:concord/widgets/status_icons.dart';
 import 'package:concord/controllers/main_controller.dart';
-import 'package:concord/controllers/chat_controller.dart';
+import 'package:concord/controllers/chat_post_controller.dart';
 
 class ChatPage extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
-  late final ChatController chatController = Get.put(ChatController());
+  late final ChatController chatController =
+      Get.put(ChatController(collection: 'chats'));
   final ChatsModel chatData;
 
   ChatPage({super.key, required this.chatData}) {
@@ -32,6 +33,7 @@ class ChatPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final shSize = MediaQuery.sizeOf(context).height;
     return Stack(
       children: [
         Scaffold(
@@ -80,6 +82,7 @@ class ChatPage extends StatelessWidget {
           ),
           body: Container(
             padding: const EdgeInsets.only(bottom: 5),
+            height: shSize,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -105,66 +108,101 @@ class ChatPage extends StatelessWidget {
                     return const Center(child: CircularProgressIndicator());
                   },
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 5),
                 Obx(() => Visibility(
-                    visible: chatController.attachmentVisible.value &&
-                        chatController.updateA == chatController.updateA,
-                    child: Column(
-                      children: [
-                        Container(
-                          height: 150,
-                          width: double.infinity,
-                          color: Colors.grey.shade900,
-                          child: ListView.builder(
-                              itemCount: chatController.attachments.length,
-                              scrollDirection: Axis.horizontal,
-                              itemBuilder: (context, index) {
-                                return Stack(
-                                  children: [
-                                    Center(
-                                      child: Container(
-                                        margin: const EdgeInsets.all(10),
-                                        height: 120,
-                                        width: 100,
-                                        child: ClipRRect(
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(15)),
-                                          child: Image(
-                                              fit: BoxFit.cover,
-                                              image: FileImage(File(
-                                                  chatController
-                                                      .attachments[index]
-                                                      .path))),
+                    visible: chatController.attachmentVisible.value,
+                    child: Container(
+                      height: 150,
+                      width: double.infinity,
+                      color: Colors.grey.shade900,
+                      child: GetBuilder(
+                          init: chatController,
+                          id: 'attachmentList',
+                          builder: (controller) {
+                            return ListView.builder(
+                                itemCount: controller.attachments.length,
+                                scrollDirection: Axis.horizontal,
+                                itemBuilder: (context, index) {
+                                  return Stack(
+                                    children: [
+                                      Center(
+                                        child: Container(
+                                          margin: const EdgeInsets.all(10),
+                                          height: 120,
+                                          width: 100,
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                const BorderRadius.all(
+                                                    Radius.circular(15)),
+                                            child: Image(
+                                                fit: BoxFit.cover,
+                                                image: FileImage(File(controller
+                                                    .attachments[index].path))),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Positioned(
-                                      top: 4,
-                                      right: 2,
-                                      child: InkWell(
-                                        onTap: () {
-                                          chatController
-                                              .removeAttachment(index);
-                                        },
-                                        child: Container(
-                                            decoration: BoxDecoration(
-                                                color: Colors.grey.shade700,
-                                                borderRadius:
-                                                    const BorderRadius.all(
-                                                        Radius.circular(3))),
-                                            child: Icon(
-                                              Icons.delete,
-                                              color: Colors.grey.shade500,
-                                            )),
+                                      Positioned(
+                                        top: 4,
+                                        right: 2,
+                                        child: InkWell(
+                                          onTap: () {
+                                            controller.removeAttachment(index);
+                                          },
+                                          child: Container(
+                                              decoration: BoxDecoration(
+                                                  color: Colors.grey.shade700,
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                          Radius.circular(3))),
+                                              child: Icon(
+                                                Icons.delete,
+                                                color: Colors.grey.shade500,
+                                              )),
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                );
-                              }),
-                        ),
-                        const SizedBox(height: 5)
-                      ],
+                                    ],
+                                  );
+                                });
+                          }),
                     ))),
+                Obx(() => Visibility(
+                    visible: chatController.editMode.value,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 13),
+                      color: const Color(0xFF151515),
+                      width: double.infinity,
+                      height: 38,
+                      child: Row(
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              chatController.exitEditMode();
+                            },
+                            child: Container(
+                              height: 20,
+                              width: 20,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.grey.shade600,
+                              ),
+                              child: const Icon(
+                                Icons.close_rounded,
+                                size: 18,
+                                color: Color(0xFF151515),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 15,
+                          ),
+                          Text(
+                            'Editing Message',
+                            style: TextStyle(color: Colors.grey.shade500),
+                          ),
+                        ],
+                      ),
+                    ))),
+                const SizedBox(height: 5),
                 Row(
                   children: [
                     SizedBox(
@@ -186,6 +224,7 @@ class ChatPage extends StatelessWidget {
                     ),
                     Expanded(
                       child: CustomInputField(
+                        contentTopPadding: 10,
                         fieldFocusNode: chatController.chatFocusNode,
                         fieldRadius: 20,
                         fieldLabel: 'messageTo'.trParams({
@@ -193,6 +232,7 @@ class ChatPage extends StatelessWidget {
                               ? chatData.receiverData![0].displayName
                               : chatData.chatGroupName!
                         }),
+                        fieldHint: 'Send a Message',
                         controller: chatController.chatFieldTextController,
                         suffixIcon: Icons.all_inclusive,
                         fieldColor: const Color(0xFF151515),
@@ -244,17 +284,13 @@ class ChatPage extends StatelessWidget {
                 },
                 child: Container(
                   color: const Color(0xCA1D1D1F),
-                  height: MediaQuery.of(context).size.height,
-                  width: double.infinity,
                 ),
               ),
             )),
         Obx(() => AnimatedPositioned(
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeInOut,
-              bottom: chatController.showMenu.value
-                  ? 0.0
-                  : -MediaQuery.of(context).size.height,
+              bottom: chatController.showMenu.value ? 0.0 : -shSize,
               left: 0.0,
               right: 0.0,
               child: chatController.chatContent.isNotEmpty
@@ -266,14 +302,12 @@ class ChatPage extends StatelessWidget {
         Obx(() => AnimatedPositioned(
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeInOut,
-              bottom: chatController.showProfile.value
-                  ? 0.0
-                  : -MediaQuery.of(context).size.height,
+              bottom: chatController.showProfile.value ? 0.0 : -shSize,
               left: 0.0,
               right: 0.0,
               child: chatController.chatContent.isNotEmpty
                   ? ProfilePopup(
-                      selectedUser: chatController.messageSelected!.senderId)
+                      selectedUser: chatController.messageSelected.senderId)
                   : Container(),
             )),
       ],
@@ -282,85 +316,112 @@ class ChatPage extends StatelessWidget {
 
   Future<Widget> messagesUI() async {
     chatController.initial ? await chatController.getMessages() : null;
-    return Obx(
-      () => chatController.updateC.value == chatController.updateC.value &&
-              chatController.chatContent.isEmpty
-          ? Center(child: Text('chatEmpty'.tr))
-          : Expanded(
-              child: RefreshIndicator(
-                // onNotification: (ScrollNotification notification) {
-                //   if (notification is ScrollUpdateNotification) {
-                //     if (notification.metrics.pixels ==
-                //             notification.metrics.maxScrollExtent &&
-                //         chatController.chatContent.length == 50 &&
-                //         chatController.historyRemaining) {
-                //       if (chatController.debounceTimer?.isActive ?? false) {
-                //         return true;
-                //       }
-                //       debugPrint('loading history');
-                //       chatController.getMessageHistory();
-                //       chatController.debounceTimer =
-                //           Timer(const Duration(seconds: 2), () {
-                //         chatController.debounceTimer = null;
-                //       });
-                //     } else if (!(chatController.historyRemaining)) {
-                //       debugPrint(
-                //           'nothing more to load ${chatController.chatHistory.length}, ${chatController.chatContent.length}');
-                //     }
-                //   }
-                //   return true;
-                // },
-                onRefresh: () async {
-                  if (chatController.chatContent.length > 49 &&
-                      chatController.historyRemaining) {
-                    return await chatController.getMessageHistory();
-                  }
-                  return Future.value(null);
-                },
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: SingleChildScrollView(
-                    reverse: true,
-                    child: Column(
-                      children: [
-                        ListView.builder(
-                          itemCount: chatController.chatHistory.length,
+    return chatController.chatContent.isEmpty
+        ? Center(child: Text('chatEmpty'.tr))
+        : Expanded(
+            child: RefreshIndicator(
+              onRefresh: () async {
+                if (chatController.chatContent.length > 49 &&
+                    chatController.historyRemaining) {
+                  return await chatController.getMessageHistory();
+                }
+                return Future.value(null);
+              },
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: SingleChildScrollView(
+                  reverse: true,
+                  child: Column(
+                    children: [
+                      GetBuilder(
+                        init: chatController,
+                        id: 'chatHistory',
+                        builder: (controller) {
+                          return ListView.builder(
+                            itemCount: controller.chatHistory.length,
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            reverse: true,
+                            itemBuilder: (context, index) {
+                              return messageBuilder(
+                                  controller.chatHistory, index);
+                            },
+                          );
+                        },
+                      ),
+                      GetBuilder(
+                        init: chatController,
+                        id: 'chatSection',
+                        builder: (controller) {
+                          return ListView.builder(
+                            itemCount: controller.chatContent.length,
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            reverse: true,
+                            itemBuilder: (context, index) {
+                              return messageBuilder(
+                                  controller.chatContent, index);
+                            },
+                          );
+                        },
+                      ),
+                      Obx(() => ListView.builder(
+                          itemCount: chatController.uploadCount.value,
                           physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
                           reverse: true,
                           itemBuilder: (context, index) {
-                            return messageBuilder(
-                                chatController.chatHistory, index);
-                          },
-                        ),
-                        ListView.builder(
-                          itemCount: chatController.chatContent.length,
-                          physics: const NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          reverse: true,
-                          itemBuilder: (context, index) {
-                            return messageBuilder(
-                                chatController.chatContent, index);
-                          },
-                        ),
-                      ],
-                    ),
+                            return Container(
+                                margin: const EdgeInsets.only(
+                                    top: 5, bottom: 5, left: 64, right: 40),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 15),
+                                width: 60,
+                                height: 50,
+                                decoration: const BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10)),
+                                    color: Color(0xFF151515)),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text('Uploading Files',
+                                        style: TextStyle(
+                                            color: Colors.grey.shade500)),
+                                    Container(
+                                      height: 20,
+                                      width: 20,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                      child: const Icon(
+                                        Icons.upload_rounded,
+                                        size: 18,
+                                        color: Color(0xFF151515),
+                                      ),
+                                    )
+                                  ],
+                                ));
+                          })),
+                    ],
                   ),
                 ),
               ),
             ),
-    );
+          );
   }
 
   messageBuilder(List<MessagesModel> content, index) {
     try {
       if (content[index].senderId != content[index + 1].senderId) {
         return MessageTileFull(
-          messageData: content[index],
-          sendingUser: chatController.userMap[content[index].senderId]!,
-          toggleMenu: chatController.toggleMenu,
-          toggleProfile: chatController.toggleProfile
-        );
+            messageData: content[index],
+            sendingUser: chatController.userMap[content[index].senderId]!,
+            toggleMenu: chatController.toggleMenu,
+            toggleProfile: chatController.toggleProfile);
       } else {
         bool select = true;
         try {

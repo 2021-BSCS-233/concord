@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 
 class PostsController extends GetxController {
   bool initial = true;
-  var updateP = 0.obs;
   List<PostsModel> publicPosts = [];
   List<PostsModel> followingPosts = [];
 
@@ -13,6 +12,6 @@ class PostsController extends GetxController {
     publicPosts = result[0];
     followingPosts = result[1];
     initial = false;
-    updateP.value +=1;
+    update();
   }
 }

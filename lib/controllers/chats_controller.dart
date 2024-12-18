@@ -5,7 +5,6 @@ import 'package:concord/services/firebase_services.dart';
 
 class ChatsController extends GetxController {
   MainController mainController = Get.find<MainController>();
-  var updateCs = 0.obs;
   bool initial = true;
   List<ChatsModel> chatsData = [];
 
@@ -29,6 +28,6 @@ class ChatsController extends GetxController {
         mainController.showMenu.value = false;
       }
     }
-    updateCs.value += 1;
+    update(['chatsSection']);
   }
 }
