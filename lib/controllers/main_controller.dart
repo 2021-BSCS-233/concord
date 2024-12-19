@@ -6,19 +6,20 @@ import 'package:concord/pages/login_page.dart';
 
 class MainController extends GetxController {
   late UsersModel currentUserData;
-  var showMenu = false.obs;
-  var showProfile = false.obs;
   var selectedIndex = 0.obs;
+  var showMenu = false.obs;
+  var showStatus = false.obs;
+  var showProfile = false.obs;
   var selectedChatId = '';
   var selectedUserId = '';
-  var selectedUsername = '';
   var selectedUserPic = '';
+  var selectedUsername = '';
   var selectedChatType = '';
   StreamSubscription? profileListenerRef;
   StreamSubscription? chatsListenerRef;
   StreamSubscription? friendsListenerRef;
   StreamSubscription? chatListenerRef;
-  List<StreamSubscription>? requestListenerRef;
+  StreamSubscription? requestListenerRef;
 
   // MainController({required this.currentUserData});
 
@@ -31,17 +32,20 @@ class MainController extends GetxController {
     showMenu.value = true;
   }
 
+  void toggleStatus(){
+    showStatus.value = true;
+  }
+
   void toggleProfile(data) {
     selectedUserId = data;
     showProfile.value = true;
   }
 
   logOut() async {
-    profileListenerRef?.cancel();
     chatsListenerRef?.cancel();
+    profileListenerRef?.cancel();
     friendsListenerRef?.cancel();
-    requestListenerRef?[0].cancel();
-    requestListenerRef?[1].cancel();
+    requestListenerRef?.cancel();
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('email');
     await prefs.remove('password');

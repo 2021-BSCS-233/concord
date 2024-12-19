@@ -19,31 +19,42 @@ class RequestsController extends GetxController {
   getInitialData(currentUserId) async {
     var result = await getInitialRequestFirebase(currentUserId);
     mainController.requestListenerRef =
-        requestsListenersFirebase(currentUserId);
+        requestsListenersFirebase(currentUserId, updateRequests);
     incomingRequestsData = result[0];
     outgoingRequestsData = result[1];
     initial = false;
   }
 
-  updateIncomingRequests(RequestsModel updateData, updateType) {
-    var index =
-        incomingRequestsData.indexWhere((map) => map.id == updateData.id);
-    if (updateType == 'added' && index < 0) {
-      incomingRequestsData.insert(0, updateData);
-    } else if (updateType == 'removed') {
-      incomingRequestsData.removeAt(index);
+  updateRequests(RequestsModel updateData, updateType, sender) {
+    if (sender) {
+      var index =
+          outgoingRequestsData.indexWhere((map) => map.id == updateData.id);
+      if (updateType == 'added' && index < 0) {
+        outgoingRequestsData.insert(0, updateData);
+      } else if (updateType == 'removed') {
+        outgoingRequestsData.removeAt(index);
+      }
+      update(['ORSection']);
+    } else {
+      var index =
+          incomingRequestsData.indexWhere((map) => map.id == updateData.id);
+      if (updateType == 'added' && index < 0) {
+        incomingRequestsData.insert(0, updateData);
+      } else if (updateType == 'removed') {
+        incomingRequestsData.removeAt(index);
+      }
+      update(['IRSection']);
     }
-    update(['IRSection']);
   }
 
-  updateOutgoingRequests(RequestsModel updateData, updateType) {
-    var index =
-        outgoingRequestsData.indexWhere((map) => map.id == updateData.id);
-    if (updateType == 'added' && index < 0) {
-      outgoingRequestsData.insert(0, updateData);
-    } else if (updateType == 'removed') {
-      outgoingRequestsData.removeAt(index);
-    }
-    update(['ORSection']);
-  }
+// updateOutgoingRequests(RequestsModel updateData, updateType) {
+//   var index =
+//       outgoingRequestsData.indexWhere((map) => map.id == updateData.id);
+//   if (updateType == 'added' && index < 0) {
+//     outgoingRequestsData.insert(0, updateData);
+//   } else if (updateType == 'removed') {
+//     outgoingRequestsData.removeAt(index);
+//   }
+//   update(['ORSection']);
+// }
 }

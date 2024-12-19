@@ -184,13 +184,17 @@ class Home extends StatelessWidget {
               bottom: mainController.showMenu.value ? 0.0 : -shSize,
               left: 0.0,
               right: 0.0,
-              child: mainController.selectedIndex.value == 0
-                  ? UserGroupPopup()
-                  : mainController.selectedIndex.value == 3
-                      ? StatusPopup(
-                          id: mainController.currentUserData.id!,
-                          status: mainController.currentUserData.displayStatus)
-                      : Container(),
+              child: UserGroupPopup(),
+            )),
+        Obx(() => AnimatedPositioned(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInOut,
+              bottom: mainController.showStatus.value ? 0.0 : -shSize,
+              left: 0.0,
+              right: 0.0,
+              child: StatusPopup(
+                  id: mainController.currentUserData.id!,
+                  status: mainController.currentUserData.displayStatus),
             )),
         Obx(() => AnimatedPositioned(
               duration: const Duration(milliseconds: 200),
@@ -198,9 +202,9 @@ class Home extends StatelessWidget {
               bottom: mainController.showProfile.value ? 0.0 : -shSize,
               left: 0.0,
               right: 0.0,
-              child: mainController.selectedUserId == ''
-                  ? Container()
-                  : ProfilePopup(selectedUser: mainController.selectedUserId),
+              // child: mainController.selectedUserId == ''
+              //     ? Container()
+              child: ProfilePopup(selectedUser: mainController.selectedUserId),
             ))
       ],
     );

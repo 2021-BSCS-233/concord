@@ -10,7 +10,6 @@ import 'package:concord/services/firebase_services.dart';
 import 'package:concord/widgets/status_icons.dart';
 import 'package:concord/widgets/option_tile.dart';
 
-
 class UserGroupPopup extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
 
@@ -124,6 +123,12 @@ class ChatMessagePopup extends StatelessWidget {
                       : const SizedBox(),
                   OptionTile(
                       action: () async {
+                        chatController.enterReplyMode();
+                      },
+                      actionIcon: Icons.reply,
+                      actionName: 'Reply'),
+                  OptionTile(
+                      action: () async {
                         await Clipboard.setData(ClipboardData(
                             text: chatController.messageSelected.message));
                       },
@@ -176,13 +181,13 @@ class PostMessagePopup extends StatelessWidget {
                     height: 10,
                   ),
                   postController.messageSelected.senderId ==
-                      mainController.currentUserData.id
+                          mainController.currentUserData.id
                       ? OptionTile(
-                      action: () {
-                        postController.enterEditMode();
-                      },
-                      actionIcon: Icons.edit,
-                      actionName: 'Edit Message')
+                          action: () {
+                            postController.enterEditMode();
+                          },
+                          actionIcon: Icons.edit,
+                          actionName: 'Edit Message')
                       : const SizedBox(),
                   OptionTile(
                       action: () async {
@@ -192,13 +197,13 @@ class PostMessagePopup extends StatelessWidget {
                       actionIcon: Icons.copy,
                       actionName: 'Copy Text'),
                   postController.messageSelected.senderId ==
-                      mainController.currentUserData.id
+                          mainController.currentUserData.id
                       ? OptionTile(
-                      action: () {
-                        postController.deleteMessage();
-                      },
-                      actionIcon: CupertinoIcons.delete,
-                      actionName: 'Delete Message')
+                          action: () {
+                            postController.deleteMessage();
+                          },
+                          actionIcon: CupertinoIcons.delete,
+                          actionName: 'Delete Message')
                       : const SizedBox(),
                 ],
               ),
@@ -393,7 +398,9 @@ class StatusPopup extends StatelessWidget {
   final String id;
 
   StatusPopup({super.key, required this.status, required this.id}) {
-    if (status == 'DND') {
+    if (status == 'Online') {
+      selectedValue.value = 1;
+    } else if (status == 'DND') {
       selectedValue.value = 2;
     } else if (status == 'Asleep') {
       selectedValue.value = 3;

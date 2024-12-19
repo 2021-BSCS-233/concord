@@ -165,6 +165,7 @@ class ChatPage extends StatelessWidget {
                                 });
                           }),
                     ))),
+                //TODO: merge both with get builder later
                 Obx(() => Visibility(
                     visible: chatController.editMode.value,
                     child: Container(
@@ -197,6 +198,43 @@ class ChatPage extends StatelessWidget {
                           ),
                           Text(
                             'Editing Message',
+                            style: TextStyle(color: Colors.grey.shade500),
+                          ),
+                        ],
+                      ),
+                    ))),
+                Obx(() => Visibility(
+                    visible: chatController.replyMode.value,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 13),
+                      color: const Color(0xFF151515),
+                      width: double.infinity,
+                      height: 38,
+                      child: Row(
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              chatController.exitReplyMode();
+                            },
+                            child: Container(
+                              height: 20,
+                              width: 20,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.grey.shade600,
+                              ),
+                              child: const Icon(
+                                Icons.close_rounded,
+                                size: 18,
+                                color: Color(0xFF151515),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 15,
+                          ),
+                          Text(
+                            'Replying To ${chatController.replyingTo['user'] ?? ''}',
                             style: TextStyle(color: Colors.grey.shade500),
                           ),
                         ],
@@ -416,7 +454,16 @@ class ChatPage extends StatelessWidget {
 
   messageBuilder(List<MessagesModel> content, index) {
     try {
-      if (content[index].senderId != content[index + 1].senderId) {
+      if (content[index].repliedTo != null) {
+        return MessageTileFull(
+          messageData: content[index],
+          sendingUser: chatController.userMap[content[index].senderId]!,
+          toggleMenu: chatController.toggleMenu,
+          toggleProfile: chatController.toggleProfile,
+          repliedToUser: chatController
+              .userMap[content[index].repliedMessage!.senderId]!.displayName,
+        );
+      } else if (content[index].senderId != content[index + 1].senderId) {
         return MessageTileFull(
             messageData: content[index],
             sendingUser: chatController.userMap[content[index].senderId]!,

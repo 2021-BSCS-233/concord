@@ -81,45 +81,45 @@ class PostsPage extends StatelessWidget {
 
   Future<Widget> postsData() async {
     postsController.initial ? await refreshContent() : null;
-    return Obx(() => TabBarView(children: [
-          Container(
-            padding: const EdgeInsets.only(left: 10, right: 10),
-            child: RefreshIndicator(
-                onRefresh: () async {
-                  refreshContent();
-                  await Future.delayed(
-                      const Duration(seconds: 2)); // Simulate a delay
-                  return Future.value(null);
-                },
-                child: GetBuilder(
-                    init: postsController,
-                    builder: (controller) {
-                      return ListView.builder(
-                          itemCount: controller.publicPosts.length,
-                          itemBuilder: (context, index) {
-                            return PostTile(
-                                postData: controller.publicPosts[index]);
-                          });
-                    })),
-          ),
-          Container(
-            padding: const EdgeInsets.only(left: 10, right: 10),
-            child: RefreshIndicator(
-                onRefresh: () async {
-                  return refreshContent();
-                },
-                child: GetBuilder(
-                    init: postsController,
-                    builder: (controller) {
-                      return ListView.builder(
-                          itemCount: controller.followingPosts.length,
-                          shrinkWrap: true,
-                          itemBuilder: (context, index) {
-                            return PostTile(
-                                postData: controller.followingPosts[index]);
-                          });
-                    })),
-          ),
-        ]));
+    return TabBarView(children: [
+      Container(
+        padding: const EdgeInsets.only(left: 10, right: 10),
+        child: RefreshIndicator(
+            onRefresh: () async {
+              refreshContent();
+              await Future.delayed(
+                  const Duration(seconds: 2)); // Simulate a delay
+              return Future.value(null);
+            },
+            child: GetBuilder(
+                init: postsController,
+                builder: (controller) {
+                  return ListView.builder(
+                      itemCount: controller.publicPosts.length,
+                      itemBuilder: (context, index) {
+                        return PostTile(
+                            postData: controller.publicPosts[index]);
+                      });
+                })),
+      ),
+      Container(
+        padding: const EdgeInsets.only(left: 10, right: 10),
+        child: RefreshIndicator(
+            onRefresh: () async {
+              return refreshContent();
+            },
+            child: GetBuilder(
+                init: postsController,
+                builder: (controller) {
+                  return ListView.builder(
+                      itemCount: controller.followingPosts.length,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        return PostTile(
+                            postData: controller.followingPosts[index]);
+                      });
+                })),
+      ),
+    ]);
   }
 }

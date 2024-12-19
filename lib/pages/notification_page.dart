@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-//this page is not in use for now
 class NotificationsPage extends StatelessWidget {
   const NotificationsPage({super.key});
 
@@ -16,25 +15,7 @@ class NotificationsPage extends StatelessWidget {
               fontSize: 22),
         ),
       ),
-      body: Container(
-        padding: const EdgeInsets.all(10),
-        child: ListView(
-          children: const [
-            ListTile(
-              leading: Icon(Icons.notification_add),
-              title: Text('Notification 1'),
-            ),
-            ListTile(
-              leading: Icon(Icons.notification_add),
-              title: Text('Notification 2'),
-            ),
-            ListTile(
-              leading: Icon(Icons.notification_add),
-              title: Text('Notification 3'),
-            )
-          ],
-        ),
-      ),
+      body: const Center(child: Text('Work In Progress')),
     );
   }
 }

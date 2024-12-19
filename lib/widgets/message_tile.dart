@@ -1,6 +1,7 @@
 import 'package:concord/models/messages_model.dart';
 import 'package:concord/models/users_model.dart';
 import 'package:concord/widgets/profile_picture.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -9,6 +10,7 @@ import 'lazy_cached_image.dart';
 class MessageTileFull extends StatelessWidget {
   final MessagesModel messageData;
   final UsersModel sendingUser;
+  final String? repliedToUser;
   final Function toggleMenu;
   final Function toggleProfile;
 
@@ -17,103 +19,139 @@ class MessageTileFull extends StatelessWidget {
       required this.messageData,
       required this.sendingUser,
       required this.toggleMenu,
-      required this.toggleProfile});
+      required this.toggleProfile,
+      this.repliedToUser});
 
   @override
   Widget build(BuildContext context) {
-    var time = messageData.timeStamp;
     var timeNow = DateTime.now();
     var formattedDateTime = '';
-    if (timeNow.year == time!.year &&
-        timeNow.month == time.month &&
-        timeNow.day == time.day) {
+    if (timeNow.year == messageData.timeStamp!.year &&
+        timeNow.month == messageData.timeStamp!.month &&
+        timeNow.day == messageData.timeStamp!.day) {
       DateFormat formatter = DateFormat('hh:mm a');
-      formattedDateTime = 'Today at ${formatter.format(time)}';
+      formattedDateTime =
+          'Today at ${formatter.format(messageData.timeStamp!)}';
     } else {
       DateFormat formatter = DateFormat('dd/MM/yyyy hh:mm a');
-      formattedDateTime = formatter.format(time);
+      formattedDateTime = formatter.format(messageData.timeStamp!);
     }
 
     return Container(
       margin: const EdgeInsets.only(left: 18, top: 16, right: 18, bottom: 0),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          InkWell(
-            onTap: () {
-              toggleProfile(messageData);
-            },
-            child: ProfilePicture(
-              profileLink: sendingUser.profilePicture,
-              profileRadius: 20,
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: InkWell(
-              onLongPress: () {
-                toggleMenu(messageData);
-              },
-              splashColor: Colors.black,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Row(
+          repliedToUser == null
+              ? const SizedBox()
+              : replyMessageWidget(
+                  repliedToUser,
+                  messageData.repliedMessage!.message,
+                  MediaQuery.sizeOf(context).width),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              InkWell(
+                onTap: () {
+                  toggleProfile(messageData);
+                },
+                child: ProfilePicture(
+                  profileLink: sendingUser.profilePicture,
+                  profileRadius: 20,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: InkWell(
+                  onLongPress: () {
+                    toggleMenu(messageData);
+                  },
+                  splashColor: Colors.black,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      InkWell(
-                        onTap: () {},
-                        child: Text(
-                          sendingUser.displayName,
-                          style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFFEEEEEE)),
-                        ),
+                      Row(
+                        children: [
+                          InkWell(
+                            onTap: () {},
+                            child: Text(
+                              sendingUser.displayName,
+                              style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFFEEEEEE)),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Text(
+                            formattedDateTime,
+                            style: const TextStyle(
+                                fontSize: 12, color: Colors.grey),
+                          ),
+                        ],
                       ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Text(
-                        formattedDateTime,
-                        style:
-                            const TextStyle(fontSize: 12, color: Colors.grey),
-                      ),
+                      messageData.message == ''
+                          ? const SizedBox()
+                          : RichText(
+                              text: TextSpan(
+                              text: messageData.message,
+                              style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w400,
+                                  color: Color(0xFFDEDEE2)),
+                              children: messageData.edited
+                                  ? [
+                                      TextSpan(
+                                          text: ' (edited)',
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey.shade500)),
+                                    ]
+                                  : null,
+                            )),
+                      messageData.attachments!.isEmpty
+                          ? const SizedBox()
+                          : attachments(messageData.attachments!,
+                              MediaQuery.sizeOf(context).width)
                     ],
                   ),
-                  messageData.message == ''
-                      ? const SizedBox()
-                      : RichText(
-                          text: TextSpan(
-                          text: messageData.message,
-                          style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0xFFDEDEE2)),
-                          children: messageData.edited
-                              ? [
-                                  TextSpan(
-                                      text: ' (edited)',
-                                      style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey.shade500)),
-                                ]
-                              : null,
-                        )),
-                  messageData.attachments!.isEmpty
-                      ? const SizedBox()
-                      : Attachments(
-                          attachments: messageData.attachments!,
-                        )
-                ],
-              ),
-            ),
-          )
+                ),
+              )
+            ],
+          ),
         ],
       ),
     );
   }
+}
+
+Widget replyMessageWidget(repliedToUser, message, swSize) {
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: [
+      const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 14),
+        child: Icon(CupertinoIcons.arrow_turn_up_right),
+      ),
+      SizedBox(
+        width: swSize * 0.7,
+        child: Text(
+          '$repliedToUser: ${message == '' ? 'attachments' : message}',
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w400,
+              color: Color(0xFFDEDEE2)),
+        ),
+      ),
+      message == '' ? Icon(Icons.image, color: Colors.grey.shade600,) : const SizedBox()
+    ],
+  );
 }
 
 class MessageTileCompact extends StatelessWidget {
@@ -173,7 +211,8 @@ class MessageTileCompact extends StatelessWidget {
                         ),
                   messageData.attachments!.isEmpty
                       ? const SizedBox()
-                      : Attachments(attachments: messageData.attachments!)
+                      : attachments(messageData.attachments!,
+                          MediaQuery.sizeOf(context).width)
                 ],
               ),
             ),
@@ -184,144 +223,125 @@ class MessageTileCompact extends StatelessWidget {
   }
 }
 
-class Attachments extends StatelessWidget {
-  final List<String> attachments;
-
-  const Attachments({super.key, required this.attachments});
-
-  @override
-  Widget build(BuildContext context) {
-    var swSize = MediaQuery.of(context).size.width;
-    int remainder = 0;
-    int size = 0;
-    if (attachments.length > 4) {
-      remainder = attachments.length % 3;
-      size = attachments.length - remainder;
-    }
-    // return ListView.builder(
-    //     itemCount: attachments.length,
-    //     shrinkWrap: true,
-    //     itemBuilder: (context, index) {
-    //       return Text(
-    //         attachments[index],
-    //         overflow: TextOverflow.ellipsis,
-    //       );
-    //     });
-    return ClipRRect(
-      borderRadius: const BorderRadius.all(
-        Radius.circular(20),
-      ),
-      child: Column(
-        children: [
-          remainder == 1 || attachments.length == 1 || attachments.length == 3
-              ? Row(
-                  children: [
-                    Flexible(
-                      child: Container(
-                          padding: attachments.length == 3
-                              ? const EdgeInsets.fromLTRB(0, 0, 3, 0)
-                              : null,
-                          height: attachments.length == 1 ? null : 200,
-                          width: attachments.length == 1
-                              ? null
-                              : attachments.length == 3
-                                  ? swSize * 0.5
-                                  : swSize * 0.8,
-                          child: LazyCachedImage(
-                            url: attachments[0],
-                          )),
-                    ),
-                    attachments.length == 3
-                        ? Column(
-                            children: [
-                              Container(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(0, 0, 0, 3),
-                                  height: 102,
-                                  width: 95,
-                                  child: LazyCachedImage(
-                                    url: attachments[1],
-                                  )),
-                              SizedBox(
-                                  height: 98,
-                                  width: 95,
-                                  child: LazyCachedImage(
-                                    url: attachments[2],
-                                  )),
-                            ],
-                          )
-                        : const SizedBox(),
-                  ],
-                )
-              : const SizedBox(),
-          remainder == 2 || attachments.length == 2 || attachments.length == 4
-              ? Row(
-                  children: [
-                    Flexible(
-                      child: Container(
-                          padding: const EdgeInsets.fromLTRB(0, 0, 3, 3),
-                          height: attachments.length == 4 ? 100 : 200,
-                          width: swSize * 0.4,
-                          child: LazyCachedImage(
-                            url: attachments[0],
-                          )),
-                    ),
-                    Flexible(
-                      child: Container(
-                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 3),
-                          height: attachments.length == 4 ? 100 : 200,
-                          width: swSize * 0.4,
-                          child: LazyCachedImage(
-                            url: attachments[1],
-                          )),
-                    ),
-                  ],
-                )
-              : const SizedBox(),
-          attachments.length == 4
-              ? Row(
-                  children: [
-                    Flexible(
-                      child: Container(
-                          padding: const EdgeInsets.fromLTRB(0, 0, 3, 3),
-                          height: 100,
-                          width: swSize * 0.4,
-                          child: LazyCachedImage(
-                            url: attachments[2],
-                          )),
-                    ),
-                    Flexible(
-                      child: Container(
-                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 3),
-                          height: 100,
-                          width: swSize * 0.4,
-                          child: LazyCachedImage(
-                            url: attachments[3],
-                          )),
-                    ),
-                  ],
-                )
-              : const SizedBox(),
-          size > 2
-              ? GridView.builder(
-                  itemCount: size,
-                  shrinkWrap: true,
-                  physics: const ScrollPhysics(
-                      parent: NeverScrollableScrollPhysics()),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 4,
-                    mainAxisSpacing: 3,
-                  ),
-                  itemBuilder: (context, index) {
-                    return LazyCachedImage(
-                      url: attachments[index],
-                    );
-                  })
-              : const SizedBox()
-        ],
-      ),
-    );
+Widget attachments(attachments, swSize) {
+  int remainder = 0;
+  int size = 0;
+  if (attachments.length > 4) {
+    remainder = attachments.length % 3;
+    size = attachments.length - remainder;
   }
+  return ClipRRect(
+    borderRadius: const BorderRadius.all(
+      Radius.circular(20),
+    ),
+    child: Column(
+      children: [
+        remainder == 1 || attachments.length == 1 || attachments.length == 3
+            ? Row(
+                children: [
+                  Flexible(
+                    child: Container(
+                        padding: attachments.length == 3
+                            ? const EdgeInsets.fromLTRB(0, 0, 3, 0)
+                            : null,
+                        height: attachments.length == 1 ? null : 200,
+                        width: attachments.length == 1
+                            ? null
+                            : attachments.length == 3
+                                ? swSize * 0.5
+                                : swSize * 0.8,
+                        child: LazyCachedImage(
+                          url: attachments[0],
+                        )),
+                  ),
+                  attachments.length == 3
+                      ? Column(
+                          children: [
+                            Container(
+                                padding: const EdgeInsets.fromLTRB(0, 0, 0, 3),
+                                height: 102,
+                                width: 95,
+                                child: LazyCachedImage(
+                                  url: attachments[1],
+                                )),
+                            SizedBox(
+                                height: 98,
+                                width: 95,
+                                child: LazyCachedImage(
+                                  url: attachments[2],
+                                )),
+                          ],
+                        )
+                      : const SizedBox(),
+                ],
+              )
+            : const SizedBox(),
+        remainder == 2 || attachments.length == 2 || attachments.length == 4
+            ? Row(
+                children: [
+                  Flexible(
+                    child: Container(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 3, 3),
+                        height: attachments.length == 4 ? 100 : 200,
+                        width: swSize * 0.4,
+                        child: LazyCachedImage(
+                          url: attachments[0],
+                        )),
+                  ),
+                  Flexible(
+                    child: Container(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 0, 3),
+                        height: attachments.length == 4 ? 100 : 200,
+                        width: swSize * 0.4,
+                        child: LazyCachedImage(
+                          url: attachments[1],
+                        )),
+                  ),
+                ],
+              )
+            : const SizedBox(),
+        attachments.length == 4
+            ? Row(
+                children: [
+                  Flexible(
+                    child: Container(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 3, 3),
+                        height: 100,
+                        width: swSize * 0.4,
+                        child: LazyCachedImage(
+                          url: attachments[2],
+                        )),
+                  ),
+                  Flexible(
+                    child: Container(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 0, 3),
+                        height: 100,
+                        width: swSize * 0.4,
+                        child: LazyCachedImage(
+                          url: attachments[3],
+                        )),
+                  ),
+                ],
+              )
+            : const SizedBox(),
+        size > 2
+            ? GridView.builder(
+                itemCount: size,
+                shrinkWrap: true,
+                physics:
+                    const ScrollPhysics(parent: NeverScrollableScrollPhysics()),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 4,
+                  mainAxisSpacing: 3,
+                ),
+                itemBuilder: (context, index) {
+                  return LazyCachedImage(
+                    url: attachments[index],
+                  );
+                })
+            : const SizedBox()
+      ],
+    ),
+  );
 }
-//TODO load images to display

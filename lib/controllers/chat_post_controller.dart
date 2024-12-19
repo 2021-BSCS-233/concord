@@ -12,13 +12,15 @@ class PostController extends GetxController {
       MessagesModel(senderId: '', message: '', edited: false);
   List<MessagesModel> chatContent = [];
   Map<String, UsersModel> userMap = {};
+  Map replyingTo = {};
   String chatId = '';
   String collection;
-  var attachments = [];
   bool initial = true;
+  var attachments = [];
   var uploadCount = 0.obs;
   var editMode = false.obs;
   var showMenu = false.obs;
+  var replyMode = false.obs;
   var showProfile = false.obs;
   var sendVisible = false.obs;
   var attachmentVisible = false.obs;
@@ -57,9 +59,9 @@ class PostController extends GetxController {
   }
 
   updateMessages(MessagesModel updateData, updateType) {
-    var index = chatContent.indexWhere((map) => map.id == updateData.id);
     if (updateData.timeStamp!.isAfter(chatContent.last.timeStamp!) ||
         updateData.timeStamp!.isAtSameMomentAs(chatContent.last.timeStamp!)) {
+      var index = chatContent.indexWhere((map) => map.id == updateData.id);
       if (updateType == 'added' && index < 0) {
         collection == 'posts'
             ? chatContent.add(updateData)
@@ -77,6 +79,7 @@ class PostController extends GetxController {
   enterEditMode() {
     attachments = [];
     attachmentVisible.value = false;
+    replyMode.value = false;
     showMenu.value = false;
     editMode.value = true;
     chatFieldTextController.text = messageSelected.message;
@@ -89,6 +92,20 @@ class PostController extends GetxController {
     chatFocusNode.unfocus();
   }
 
+  enterReplyMode() {
+    showMenu.value = false;
+    editMode.value = false;
+    replyMode.value = true;
+    replyingTo['user'] = userMap[messageSelected.senderId]!.displayName;
+    replyingTo['messageId'] = messageSelected.id;
+    chatFocusNode.requestFocus();
+  }
+
+  exitReplyMode() {
+    replyMode.value = false;
+    replyingTo.clear();
+  }
+
   sendMessage(currentUserId) async {
     sendVisible.value = false;
     attachmentVisible.value = false;
@@ -98,9 +115,12 @@ class PostController extends GetxController {
       MessagesModel messageData = MessagesModel(
           senderId: currentUserId,
           message: chatFieldTextController.text.trim(),
-          edited: false);
-      attachments.isNotEmpty ? uploadCount++ : null;
+          edited: false,
+          repliedTo: replyingTo['messageId']);
       chatFieldTextController.clear();
+      replyMode.value = false;
+      replyingTo.clear();
+      attachments.isNotEmpty ? uploadCount++ : null;
       await sendMessageFirebase(collection, chatId, messageData, attachments);
       attachments.isNotEmpty ? uploadCount-- : null;
     }
