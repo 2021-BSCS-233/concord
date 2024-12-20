@@ -32,6 +32,7 @@ class MainController extends GetxController {
     showMenu.value = true;
   }
 
+
   void toggleStatus(){
     showStatus.value = true;
   }

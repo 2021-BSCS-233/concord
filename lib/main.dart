@@ -86,7 +86,7 @@ class InitialLoading extends StatelessWidget {
 }
 
 class Home extends StatelessWidget {
-  late final MainController mainController = Get.find<MainController>();
+  final MainController mainController = Get.find<MainController>();
 
   Home({
     super.key,
@@ -98,9 +98,7 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List pages = [
-      ChatsPage(
-        mainController: mainController,
-      ),
+      ChatsPage(),
       PostsPage(),
       const NotificationsPage(),
       ProfilePage()

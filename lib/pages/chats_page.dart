@@ -10,11 +10,11 @@ import 'package:concord/controllers/main_controller.dart';
 import 'package:concord/controllers/chats_controller.dart';
 
 class ChatsPage extends StatelessWidget {
-  final MainController mainController;
+  final MainController mainController = Get.find<MainController>();
   final ChatsController chatsController = Get.put(ChatsController());
   final FriendsController friendsController = Get.put(FriendsController());
 
-  ChatsPage({super.key, required this.mainController}) {
+  ChatsPage({super.key}) {
     chatsController.initial = true;
   }
 

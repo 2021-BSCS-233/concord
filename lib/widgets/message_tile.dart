@@ -138,7 +138,7 @@ Widget replyMessageWidget(repliedToUser, message, swSize) {
         child: Icon(CupertinoIcons.arrow_turn_up_right),
       ),
       SizedBox(
-        width: swSize * 0.7,
+        width: swSize * (message == '' ? 0.4 : 0.7),
         child: Text(
           '$repliedToUser: ${message == '' ? 'attachments' : message}',
           maxLines: 2,
@@ -149,7 +149,12 @@ Widget replyMessageWidget(repliedToUser, message, swSize) {
               color: Color(0xFFDEDEE2)),
         ),
       ),
-      message == '' ? Icon(Icons.image, color: Colors.grey.shade600,) : const SizedBox()
+      message == ''
+          ? Icon(
+              Icons.image,
+              color: Colors.grey.shade600,
+            )
+          : const SizedBox()
     ],
   );
 }
