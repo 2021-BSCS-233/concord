@@ -168,11 +168,10 @@ Future<List<UsersModel>> getInitialFriendsFirebase(currentUserId) async {
       .orderBy('displayName')
       .where('friends', arrayContains: currentUserId)
       .get();
+  // .get(const GetOptions( source: Source.cache)); // test this later
   List<UsersModel> friends = [];
   for (var doc in friendInstances.docs) {
     UsersModel friendUserData = UsersModel.fromJson(doc.data());
-    // Map friendUserData = doc.data();
-    // friendUserData['id'] = doc.id;
     friendUserData.id = doc.id;
     friends.add(friendUserData);
   }
@@ -343,6 +342,7 @@ Future<List<ChatsModel>> getInitialChatsFirebase(currentUserId) async {
     ChatsModel chatData = ChatsModel.fromJson(doc.data());
     chatData.receiverData = [];
     chatData.id = doc.id;
+    chatData.docRef = doc.reference;
     chatData.users.removeWhere((element) => element == currentUserId);
     for (var user in chatData.users) {
       chatData.receiverData?.add(await getUserProfileFirebase(user));
@@ -363,6 +363,7 @@ StreamSubscription chatsListenerFirebase(currentUserId, updateChats) {
     for (var change in event) {
       ChatsModel updateData = ChatsModel.fromJson(change.doc.data()!);
       updateData.id = change.doc.id;
+      updateData.docRef = change.doc.reference;
       if (change.type == DocumentChangeType.modified) {
         updateChats(updateData, 'modified');
       } else if (change.type == DocumentChangeType.added) {
@@ -391,15 +392,15 @@ createGroupFirebase(users, groupName) async {
 }
 
 Future<ChatsModel> getFriendChatFirebase(currentUserId, otherUserId) async {
-  var instances = await FirebaseFirestore.instance
-      .collection('chats')
+  var instances = await chatsRef
       .where('chatType', isEqualTo: 'dm')
       .where('users', whereIn: [
     [currentUserId, otherUserId],
     [otherUserId, currentUserId]
   ]).get();
   if (instances.docs.isNotEmpty) {
-    ChatsModel chatData = ChatsModel.fromJson(instances.docs[0].data());
+    ChatsModel chatData =
+        ChatsModel.fromJson(instances.docs[0].data() as Map<String, dynamic>);
     chatData.id = instances.docs[0].id;
     if (!(chatData.visible.contains(currentUserId))) {
       chatsRef.doc(chatData.id).update({
@@ -436,12 +437,10 @@ Future<bool> hideChatFirebase(chatId, currentUserId) async {
   }
 }
 
-Future<List<MessagesModel>> getInitialMessagesFirebase(
-    collection, chatId) async {
-  var messageInstances = await chatsRef
-      .doc(chatId)
+Future<List<MessagesModel>> getInitialMessagesFirebase(docRef) async {
+  var messageInstances = await docRef
       .collection('messages')
-      .orderBy('timeStamp', descending: collection == 'chats' ? true : false)
+      .orderBy('timeStamp', descending: true)
       .limit(50)
       .get();
   List<MessagesModel> messages = [];
@@ -449,18 +448,12 @@ Future<List<MessagesModel>> getInitialMessagesFirebase(
     MessagesModel messageData = MessagesModel.fromJson(message.data());
     messageData.id = message.id;
     if (messageData.repliedTo != null) {
-      var rmData = await chatsRef
-          .doc(chatId)
-          .collection('messages')
-          .doc(messageData.repliedTo)
-          .get();
+      var rmData =
+          await docRef.collection('messages').doc(messageData.repliedTo).get();
       if (rmData.data() != null) {
         messageData.repliedMessage =
             MessagesModel.fromJson(rmData.data() as Map<String, dynamic>);
         messageData.repliedMessage!.id = rmData.id;
-      } else {
-        //TODO: handel message not found
-        messageData.repliedTo == null;
       }
     }
     messages.add(messageData);
@@ -468,11 +461,9 @@ Future<List<MessagesModel>> getInitialMessagesFirebase(
   return messages;
 }
 
-StreamSubscription messagesListenerFirebase(
-    collection, chatId, Function updateMessages) {
-  return FirebaseFirestore.instance
-      .collection(collection)
-      .doc(chatId)
+//TODO: figure proper use of cache data for faster loading
+StreamSubscription messagesListenerFirebase(docRef, Function updateMessages) {
+  return docRef
       .collection('messages')
       .orderBy('timeStamp', descending: true)
       .snapshots()
@@ -482,18 +473,12 @@ StreamSubscription messagesListenerFirebase(
       MessagesModel updateData = MessagesModel.fromJson(change.doc.data()!);
       updateData.id = change.doc.id;
       if (updateData.repliedTo != null) {
-        var rmData = await chatsRef
-            .doc(chatId)
-            .collection('messages')
-            .doc(updateData.repliedTo)
-            .get();
+        var rmData =
+            await docRef.collection('messages').doc(updateData.repliedTo).get();
         if (rmData.data() != null) {
           updateData.repliedMessage =
               MessagesModel.fromJson(rmData.data() as Map<String, dynamic>);
           updateData.repliedMessage!.id = rmData.id;
-        } else {
-          //TODO: handel message not found
-          updateData.repliedTo == null;
         }
       }
       if (change.type == DocumentChangeType.added) {
@@ -507,12 +492,10 @@ StreamSubscription messagesListenerFirebase(
   });
 }
 
-getMessageHistoryFirebase(collection, chatId, MessagesModel lastMessage) async {
-  var messageInstances = await FirebaseFirestore.instance
-      .collection(collection)
-      .doc(chatId)
+getMessageHistoryFirebase(docRef, MessagesModel lastMessage) async {
+  var messageInstances = await docRef
       .collection('messages')
-      .orderBy('timeStamp', descending: collection == 'chats' ? true : false)
+      .orderBy('timeStamp', descending: true)
       .where('timeStamp', isLessThan: lastMessage.timeStamp)
       .limit(20)
       .get();
@@ -525,18 +508,12 @@ getMessageHistoryFirebase(collection, chatId, MessagesModel lastMessage) async {
     MessagesModel messageData = MessagesModel.fromJson(message.data());
     messageData.id = message.id;
     if (messageData.repliedTo != null) {
-      var rmData = await chatsRef
-          .doc(chatId)
-          .collection('messages')
-          .doc(messageData.repliedTo)
-          .get();
+      var rmData =
+          await docRef.collection('messages').doc(messageData.repliedTo).get();
       if (rmData.data() != null) {
         messageData.repliedMessage =
             MessagesModel.fromJson(rmData.data() as Map<String, dynamic>);
         messageData.repliedMessage!.id = rmData.id;
-      } else {
-        //TODO: handel message not found
-        messageData.repliedTo == null;
       }
     }
     messages.add(messageData);
@@ -545,9 +522,7 @@ getMessageHistoryFirebase(collection, chatId, MessagesModel lastMessage) async {
 }
 
 Future<void> sendMessageFirebase(
-    collection, chatId, MessagesModel messageData, attachments) async {
-  var collectionRef = FirebaseFirestore.instance.collection(collection);
-  var chatRef = collectionRef.doc(chatId);
+    collection, docRef, MessagesModel messageData, attachments) async {
   var storageRef = FirebaseStorage.instance.ref();
   List<String> fileLinks = [];
 
@@ -565,9 +540,9 @@ Future<void> sendMessageFirebase(
   messageData.attachments = fileLinks;
 
   var batch = FirebaseFirestore.instance.batch();
-  batch.set(chatRef.collection('messages').doc(), messageData.toJson());
+  batch.set(docRef.collection('messages').doc(), messageData.toJson());
   if (collection == 'chats') {
-    batch.update(chatRef, {
+    batch.update(docRef, {
       'latestMessage': messageData.message,
       'timeStamp': messageData.timeStamp
     });
@@ -575,77 +550,61 @@ Future<void> sendMessageFirebase(
   batch.commit();
 }
 
-void editMessageFirebase(collection, chatId, messageId, message) {
-  FirebaseFirestore.instance
-      .collection(collection)
-      .doc(chatId)
-      .collection('messages')
-      .doc(messageId)
-      .update({
+void editMessageFirebase(docRef, messageId, message) {
+  docRef.collection('messages').doc(messageId).update({
     'message': message,
     'edited': true,
   });
 }
 
-void deleteMessageFirebase(collection, chatId, MessagesModel message) {
+void deleteMessageFirebase(docRef, MessagesModel message) {
   if (message.attachments != null) {
     for (String attachment in message.attachments!) {
       FirebaseStorage.instance.refFromURL(attachment).delete();
     }
   }
-  FirebaseFirestore.instance
-      .collection(collection)
-      .doc(chatId)
-      .collection('messages')
-      .doc(message.id)
-      .delete();
+  docRef.collection('messages').doc(message.id).delete();
 }
 
 Future<List> getInitialPostsFirebase(currentUserId, preference) async {
-  List<PostsModel> publicPosts = [];
+  processPostData(data) async {
+    List<PostsModel> processedPosts = [];
+    for (var doc in data.docs) {
+      PostsModel postData =
+          PostsModel.fromJson(doc.data() as Map<String, dynamic>);
+      postData.id = doc.id;
+      postData.docRef = doc.reference;
+      postData.participants.removeWhere((element) => element == currentUserId);
+      postData.participants
+          .removeWhere((element) => element == postData.poster);
+      var posterData = await usersRef.doc(postData.poster).get();
+      postData.posterData =
+          UsersModel.fromJson(posterData.data() as Map<String, dynamic>);
+      postData.posterData!.id = posterData.id;
+      postData.receiverData = [];
+      for (var participant in postData.participants) {
+        postData.receiverData?.add(await getUserProfileFirebase(participant));
+      }
+      processedPosts.add(postData);
+    }
+    return processedPosts;
+  }
+
   var publicPostsInstances = await postsRef
       .orderBy('timeStamp', descending: true)
       .where('categories', arrayContainsAny: preference)
+      .limit(20)
       .get();
-  for (var instance in publicPostsInstances.docs) {
-    PostsModel postData =
-        PostsModel.fromJson(instance.data() as Map<String, dynamic>);
-    postData.receiverData = [];
-    postData.id = instance.id;
-    postData.participants.removeWhere((element) => element == currentUserId);
-    postData.participants.removeWhere((element) => element == postData.poster);
-    var posterData = await usersRef.doc(postData.poster).get();
-    postData.posterData =
-        UsersModel.fromJson(posterData.data() as Map<String, dynamic>);
-    postData.posterData!.id = posterData.id;
-    publicPosts.add(postData);
-    for (var participant in postData.participants) {
-      postData.receiverData?.add(await getUserProfileFirebase(participant));
-    }
-  }
-  List<PostsModel> followingPosts = [];
+
   var followingPostsInstances = await postsRef
       .orderBy('timeStamp', descending: true)
       .where('followers', arrayContains: currentUserId)
       .limit(20)
       .get();
-  for (var instance in followingPostsInstances.docs) {
-    PostsModel postData =
-        PostsModel.fromJson(instance.data() as Map<String, dynamic>);
-    postData.id = instance.id;
-    postData.participants.removeWhere((element) => element == currentUserId);
-    postData.participants.removeWhere((element) => element == postData.poster);
-    var posterData = await usersRef.doc(postData.poster).get();
-    postData.posterData =
-        UsersModel.fromJson(posterData.data() as Map<String, dynamic>);
-    postData.posterData!.id = posterData.id;
-    postData.receiverData = [];
-    followingPosts.add(postData);
-    for (var participant in postData.participants) {
-      postData.receiverData?.add(await getUserProfileFirebase(participant));
-    }
-  }
-  return [publicPosts, followingPosts];
+  return [
+    await processPostData(publicPostsInstances),
+    await processPostData(followingPostsInstances)
+  ];
 }
 
 Future<bool> sendPostFirebase(

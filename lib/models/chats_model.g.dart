@@ -13,6 +13,10 @@ ChatsModel _$ChatsModelFromJson(Map<String, dynamic> json) => ChatsModel(
       users: (json['users'] as List<dynamic>).map((e) => e as String).toList(),
       visible:
           (json['visible'] as List<dynamic>).map((e) => e as String).toList(),
+      groupOwner: json['groupOwner'] as String? ?? '',
+      groupAdmins: (json['groupAdmins'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
       chatGroupName: json['chatGroupName'] as String? ?? '',
     );
 
@@ -20,8 +24,10 @@ Map<String, dynamic> _$ChatsModelToJson(ChatsModel instance) =>
     <String, dynamic>{
       'chatType': instance.chatType,
       'chatGroupName': instance.chatGroupName,
-      'latestMessage': instance.latestMessage,
-      'timeStamp': ChatsModel._customDateToJson(instance.timeStamp),
+      'groupOwner': instance.groupOwner,
       'users': instance.users,
       'visible': instance.visible,
+      'latestMessage': instance.latestMessage,
+      'groupAdmins': instance.groupAdmins,
+      'timeStamp': ChatsModel._customDateToJson(instance.timeStamp),
     };

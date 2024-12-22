@@ -115,6 +115,8 @@ class Home extends StatelessWidget {
                   currentIndex: mainController.selectedIndex.value,
                   onTap: (index) {
                     mainController.selectedIndex.value = index;
+                    if (index == 0)
+                      mainController.showOverlay(context, 'testing\noverlay');
                   },
                   unselectedFontSize: 10,
                   selectedFontSize: 10,
@@ -165,11 +167,13 @@ class Home extends StatelessWidget {
         ),
         Obx(() => Visibility(
               visible: mainController.showMenu.value ||
-                  mainController.showProfile.value,
+                  mainController.showProfile.value ||
+                  mainController.showStatus.value,
               child: GestureDetector(
                 onTap: () {
                   mainController.showMenu.value = false;
                   mainController.showProfile.value = false;
+                  mainController.showStatus.value = false;
                 },
                 child: Container(
                   color: const Color(0xC01D1D1F),

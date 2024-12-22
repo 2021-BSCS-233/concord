@@ -9,3 +9,12 @@
 // sub collection for this local info
 
 //ability to redirect to where post was generated
+
+import 'package:concord/models/notifications_model.dart';
+import 'package:get/get.dart';
+
+class NotificationController extends GetxController{
+  List<NotificationsModel> notificationContent = [];
+
+
+}

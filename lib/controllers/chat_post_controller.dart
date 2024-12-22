@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:concord/controllers/main_controller.dart';
 import 'package:concord/models/users_model.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,15 +13,15 @@ class PostController extends GetxController {
       MessagesModel(senderId: '', message: '', edited: false);
   List<MessagesModel> chatContent = [];
   Map<String, UsersModel> userMap = {};
+  DocumentReference? docRef;
   Map replyingTo = {};
-  String chatId = '';
   String collection;
   bool initial = true;
   var attachments = [];
-  var uploadCount = 0.obs;
   var editMode = false.obs;
-  var showMenu = false.obs;
   var replyMode = false.obs;
+  var uploadCount = 0.obs;
+  var showMenu = false.obs;
   var showProfile = false.obs;
   var sendVisible = false.obs;
   var attachmentVisible = false.obs;
@@ -28,6 +29,11 @@ class PostController extends GetxController {
   TextEditingController chatFieldTextController = TextEditingController();
 
   PostController({required this.collection});
+
+  // @override
+  // void onInit() {
+  //   super.onInit();
+  // }
 
   void toggleMenu(MessagesModel message) {
     messageSelected = message;
@@ -40,9 +46,9 @@ class PostController extends GetxController {
   }
 
   getMessages() async {
-    chatContent = await getInitialMessagesFirebase(collection, chatId);
+    chatContent = await getInitialMessagesFirebase(docRef);
     mainController.chatListenerRef =
-        messagesListenerFirebase(collection, chatId, updateMessages);
+        messagesListenerFirebase(docRef, updateMessages);
     initial = false;
   }
 
@@ -58,14 +64,16 @@ class PostController extends GetxController {
     }
   }
 
-  updateMessages(MessagesModel updateData, updateType) {
+  updateMessages(MessagesModel updateData, updateType) async {
     if (updateData.timeStamp!.isAfter(chatContent.last.timeStamp!) ||
         updateData.timeStamp!.isAtSameMomentAs(chatContent.last.timeStamp!)) {
+      if (userMap[updateData.senderId] != null) {
+        userMap[updateData.senderId] =
+            await getUserProfileFirebase(updateData.senderId);
+      }
       var index = chatContent.indexWhere((map) => map.id == updateData.id);
       if (updateType == 'added' && index < 0) {
-        collection == 'posts'
-            ? chatContent.add(updateData)
-            : chatContent.insert(0, updateData);
+        chatContent.insert(0, updateData);
       } else if (updateType == 'modified' && !(index < 0)) {
         chatContent[index].message = updateData.message;
         chatContent[index].edited = updateData.edited;
@@ -84,12 +92,14 @@ class PostController extends GetxController {
     editMode.value = true;
     chatFieldTextController.text = messageSelected.message;
     chatFocusNode.requestFocus();
+    // update(['editReplyMode']);
   }
 
   exitEditMode() {
     editMode.value = false;
     chatFieldTextController.text = '';
     chatFocusNode.unfocus();
+    // update(['editReplyMode']);
   }
 
   enterReplyMode() {
@@ -99,11 +109,13 @@ class PostController extends GetxController {
     replyingTo['user'] = userMap[messageSelected.senderId]!.displayName;
     replyingTo['messageId'] = messageSelected.id;
     chatFocusNode.requestFocus();
+    // update(['editReplyMode']);
   }
 
   exitReplyMode() {
     replyMode.value = false;
     replyingTo.clear();
+    // update(['editReplyMode']);
   }
 
   sendMessage(currentUserId) async {
@@ -121,22 +133,23 @@ class PostController extends GetxController {
       replyMode.value = false;
       replyingTo.clear();
       attachments.isNotEmpty ? uploadCount++ : null;
-      await sendMessageFirebase(collection, chatId, messageData, attachments);
+      await sendMessageFirebase(collection, docRef, messageData, attachments);
       attachments.isNotEmpty ? uploadCount-- : null;
     }
     attachments = [];
   }
 
   sendEditedMessage() {
-    editMessageFirebase(collection, chatId, messageSelected.id,
-        chatFieldTextController.text.trim());
+    editMessageFirebase(
+        docRef, messageSelected.id, chatFieldTextController.text.trim());
     chatFieldTextController.clear();
     chatFocusNode.unfocus();
     editMode.value = false;
+    // update(['editReplyMode']);
   }
 
   deleteMessage() {
-    deleteMessageFirebase(collection, chatId, messageSelected);
+    deleteMessageFirebase(docRef, messageSelected);
     showMenu.value = false;
   }
 
@@ -175,7 +188,7 @@ class ChatController extends PostController {
   ChatController({required super.collection});
 
   getMessageHistory() async {
-    var result = await getMessageHistoryFirebase(collection, chatId,
+    var result = await getMessageHistoryFirebase(docRef,
         chatHistory.isEmpty ? chatContent.last : chatHistory.last);
     chatHistory.addAll(result[0]);
     historyRemaining = result[1];

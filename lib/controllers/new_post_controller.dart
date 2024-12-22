@@ -17,10 +17,12 @@ class NewPostController extends GetxController {
         poster: posterId,
         title: titleTextController.text.trim(),
         description: descriptionTextController.text.trim(),
-        attachments: [],
+        // attachments: [],
         categories: categories,
         followers: [posterId],
         participants: [posterId],
+        allNotifications: [posterId],
+        noNotifications: [],
         timeStamp: DateTime.now());
     MessagesModel firstMessage = MessagesModel(
         senderId: posterId,

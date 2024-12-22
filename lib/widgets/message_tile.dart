@@ -4,8 +4,7 @@ import 'package:concord/widgets/profile_picture.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
-import 'lazy_cached_image.dart';
+import 'package:concord/widgets/lazy_cached_image.dart';
 
 class MessageTileFull extends StatelessWidget {
   final MessagesModel messageData;
@@ -24,6 +23,7 @@ class MessageTileFull extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var swSize = MediaQuery.sizeOf(context).width;
     var timeNow = DateTime.now();
     var formattedDateTime = '';
     if (timeNow.year == messageData.timeStamp!.year &&
@@ -44,10 +44,10 @@ class MessageTileFull extends StatelessWidget {
         children: [
           repliedToUser == null
               ? const SizedBox()
-              : replyMessageWidget(
-                  repliedToUser,
-                  messageData.repliedMessage!.message,
-                  MediaQuery.sizeOf(context).width),
+              : messageData.repliedMessage == null
+                  ? replyMessageWidget('', 'Message was deleted', swSize)
+                  : replyMessageWidget(repliedToUser,
+                      messageData.repliedMessage!.message, swSize),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
@@ -115,8 +115,7 @@ class MessageTileFull extends StatelessWidget {
                             )),
                       messageData.attachments!.isEmpty
                           ? const SizedBox()
-                          : attachments(messageData.attachments!,
-                              MediaQuery.sizeOf(context).width)
+                          : attachments(messageData.attachments!, swSize)
                     ],
                   ),
                 ),
@@ -140,13 +139,16 @@ Widget replyMessageWidget(repliedToUser, message, swSize) {
       SizedBox(
         width: swSize * (message == '' ? 0.4 : 0.7),
         child: Text(
-          '$repliedToUser: ${message == '' ? 'attachments' : message}',
+          repliedToUser != ''
+              ? ('$repliedToUser: ${message == '' ? 'attachments' : message}')
+              : message,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
+          style: TextStyle(
+              fontStyle: repliedToUser != '' ? null : FontStyle.italic,
               fontSize: 13,
               fontWeight: FontWeight.w400,
-              color: Color(0xFFDEDEE2)),
+              color: const Color(0xFFCECED2)),
         ),
       ),
       message == ''

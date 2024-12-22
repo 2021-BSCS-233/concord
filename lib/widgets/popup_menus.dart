@@ -191,6 +191,12 @@ class PostMessagePopup extends StatelessWidget {
                       : const SizedBox(),
                   OptionTile(
                       action: () async {
+                        postController.enterReplyMode();
+                      },
+                      actionIcon: Icons.reply,
+                      actionName: 'Reply'),
+                  OptionTile(
+                      action: () async {
                         await Clipboard.setData(ClipboardData(
                             text: postController.messageSelected.message));
                       },
@@ -228,11 +234,11 @@ class ProfilePopup extends StatelessWidget {
         if (snapshot.hasData) {
           return snapshot.data!;
         } else if (snapshot.hasError) {
-          return Text("${snapshot.error}");
+          return Material(child: Center(child: Text("${snapshot.error}")));
         }
-        return Container();
-        // height: MediaQuery.sizeOf(context).height * 0.65,
-        // child: CircularProgressIndicator());
+        return SizedBox(
+            height: MediaQuery.sizeOf(context).height * 0.65,
+            child: const Center(child: CircularProgressIndicator()));
       },
     );
   }

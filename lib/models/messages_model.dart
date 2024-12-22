@@ -39,3 +39,9 @@ class MessagesModel {
     return timeStamp;
   }
 }
+
+// group owner, multiple admins? or just one the owner
+// permission to add, remove members
+// delete group
+// permission to delete any message? probably not
+// max users 10 per group?

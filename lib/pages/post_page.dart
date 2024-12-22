@@ -16,7 +16,7 @@ class PostPage extends StatelessWidget {
   final PostsModel postData;
 
   PostPage({super.key, required this.postData}) {
-    postController.chatId = postData.id!;
+    postController.docRef = postData.docRef;
     postController.initial = true;
     postController.userMap[mainController.currentUserData.id!] =
         mainController.currentUserData;
@@ -95,8 +95,8 @@ class PostPage extends StatelessWidget {
                                           width: 100,
                                           child: ClipRRect(
                                             borderRadius:
-                                            const BorderRadius.all(
-                                                Radius.circular(15)),
+                                                const BorderRadius.all(
+                                                    Radius.circular(15)),
                                             child: Image(
                                                 fit: BoxFit.cover,
                                                 image: FileImage(File(controller
@@ -115,8 +115,8 @@ class PostPage extends StatelessWidget {
                                               decoration: BoxDecoration(
                                                   color: Colors.grey.shade700,
                                                   borderRadius:
-                                                  const BorderRadius.all(
-                                                      Radius.circular(3))),
+                                                      const BorderRadius.all(
+                                                          Radius.circular(3))),
                                               child: Icon(
                                                 Icons.delete,
                                                 color: Colors.grey.shade500,
@@ -129,7 +129,8 @@ class PostPage extends StatelessWidget {
                           }),
                     ))),
                 Obx(() => Visibility(
-                    visible: postController.editMode.value,
+                    visible: postController.editMode.value ||
+                        postController.replyMode.value,
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 13),
                       color: const Color(0xFF151515),
@@ -139,7 +140,12 @@ class PostPage extends StatelessWidget {
                         children: [
                           InkWell(
                             onTap: () {
-                              postController.exitEditMode();
+                              if (postController.editMode.value) {
+                                postController.exitEditMode();
+                              }
+                              if (postController.replyMode.value) {
+                                postController.exitReplyMode();
+                              }
                             },
                             child: Container(
                               height: 20,
@@ -159,7 +165,9 @@ class PostPage extends StatelessWidget {
                             width: 15,
                           ),
                           Text(
-                            'Editing Message',
+                            postController.editMode.value
+                                ? 'Editing Message'
+                                : 'Replying to ${postController.replyingTo['user']}',
                             style: TextStyle(color: Colors.grey.shade500),
                           ),
                         ],
@@ -276,39 +284,53 @@ class PostPage extends StatelessWidget {
   Future<Widget> messagesUI() async {
     postController.initial ? await postController.getMessages() : null;
     return Expanded(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              GetBuilder(
-                init: postController,
-                id: 'chatSection',
-                builder: (val) {
-                  return ListView.builder(
-                    itemCount: postController.chatContent.length,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            GetBuilder(
+              init: postController,
+              id: 'chatSection',
+              builder: (val) {
+                return ListView.builder(
+                  itemCount: postController.chatContent.length,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    var message = postController.chatContent[
+                        postController.chatContent.length - (index + 1)];
+                    if (message.repliedTo != null) {
                       return MessageTileFull(
-                          messageData: postController.chatContent[index],
-                          sendingUser: postController.userMap[
-                              postController.chatContent[index].senderId]!,
+                        messageData: message,
+                        sendingUser: postController.userMap[message.senderId]!,
+                        toggleMenu: postController.toggleMenu,
+                        toggleProfile: postController.toggleProfile,
+                        repliedToUser: message.repliedMessage != null
+                            ? postController
+                                .userMap[message.senderId]!.displayName
+                            : '',
+                      );
+                    } else {
+                      return MessageTileFull(
+                          messageData: message,
+                          sendingUser:
+                              postController.userMap[message.senderId]!,
                           toggleMenu: postController.toggleMenu,
                           toggleProfile: postController.toggleProfile);
-                    },
-                  );
-                },
-              ),
-              Obx(() => ListView.builder(
-                  itemCount: postController.uploadCount.value,
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemBuilder: (context, index) {
-                    return Container();
-                  })),
-            ],
-          ),
+                    }
+                  },
+                );
+              },
+            ),
+            Obx(() => ListView.builder(
+                itemCount: postController.uploadCount.value,
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  return Container();
+                })),
+          ],
         ),
-
+      ),
     );
   }
 }

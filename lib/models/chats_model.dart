@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:concord/models/users_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -8,11 +9,16 @@ class ChatsModel {
   String chatType;
   @JsonKey(defaultValue: '')
   String? chatGroupName;
-  String latestMessage;
-  @JsonKey(fromJson: _customDateFromJson, toJson: _customDateToJson)
-  DateTime timeStamp; // (json['timeStamp'] as Timestamp).toDate()
+  @JsonKey(defaultValue: '')
+  String? groupOwner;
   List<String> users;
   List<String> visible;
+  String latestMessage;
+  List<String>? groupAdmins;
+  @JsonKey(fromJson: _customDateFromJson, toJson: _customDateToJson)
+  DateTime timeStamp; // (json['timeStamp'] as Timestamp).toDate()
+  @JsonKey(includeToJson: false, includeFromJson: false)
+  DocumentReference? docRef;
   @JsonKey(includeToJson: false, includeFromJson: false)
   String? id;
   @JsonKey(includeToJson: false, includeFromJson: false)
@@ -24,8 +30,11 @@ class ChatsModel {
       required this.timeStamp,
       required this.users,
       required this.visible,
+      this.groupOwner,
+      this.groupAdmins,
       this.chatGroupName,
       this.receiverData,
+      this.docRef,
       this.id});
 
   factory ChatsModel.fromJson(Map<String, dynamic> json) =>
