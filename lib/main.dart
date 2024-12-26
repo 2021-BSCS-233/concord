@@ -92,17 +92,12 @@ class Home extends StatelessWidget {
     super.key,
   }) {
     mainController.selectedIndex.value = 0;
-    profileListenerFirebase(mainController.currentUserData.id);
+    profileListenerFirebase(mainController.currentUserData.id!);
   }
 
   @override
   Widget build(BuildContext context) {
-    List pages = [
-      ChatsPage(),
-      PostsPage(),
-      const NotificationsPage(),
-      ProfilePage()
-    ];
+    List pages = [ChatsPage(), PostsPage(), NotificationsPage(), ProfilePage()];
     var shSize = MediaQuery.sizeOf(context).height;
 
     return Stack(
@@ -115,8 +110,9 @@ class Home extends StatelessWidget {
                   currentIndex: mainController.selectedIndex.value,
                   onTap: (index) {
                     mainController.selectedIndex.value = index;
-                    if (index == 0)
+                    if (index == 0) {
                       mainController.showOverlay(context, 'testing\noverlay');
+                    }
                   },
                   unselectedFontSize: 10,
                   selectedFontSize: 10,
@@ -181,7 +177,8 @@ class Home extends StatelessWidget {
               ),
             )),
         Obx(() => AnimatedPositioned(
-              duration: const Duration(milliseconds: 200),
+              duration: Duration(
+                  milliseconds: mainController.showMenu.value ? 200 : 400),
               curve: Curves.easeInOut,
               bottom: mainController.showMenu.value ? 0.0 : -shSize,
               left: 0.0,
@@ -189,7 +186,8 @@ class Home extends StatelessWidget {
               child: UserGroupPopup(),
             )),
         Obx(() => AnimatedPositioned(
-              duration: const Duration(milliseconds: 200),
+              duration: Duration(
+                  milliseconds: mainController.showStatus.value ? 200 : 400),
               curve: Curves.easeInOut,
               bottom: mainController.showStatus.value ? 0.0 : -shSize,
               left: 0.0,
@@ -199,7 +197,8 @@ class Home extends StatelessWidget {
                   status: mainController.currentUserData.displayStatus),
             )),
         Obx(() => AnimatedPositioned(
-              duration: const Duration(milliseconds: 200),
+              duration: Duration(
+                  milliseconds: mainController.showProfile.value ? 200 : 400),
               curve: Curves.easeInOut,
               bottom: mainController.showProfile.value ? 0.0 : -shSize,
               left: 0.0,
@@ -212,6 +211,9 @@ class Home extends StatelessWidget {
     );
   }
 }
+
+//TODO:check out bottom sheet
+//TODO:also check out snack bar
 
 //future builder code cuz i keep forgetting
 // @override

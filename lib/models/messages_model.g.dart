@@ -11,11 +11,16 @@ MessagesModel _$MessagesModelFromJson(Map<String, dynamic> json) =>
       senderId: json['senderId'] as String,
       message: json['message'] as String,
       edited: json['edited'] as bool,
+      pinged: (json['pinged'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          [],
+      attachments: (json['attachments'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          [],
       repliedTo: json['repliedTo'] as String?,
       timeStamp: MessagesModel._customDateFromJson(json['timeStamp']),
-      attachments: (json['attachments'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList(),
     );
 
 Map<String, dynamic> _$MessagesModelToJson(MessagesModel instance) =>
@@ -24,6 +29,7 @@ Map<String, dynamic> _$MessagesModelToJson(MessagesModel instance) =>
       'timeStamp': MessagesModel._customDateToJson(instance.timeStamp),
       'message': instance.message,
       'edited': instance.edited,
-      'repliedTo': instance.repliedTo,
+      'pinged': instance.pinged,
       'attachments': instance.attachments,
+      'repliedTo': instance.repliedTo,
     };

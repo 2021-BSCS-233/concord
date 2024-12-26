@@ -3,7 +3,6 @@ import 'package:concord/models/posts_model.dart';
 import 'package:concord/services/firebase_services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
-// import 'package:get/get.dart';
 
 class NewPostController extends GetxController {
   TextEditingController titleTextController = TextEditingController();
@@ -17,7 +16,7 @@ class NewPostController extends GetxController {
         poster: posterId,
         title: titleTextController.text.trim(),
         description: descriptionTextController.text.trim(),
-        // attachments: [],
+        topAttachment: '',
         categories: categories,
         followers: [posterId],
         participants: [posterId],
@@ -27,7 +26,9 @@ class NewPostController extends GetxController {
     MessagesModel firstMessage = MessagesModel(
         senderId: posterId,
         message: descriptionTextController.text.trim(),
-        edited: false);
+        edited: false,
+        pinged: [],
+        attachments: []);
     return await sendPostFirebase(newPost, firstMessage, []);
   }
 }

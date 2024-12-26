@@ -64,7 +64,7 @@ class UserGroupPopup extends StatelessWidget {
                     ? OptionTile(
                         action: () {
                           hideChatFirebase(mainController.selectedChatId,
-                              mainController.currentUserData.id);
+                              mainController.currentUserData.id!);
                         },
                         actionIcon: Icons.remove_circle_outline,
                         actionName: 'Close DM')

@@ -14,9 +14,7 @@ class DmChatTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var time1 = chatData.timeStamp;
-    var time2 = DateTime.now();
-    var difference = time2.difference(time1);
+    var difference = DateTime.now().difference(chatData.timeStamp);
     String timeDifference = '';
     if (difference.inMinutes < 1) {
       timeDifference = '<1m';
@@ -104,7 +102,7 @@ class DmChatTile extends StatelessWidget {
         title: Text(
           chatData.chatType == 'dm'
               ? chatData.receiverData![0].displayName
-              : chatData.chatGroupName!,
+              : chatData.chatGroupName,
           style: const TextStyle(
               overflow: TextOverflow.ellipsis,
               fontSize: 16,

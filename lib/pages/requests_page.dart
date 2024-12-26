@@ -127,7 +127,7 @@ class RequestsPage extends StatelessWidget {
                                             await requestActionFirebase(
                                                 controller
                                                     .incomingRequestsData[index]
-                                                    .id,
+                                                    .id!,
                                                 'accept');
                                           },
                                         ),
@@ -146,7 +146,7 @@ class RequestsPage extends StatelessWidget {
                                             requestActionFirebase(
                                                 controller
                                                     .incomingRequestsData[index]
-                                                    .id,
+                                                    .id!,
                                                 'deny');
                                           },
                                         )
@@ -187,7 +187,7 @@ class RequestsPage extends StatelessWidget {
                             onPressed: () {
                               requestsController.fieldCheck.value = false;
                               sendRequestFirebase(
-                                  mainController.currentUserData.id,
+                                  mainController.currentUserData,
                                   requestsController
                                       .requestsFieldTextController.text
                                       .trim());
@@ -259,7 +259,8 @@ class RequestsPage extends StatelessWidget {
                                       onTap: () {
                                         requestActionFirebase(
                                             controller
-                                                .outgoingRequestsData[index].id,
+                                                .outgoingRequestsData[index]
+                                                .id!,
                                             'deny');
                                       },
                                     ),

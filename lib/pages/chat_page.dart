@@ -69,7 +69,7 @@ class ChatPage extends StatelessWidget {
                 Text(
                   chatData.chatType == 'dm'
                       ? chatData.receiverData![0].displayName
-                      : chatData.chatGroupName!,
+                      : chatData.chatGroupName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -238,7 +238,7 @@ class ChatPage extends StatelessWidget {
                         fieldLabel: 'messageTo'.trParams({
                           'name': chatData.chatType == 'dm'
                               ? chatData.receiverData![0].displayName
-                              : chatData.chatGroupName!
+                              : chatData.chatGroupName
                         }),
                         fieldHint: 'Send a Message',
                         controller: chatController.chatFieldTextController,
@@ -296,28 +296,22 @@ class ChatPage extends StatelessWidget {
               ),
             )),
         Obx(() => AnimatedPositioned(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeInOut,
-              bottom: chatController.showMenu.value ? 0.0 : -shSize,
-              left: 0.0,
-              right: 0.0,
-              child: chatController.chatContent.isNotEmpty
-                  ? ChatMessagePopup(
-                      chatId: chatData.id!,
-                    )
-                  : Container(),
-            )),
+            duration: Duration(
+                milliseconds: chatController.showMenu.value ? 200 : 400),
+            curve: Curves.easeInOut,
+            bottom: chatController.showMenu.value ? 0.0 : -shSize,
+            left: 0.0,
+            right: 0.0,
+            child: ChatMessagePopup(chatId: chatData.id!))),
         Obx(() => AnimatedPositioned(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeInOut,
-              bottom: chatController.showProfile.value ? 0.0 : -shSize,
-              left: 0.0,
-              right: 0.0,
-              child: chatController.chatContent.isNotEmpty
-                  ? ProfilePopup(
-                      selectedUser: chatController.messageSelected.senderId)
-                  : Container(),
-            )),
+            duration: Duration(
+                milliseconds: chatController.showProfile.value ? 200 : 200),
+            curve: Curves.easeInOut,
+            bottom: chatController.showProfile.value ? 0.0 : -shSize,
+            left: 0.0,
+            right: 0.0,
+            child: ProfilePopup(
+                selectedUser: chatController.messageSelected.senderId))),
       ],
     );
   }

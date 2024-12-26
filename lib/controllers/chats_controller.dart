@@ -22,6 +22,7 @@ class ChatsController extends GetxController {
     } else if (updateType == 'modified' && !(index < 0)) {
       chatsData[index].latestMessage = updateData.latestMessage;
       chatsData[index].timeStamp = updateData.timeStamp;
+      chatsData.sort((a, b) => b.timeStamp.compareTo(a.timeStamp));
     } else if (updateType == 'removed' && !(index < 0)) {
       chatsData.removeAt(index);
       if(mainController.selectedChatId == updateData.id){

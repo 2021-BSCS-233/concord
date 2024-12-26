@@ -7,22 +7,21 @@ part 'chats_model.g.dart';
 @JsonSerializable()
 class ChatsModel {
   String chatType;
-  @JsonKey(defaultValue: '')
-  String? chatGroupName;
-  @JsonKey(defaultValue: '')
-  String? groupOwner;
+  String chatGroupName;
+  String groupOwner;
   List<String> users;
   List<String> visible;
+  List<String> noNotifications;
+  List<String> onlyMentions;
   String latestMessage;
-  List<String>? groupAdmins;
   @JsonKey(fromJson: _customDateFromJson, toJson: _customDateToJson)
-  DateTime timeStamp; // (json['timeStamp'] as Timestamp).toDate()
+  DateTime timeStamp;
+  @JsonKey(includeToJson: false, includeFromJson: false)
+  List<UsersModel>? receiverData;
   @JsonKey(includeToJson: false, includeFromJson: false)
   DocumentReference? docRef;
   @JsonKey(includeToJson: false, includeFromJson: false)
   String? id;
-  @JsonKey(includeToJson: false, includeFromJson: false)
-  List<UsersModel>? receiverData;
 
   ChatsModel(
       {required this.chatType,
@@ -30,9 +29,10 @@ class ChatsModel {
       required this.timeStamp,
       required this.users,
       required this.visible,
-      this.groupOwner,
-      this.groupAdmins,
-      this.chatGroupName,
+      required this.noNotifications,
+      required this.onlyMentions,
+      required this.groupOwner,
+      required this.chatGroupName,
       this.receiverData,
       this.docRef,
       this.id});

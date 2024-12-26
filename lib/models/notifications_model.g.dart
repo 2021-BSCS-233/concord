@@ -8,21 +8,20 @@ part of 'notifications_model.dart';
 
 NotificationsModel _$NotificationsModelFromJson(Map<String, dynamic> json) =>
     NotificationsModel(
-      sourceCollection: json['sourceCollection'] as String,
-      sourceDoc: json['sourceDoc'] as String,
-      title: json['title'] as String,
+      sourceType: json['sourceType'] as String,
       fromUser: json['fromUser'] as String,
       toUsers:
           (json['toUsers'] as List<dynamic>).map((e) => e as String).toList(),
       timeStamp: NotificationsModel._customDateFromJson(json['timeStamp']),
+      sourceDoc:
+          NotificationsModel._docRefFromJson(json['sourceDoc'] as String),
     );
 
 Map<String, dynamic> _$NotificationsModelToJson(NotificationsModel instance) =>
     <String, dynamic>{
       'timeStamp': NotificationsModel._customDateToJson(instance.timeStamp),
-      'sourceCollection': instance.sourceCollection,
-      'sourceDoc': instance.sourceDoc,
-      'title': instance.title,
+      'sourceType': instance.sourceType,
+      'sourceDoc': NotificationsModel._docRefToJson(instance.sourceDoc),
       'fromUser': instance.fromUser,
       'toUsers': instance.toUsers,
     };

@@ -9,7 +9,7 @@ class PostsModel {
   String poster;
   String title;
   String description;
-  // List<String> attachments;
+  String topAttachment;
   List<String> categories;
   List<String> followers;
   List<String> participants;
@@ -18,11 +18,11 @@ class PostsModel {
   @JsonKey(fromJson: _customDateFromJson, toJson: _customDateToJson)
   DateTime timeStamp;
   @JsonKey(includeToJson: false, includeFromJson: false)
-  DocumentReference? docRef;
-  @JsonKey(includeToJson: false, includeFromJson: false)
   UsersModel? posterData;
   @JsonKey(includeToJson: false, includeFromJson: false)
   List<UsersModel>? receiverData;
+  @JsonKey(includeToJson: false, includeFromJson: false)
+  DocumentReference? docRef;
   @JsonKey(includeToJson: false, includeFromJson: false)
   String? id;
 
@@ -30,7 +30,7 @@ class PostsModel {
       {required this.poster,
         required this.title,
         required this.description,
-        // required this.attachments,
+        required this.topAttachment,
         required this.categories,
         required this.followers,
         required this.participants,

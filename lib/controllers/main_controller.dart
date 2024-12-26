@@ -21,6 +21,7 @@ class MainController extends GetxController {
   StreamSubscription? friendsListenerRef;
   StreamSubscription? chatListenerRef;
   StreamSubscription? requestListenerRef;
+  StreamSubscription? notificationListenerRef;
   Timer? overlayTimer;
   OverlayEntry? currentOverlayEntry;
 
@@ -88,6 +89,7 @@ class MainController extends GetxController {
     profileListenerRef?.cancel();
     friendsListenerRef?.cancel();
     requestListenerRef?.cancel();
+    notificationListenerRef?.cancel();
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('email');
     await prefs.remove('password');

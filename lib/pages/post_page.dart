@@ -254,29 +254,22 @@ class PostPage extends StatelessWidget {
               ),
             )),
         Obx(() => AnimatedPositioned(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeInOut,
-              bottom: postController.showMenu.value ? 0.0 : -shSize,
-              left: 0.0,
-              right: 0.0,
-              // child: Container()
-              child: postController.chatContent.isNotEmpty
-                  ? PostMessagePopup(
-                      postId: postData.id!,
-                    )
-                  : Container(),
-            )),
+            duration: Duration(
+                milliseconds: postController.showMenu.value ? 20 : 400),
+            curve: Curves.easeInOut,
+            bottom: postController.showMenu.value ? 0.0 : -shSize,
+            left: 0.0,
+            right: 0.0,
+            child: PostMessagePopup(postId: postData.id!))),
         Obx(() => AnimatedPositioned(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeInOut,
-              bottom: postController.showProfile.value ? 0.0 : -shSize,
-              left: 0.0,
-              right: 0.0,
-              child: postController.chatContent.isNotEmpty
-                  ? ProfilePopup(
-                      selectedUser: postController.messageSelected.senderId)
-                  : Container(),
-            )),
+            duration: Duration(
+                milliseconds: postController.showProfile.value ? 200 : 400),
+            curve: Curves.easeInOut,
+            bottom: postController.showProfile.value ? 0.0 : -shSize,
+            left: 0.0,
+            right: 0.0,
+            child: ProfilePopup(
+                selectedUser: postController.messageSelected.senderId))),
       ],
     );
   }

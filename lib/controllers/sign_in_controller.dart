@@ -28,17 +28,22 @@ class SignInController extends GetxController {
         RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(email) &&
         RegExp(r'.{8,}').hasMatch(pass)) {
       mainController.currentUserData = UsersModel(
-          username: user,
-          email: email,
-          displayName: display != '' ? display : user,
-          profilePicture: '',
-          status: 'Online',
-          displayStatus: 'Online',
-          pronouns: '',
-          aboutMe: '',
-          friends: [],
-          preference: [],
-          followingPosts: []);
+        username: user,
+        email: email,
+        displayName: display != '' ? display : user,
+        profilePicture: '',
+        status: 'Online',
+        displayStatus: 'Online',
+        pronouns: '',
+        aboutMe: '',
+        friends: [],
+        preference: [],
+        followingPosts: [],
+        statusText: '',
+        idle: false,
+        bannerImg: '',
+        bannerColor: 0xFFFFFFFF,
+      );
       var response = await signInUserFirebase(email, pass);
       if (response?[0]) {
         await saveUserOnDevice(email, signInPassTextController.text.trim());

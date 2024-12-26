@@ -136,9 +136,11 @@ class FriendsPage extends StatelessWidget {
                                         CupertinoIcons.chat_bubble_text_fill),
                                     onTap: () async {
                                       var chatData =
-                                          await getFriendChatFirebase(
-                                              mainController.currentUserData.id,
-                                              controller.friendsData[index].id);
+                                          await getUserChatFirebase(
+                                              mainController
+                                                  .currentUserData.id!,
+                                              controller
+                                                  .friendsData[index].id!);
                                       Get.to(ChatPage(chatData: chatData));
                                     },
                                   ),
@@ -153,8 +155,8 @@ class FriendsPage extends StatelessWidget {
                                     ),
                                     onTap: () {
                                       removeFriendFirebase(
-                                          mainController.currentUserData.id,
-                                          controller.friendsData[index].id);
+                                          mainController.currentUserData.id!,
+                                          controller.friendsData[index].id!);
                                     },
                                   )
                                 ],

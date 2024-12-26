@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:concord/models/posts_model.dart';
+import 'package:concord/models/users_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'notifications_model.g.dart';
@@ -5,22 +8,30 @@ part 'notifications_model.g.dart';
 @JsonSerializable()
 class NotificationsModel {
   @JsonKey(fromJson: _customDateFromJson, toJson: _customDateToJson)
-  DateTime? timeStamp;
+  DateTime timeStamp;
+  String sourceType;
+  @JsonKey(fromJson: _docRefFromJson, toJson: _docRefToJson)
+  DocumentReference? sourceDoc; //for redirecting, only for posts
+  String fromUser;
+  List<String> toUsers;
+  @JsonKey(includeToJson: false, includeFromJson: false)
+  PostsModel? sourcePostData;
+  @JsonKey(includeToJson: false, includeFromJson: false)
+  UsersModel? fromUserData;
+  @JsonKey(includeToJson: false, includeFromJson: false)
+  DocumentReference? docRef;
   @JsonKey(includeToJson: false, includeFromJson: false)
   String? id;
-  String sourceCollection; //defines display
-  String sourceDoc; //for redirecting
-  String title;
-  String fromUser;
-  List<String> toUsers; //one doc for multiple users
 
   NotificationsModel(
-      {required this.sourceCollection,
-      required this.sourceDoc,
-      required this.title,
+      {required this.sourceType,
       required this.fromUser,
       required this.toUsers,
-      this.timeStamp,
+      required this.timeStamp,
+      this.sourceDoc,
+      this.sourcePostData,
+      this.fromUserData,
+      this.docRef,
       this.id});
 
   factory NotificationsModel.fromJson(Map<String, dynamic> json) =>
@@ -34,6 +45,19 @@ class NotificationsModel {
 
   static DateTime _customDateToJson(dynamic timeStamp) {
     return timeStamp;
+  }
+
+  static DocumentReference? _docRefFromJson(String json) {
+    if(json != '') {
+      return FirebaseFirestore.instance.doc(json);
+    }
+    else {
+      return null;
+    }
+  }
+
+  static String _docRefToJson(DocumentReference? reference) {
+    return reference?.path ?? '';
   }
 }
 

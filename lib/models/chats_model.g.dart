@@ -13,11 +13,14 @@ ChatsModel _$ChatsModelFromJson(Map<String, dynamic> json) => ChatsModel(
       users: (json['users'] as List<dynamic>).map((e) => e as String).toList(),
       visible:
           (json['visible'] as List<dynamic>).map((e) => e as String).toList(),
-      groupOwner: json['groupOwner'] as String? ?? '',
-      groupAdmins: (json['groupAdmins'] as List<dynamic>?)
-          ?.map((e) => e as String)
+      noNotifications: (json['noNotifications'] as List<dynamic>)
+          .map((e) => e as String)
           .toList(),
-      chatGroupName: json['chatGroupName'] as String? ?? '',
+      onlyMentions: (json['onlyMentions'] as List<dynamic>)
+          .map((e) => e as String)
+          .toList(),
+      groupOwner: json['groupOwner'] as String,
+      chatGroupName: json['chatGroupName'] as String,
     );
 
 Map<String, dynamic> _$ChatsModelToJson(ChatsModel instance) =>
@@ -27,7 +30,8 @@ Map<String, dynamic> _$ChatsModelToJson(ChatsModel instance) =>
       'groupOwner': instance.groupOwner,
       'users': instance.users,
       'visible': instance.visible,
+      'noNotifications': instance.noNotifications,
+      'onlyMentions': instance.onlyMentions,
       'latestMessage': instance.latestMessage,
-      'groupAdmins': instance.groupAdmins,
       'timeStamp': ChatsModel._customDateToJson(instance.timeStamp),
     };

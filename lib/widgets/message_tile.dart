@@ -113,9 +113,9 @@ class MessageTileFull extends StatelessWidget {
                                     ]
                                   : null,
                             )),
-                      messageData.attachments!.isEmpty
+                      messageData.attachments.isEmpty
                           ? const SizedBox()
-                          : attachments(messageData.attachments!, swSize)
+                          : attachments(messageData.attachments, swSize)
                     ],
                   ),
                 ),
@@ -180,11 +180,9 @@ class MessageTileCompact extends StatelessWidget {
         onLongPress: () {
           toggleMenu(messageData);
         },
-        // enableFeedback: false,
         splashColor: Colors.black,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
-          // mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Container(
               alignment: Alignment.centerRight,
@@ -216,9 +214,9 @@ class MessageTileCompact extends StatelessWidget {
                                 : null,
                           ),
                         ),
-                  messageData.attachments!.isEmpty
+                  messageData.attachments.isEmpty
                       ? const SizedBox()
-                      : attachments(messageData.attachments!,
+                      : attachments(messageData.attachments,
                           MediaQuery.sizeOf(context).width)
                 ],
               ),

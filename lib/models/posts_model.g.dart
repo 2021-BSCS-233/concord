@@ -10,6 +10,7 @@ PostsModel _$PostsModelFromJson(Map<String, dynamic> json) => PostsModel(
       poster: json['poster'] as String,
       title: json['title'] as String,
       description: json['description'] as String,
+      topAttachment: json['topAttachment'] as String,
       categories: (json['categories'] as List<dynamic>)
           .map((e) => e as String)
           .toList(),
@@ -32,6 +33,7 @@ Map<String, dynamic> _$PostsModelToJson(PostsModel instance) =>
       'poster': instance.poster,
       'title': instance.title,
       'description': instance.description,
+      'topAttachment': instance.topAttachment,
       'categories': instance.categories,
       'followers': instance.followers,
       'participants': instance.participants,

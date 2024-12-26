@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'messages_model.g.dart';
@@ -9,10 +10,15 @@ class MessagesModel {
   DateTime? timeStamp;
   String message;
   bool edited;
+  @JsonKey(defaultValue: [])
+  List<String> pinged;
+  @JsonKey(defaultValue: [])
+  List<String> attachments;
   String? repliedTo;
-  List<String>? attachments;
   @JsonKey(includeToJson: false, includeFromJson: false)
   MessagesModel? repliedMessage;
+  @JsonKey(includeToJson: false, includeFromJson: false)
+  DocumentReference? docRef;
   @JsonKey(includeToJson: false, includeFromJson: false)
   String? id;
 
@@ -20,10 +26,12 @@ class MessagesModel {
       {required this.senderId,
       required this.message,
       required this.edited,
+      required this.pinged,
+      required this.attachments,
       this.repliedTo,
       this.timeStamp,
-      this.attachments,
       this.repliedMessage,
+      this.docRef,
       this.id});
 
   factory MessagesModel.fromJson(Map<String, dynamic> json) =>

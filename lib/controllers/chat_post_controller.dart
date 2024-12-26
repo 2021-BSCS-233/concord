@@ -9,8 +9,8 @@ import 'package:concord/services/firebase_services.dart';
 
 class PostController extends GetxController {
   MainController mainController = Get.find<MainController>();
-  MessagesModel messageSelected =
-      MessagesModel(senderId: '', message: '', edited: false);
+  MessagesModel messageSelected = MessagesModel(
+      senderId: '', message: '', edited: false, pinged: [], attachments: []);
   List<MessagesModel> chatContent = [];
   Map<String, UsersModel> userMap = {};
   DocumentReference? docRef;
@@ -46,9 +46,9 @@ class PostController extends GetxController {
   }
 
   getMessages() async {
-    chatContent = await getInitialMessagesFirebase(docRef);
+    chatContent = await getInitialMessagesFirebase(docRef!);
     mainController.chatListenerRef =
-        messagesListenerFirebase(docRef, updateMessages);
+        messagesListenerFirebase(docRef!, updateMessages);
     initial = false;
   }
 
@@ -128,12 +128,14 @@ class PostController extends GetxController {
           senderId: currentUserId,
           message: chatFieldTextController.text.trim(),
           edited: false,
-          repliedTo: replyingTo['messageId']);
+          repliedTo: replyingTo['messageId'],
+          pinged: [],
+          attachments: []);
       chatFieldTextController.clear();
       replyMode.value = false;
       replyingTo.clear();
       attachments.isNotEmpty ? uploadCount++ : null;
-      await sendMessageFirebase(collection, docRef, messageData, attachments);
+      await sendMessageFirebase(collection, docRef!, messageData, attachments);
       attachments.isNotEmpty ? uploadCount-- : null;
     }
     attachments = [];
@@ -141,7 +143,7 @@ class PostController extends GetxController {
 
   sendEditedMessage() {
     editMessageFirebase(
-        docRef, messageSelected.id, chatFieldTextController.text.trim());
+        messageSelected.docRef!, chatFieldTextController.text.trim());
     chatFieldTextController.clear();
     chatFocusNode.unfocus();
     editMode.value = false;
@@ -149,7 +151,7 @@ class PostController extends GetxController {
   }
 
   deleteMessage() {
-    deleteMessageFirebase(docRef, messageSelected);
+    deleteMessageFirebase(messageSelected);
     showMenu.value = false;
   }
 
@@ -188,8 +190,8 @@ class ChatController extends PostController {
   ChatController({required super.collection});
 
   getMessageHistory() async {
-    var result = await getMessageHistoryFirebase(docRef,
-        chatHistory.isEmpty ? chatContent.last : chatHistory.last);
+    var result = await getMessageHistoryFirebase(
+        docRef!, chatHistory.isEmpty ? chatContent.last : chatHistory.last);
     chatHistory.addAll(result[0]);
     historyRemaining = result[1];
     update(['chatHistory']);
