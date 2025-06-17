@@ -190,7 +190,7 @@ class RequestsPage extends StatelessWidget {
                                   mainController.currentUserData,
                                   requestsController
                                       .requestsFieldTextController.text
-                                      .trim());
+                                      .trim().toLowerCase());
                               requestsController
                                   .requestsFieldTextController.text = '';
                             },

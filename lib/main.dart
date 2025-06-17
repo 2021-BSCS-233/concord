@@ -110,9 +110,9 @@ class Home extends StatelessWidget {
                   currentIndex: mainController.selectedIndex.value,
                   onTap: (index) {
                     mainController.selectedIndex.value = index;
-                    if (index == 0) {
-                      mainController.showOverlay(context, 'testing\noverlay');
-                    }
+                    // if (index == 0) {
+                    //   mainController.showOverlay(context, 'testing\noverlay');
+                    // }
                   },
                   unselectedFontSize: 10,
                   selectedFontSize: 10,
@@ -203,8 +203,6 @@ class Home extends StatelessWidget {
               bottom: mainController.showProfile.value ? 0.0 : -shSize,
               left: 0.0,
               right: 0.0,
-              // child: mainController.selectedUserId == ''
-              //     ? Container()
               child: ProfilePopup(selectedUser: mainController.selectedUserId),
             ))
       ],
@@ -220,15 +218,23 @@ class Home extends StatelessWidget {
 // Widget build(BuildContext context) {
 //   return FutureBuilder<Widget>(
 //     future: _buildContent(context),
-//     builder: (context, snapshot) {
-//       if (snapshot.hasData) {
-//         return snapshot.data!;
-//       } else if (snapshot.hasError) {
-//         return Text("${snapshot.error}");
-//       }
-//       return CircularProgressIndicator();
-//     },
-//   );
+// builder: (context, snapshot) {
+// if (snapshot.hasData) {
+// return snapshot.data!;
+// } else if (snapshot.hasError) {
+// debugPrint('${snapshot.error}');
+// return const Material(
+// color: Colors.transparent,
+// child: Center(
+// child: Column(
+// mainAxisAlignment: MainAxisAlignment.center,
+// children: [
+// Text("We could not access our services"),
+// Text("Check your connection or try again later"),
+// ],
+// ),
+// ));
+// }
+// return const Center(child: CircularProgressIndicator());
 // }
 //
-// Future<Widget> _buildContent(BuildContext context) async {

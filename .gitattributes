@@ -1,0 +1,13 @@
+# Enforce LF line endings for all text files
+* text=auto eol=lf
+# Or, if you want specific file types:
+# *.dart text eol=lf
+# *.json text eol=lf
+# *.plist text eol=lf
+# *.cc text eol=lf
+# *.h text eol=lf
+# *.cmake text eol=lf
+# *.swift text eol=lf
+# *.lock text eol=lf
+# For generated files, consider if you want them treated as text or binary.
+# Often generated files should also have consistent line endings.
