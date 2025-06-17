@@ -14,6 +14,7 @@ class ChatsModel {
   List<String> noNotifications;
   List<String> onlyMentions;
   String latestMessage;
+  int attachmentCount;
   @JsonKey(fromJson: _customDateFromJson, toJson: _customDateToJson)
   DateTime timeStamp;
   @JsonKey(includeToJson: false, includeFromJson: false)
@@ -26,6 +27,7 @@ class ChatsModel {
   ChatsModel(
       {required this.chatType,
       required this.latestMessage,
+      required this.attachmentCount,
       required this.timeStamp,
       required this.users,
       required this.visible,

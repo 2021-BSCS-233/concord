@@ -116,22 +116,22 @@ class DmChatTile extends StatelessWidget {
                 maxLines: 1,
                 style: const TextStyle(fontSize: 14, color: Color(0xB0FFFFFF)),
               )
-            : const Row(
+            : chatData.attachmentCount != 0 ? Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.attachment,
                     color: Color(0xB0FFFFFF),
                     size: 18,
                   ),
                   Text(
-                    'attachments',
-                    style: TextStyle(
+                    '${chatData.attachmentCount} attachments',
+                    style: const TextStyle(
                         fontSize: 14,
                         color: Color(0xB0FFFFFF),
                         fontStyle: FontStyle.italic),
                   )
                 ],
-              ),
+              ) : const Text(''),
         trailing: Text(timeDifference),
       ),
     );

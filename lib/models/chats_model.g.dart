@@ -9,6 +9,7 @@ part of 'chats_model.dart';
 ChatsModel _$ChatsModelFromJson(Map<String, dynamic> json) => ChatsModel(
       chatType: json['chatType'] as String,
       latestMessage: json['latestMessage'] as String,
+      attachmentCount: (json['attachmentCount'] as num).toInt(),
       timeStamp: ChatsModel._customDateFromJson(json['timeStamp']),
       users: (json['users'] as List<dynamic>).map((e) => e as String).toList(),
       visible:
@@ -33,5 +34,6 @@ Map<String, dynamic> _$ChatsModelToJson(ChatsModel instance) =>
       'noNotifications': instance.noNotifications,
       'onlyMentions': instance.onlyMentions,
       'latestMessage': instance.latestMessage,
+      'attachmentCount': instance.attachmentCount,
       'timeStamp': ChatsModel._customDateToJson(instance.timeStamp),
     };

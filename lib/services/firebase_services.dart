@@ -412,6 +412,7 @@ Future<void> createGroupFirebase(List<String> users, String groupName) async {
   ChatsModel newChat = ChatsModel(
       chatType: 'group',
       latestMessage: '',
+      attachmentCount: 0,
       timeStamp: DateTime.now(),
       chatGroupName: groupName,
       users: users,
@@ -451,6 +452,7 @@ Future<ChatsModel> getUserChatFirebase(
     ChatsModel newChat = ChatsModel(
         chatType: 'dm',
         latestMessage: '',
+        attachmentCount: 0,
         timeStamp: DateTime.now(),
         users: [currentUserId, otherUserId],
         visible: [currentUserId, otherUserId],
@@ -590,6 +592,7 @@ Future<void> sendMessageFirebase(String collection, DocumentReference docRef,
   if (collection == 'chats') {
     batch.update(docRef, {
       'latestMessage': messageData.message,
+      'attachmentCount': attachments.length,
       'timeStamp': messageData.timeStamp
     });
   } else if (collection == 'posts'){
