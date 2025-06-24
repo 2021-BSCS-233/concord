@@ -45,3 +45,7 @@ app.*.map.json
 #sensitive files
 firebase.json
 lib/firebase_options.dart
+nl-server/credentials/
+nl-server/.env
+nl-server/node_modules/
+nl-server/package-lock.json

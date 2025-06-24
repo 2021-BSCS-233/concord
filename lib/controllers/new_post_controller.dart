@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 
 class NewPostController extends GetxController {
+  final MyFirestore myFirestore = MyFirestore();
   TextEditingController titleTextController = TextEditingController();
   TextEditingController descriptionTextController = TextEditingController();
   TextEditingController debugCategoriesTextController = TextEditingController();
@@ -29,6 +30,6 @@ class NewPostController extends GetxController {
         edited: false,
         pinged: [],
         attachments: []);
-    return await sendPostFirebase(newPost, firstMessage, []);
+    return await myFirestore.sendPostFirebase(newPost, firstMessage, []);
   }
 }

@@ -5,7 +5,8 @@ import 'package:concord/models/request_model.dart';
 import 'package:concord/services/firebase_services.dart';
 
 class RequestsController extends GetxController {
-  MainController mainController = Get.find<MainController>();
+  final MainController mainController = Get.find<MainController>();
+  final MyFirestore myFirestore = MyFirestore();
   var initial = true;
   List<RequestsModel> incomingRequestsData = [];
   List<RequestsModel> outgoingRequestsData = [];
@@ -17,12 +18,25 @@ class RequestsController extends GetxController {
   }
 
   getInitialData(currentUserId) async {
-    var result = await getInitialRequestFirebase(currentUserId);
+    var result = await myFirestore.getInitialRequestFirebase(currentUserId);
     mainController.requestListenerRef =
-        requestsListenersFirebase(currentUserId, updateRequests);
+        myFirestore.requestsListenersFirebase(currentUserId, updateRequests);
     incomingRequestsData = result[0];
     outgoingRequestsData = result[1];
     initial = false;
+  }
+
+  Future<void> sendRequest() async {
+    fieldCheck.value = false;
+    var response = await myFirestore.sendRequestFirebase(
+        mainController.currentUserData,
+        requestsFieldTextController.text.trim().toLowerCase());
+    requestsFieldTextController.text = '';
+    debugPrint(response);
+  }
+
+  requestAction(index, action) {
+    myFirestore.requestActionFirebase(incomingRequestsData[index].id!, action);
   }
 
   updateRequests(RequestsModel updateData, updateType, sender) {

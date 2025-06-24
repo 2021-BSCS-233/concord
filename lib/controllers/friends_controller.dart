@@ -1,18 +1,30 @@
 import 'package:concord/controllers/main_controller.dart';
+import 'package:concord/models/chats_model.dart';
 import 'package:concord/models/users_model.dart';
 import 'package:get/get.dart';
 import 'package:concord/services/firebase_services.dart';
 
 class FriendsController extends GetxController {
-  MainController mainController = Get.find<MainController>();
+  final MainController mainController = Get.find<MainController>();
+  final MyFirestore myFirestore = MyFirestore();
   bool initial = true;
   List<UsersModel> friendsData = [];
 
-  getInitialData(currentUserId) async {
-    friendsData = await getInitialFriendsFirebase(currentUserId);
+  Future<void> getInitialData(currentUserId) async {
+    friendsData = await myFirestore.getInitialFriendsFirebase(currentUserId);
     mainController.friendsListenerRef =
-        friendsListenerFirebase(currentUserId, updateFriends);
+        myFirestore.friendsListenerFirebase(currentUserId, updateFriends);
     initial = false;
+  }
+
+  Future<ChatsModel> getUserChat(index) async {
+    return await myFirestore.getUserChatFirebase(
+        mainController.currentUserData.id!, friendsData[index].id!);
+  }
+
+  removeFriend(index) {
+    myFirestore.removeFriendFirebase(
+        mainController.currentUserData.id!, friendsData[index].id!);
   }
 
   updateFriends(UsersModel updateData, updateType) {

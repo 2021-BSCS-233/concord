@@ -40,14 +40,16 @@ Future<void> main() async {
     locale: Get.locale,
     fallbackLocale: const Locale('en', ''),
     home:
-        const InitialLoading(), // default is suppose to be InitialLoading() any other page is debugging
+        InitialLoading(), // default is suppose to be InitialLoading() any other page is debugging
   ));
 }
 
 bool initialMain = true;
 
 class InitialLoading extends StatelessWidget {
-  const InitialLoading({super.key});
+  InitialLoading({super.key});
+
+  final MyAuthentication authentication = MyAuthentication();
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +78,7 @@ class InitialLoading extends StatelessWidget {
 
   Future<Widget> _buildContent(BuildContext context) async {
     bool response = false;
-    initialMain ? (response = await autoLoginFirebase()) : null;
+    initialMain ? (response = await authentication.autoLoginFirebase()) : null;
     if (response) {
       return Home();
     } else {
@@ -87,12 +89,13 @@ class InitialLoading extends StatelessWidget {
 
 class Home extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
+  final MyFirestore myFirestore = MyFirestore();
 
   Home({
     super.key,
   }) {
     mainController.selectedIndex.value = 0;
-    profileListenerFirebase(mainController.currentUserData.id!);
+    myFirestore.profileListenerFirebase(mainController.currentUserData.id!);
   }
 
   @override
@@ -238,3 +241,37 @@ class Home extends StatelessWidget {
 // return const Center(child: CircularProgressIndicator());
 // }
 //
+
+/* things to add in UI page
+  account page:
+    all usual stuff
+  connections: (optional)
+    ability to connect other accounts with a link to access them
+  appearance:
+    themes, light, dark, true dark,
+    maybe: text size,
+    change post attachment size,
+  accessibility:
+    toggle user colors,
+    disable post attachments,
+  language:
+    options for various languages
+  notifications:
+    overall off,
+    chat notifications section:
+      posts created by friends,
+      //will provide chat specific settings
+      dms:
+        all messages, nothing
+      groups:
+        all messages, pings, nothing
+    post notifications section:
+      //will provide post specific settings
+      //over all toggle for following
+      own created posts:
+        all messages, only pings, nothing
+      followed posts:
+        all messages, only pings, nothing
+      followed users:
+        newly created posts, nothing
+*/

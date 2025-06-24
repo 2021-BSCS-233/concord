@@ -5,7 +5,8 @@ import 'package:concord/models/users_model.dart';
 import 'package:concord/services/firebase_services.dart';
 
 class SignInController extends GetxController {
-  MainController mainController = Get.find<MainController>();
+  final MainController mainController = Get.find<MainController>();
+  final MyAuthentication authentication = MyAuthentication();
   TextEditingController signInUsernameTextController = TextEditingController();
   TextEditingController signInDisplayTextController = TextEditingController();
   TextEditingController signInEmailTextController = TextEditingController();
@@ -44,9 +45,9 @@ class SignInController extends GetxController {
         bannerImg: '',
         bannerColor: 0xFFFFFFFF,
       );
-      var response = await signInUserFirebase(email, pass);
+      var response = await authentication.signInUserFirebase(email, pass);
       if (response?[0]) {
-        await saveUserOnDevice(email, signInPassTextController.text.trim());
+        await authentication.saveUserOnDevice(email, signInPassTextController.text.trim());
         showOverlaySignIn.value = false;
         return response?[0];
       } else {

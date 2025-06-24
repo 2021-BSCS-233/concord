@@ -39,14 +39,7 @@ class EditProfilePage extends StatelessWidget {
         actions: [
           InkWell(
             onTap: () async {
-              await updateProfileFirebase(
-                  mainController.currentUserData.id,
-                  editProfileController.displayTextController.text.trim() != ''
-                      ? editProfileController.displayTextController.text.trim()
-                      : mainController.currentUserData.displayName,
-                  editProfileController.pronounceTextController.text.trim(),
-                  editProfileController.aboutMeTextController.text.trim(),
-                  editProfileController.image);
+              await editProfileController.updateProfile();
               Get.back();
             },
             child: SizedBox(

@@ -5,6 +5,7 @@ import 'package:concord/models/messages_model.dart';
 import 'package:concord/models/notifications_model.dart';
 import 'package:concord/models/posts_model.dart';
 import 'package:concord/models/request_model.dart';
+import 'package:concord/services/services.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,94 +15,50 @@ import 'package:concord/controllers/main_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:concord/models/users_model.dart';
 
-//TODO: Organize the functions in separate files
-//TODO: and maybe put them in classes
 //TODO: figure proper use of cache data for faster loading
 
-final CollectionReference usersRef =
-    FirebaseFirestore.instance.collection('users');
-final CollectionReference requestsRef =
-    FirebaseFirestore.instance.collection('requests');
-final CollectionReference chatsRef =
-    FirebaseFirestore.instance.collection('chats');
-final CollectionReference postsRef =
-    FirebaseFirestore.instance.collection('posts');
-final CollectionReference notificationsRef =
-    FirebaseFirestore.instance.collection('notifications');
+class MyAuthentication {
+  final FirebaseAuth authRef = FirebaseAuth.instance;
+  final CollectionReference usersRef =
+      FirebaseFirestore.instance.collection('users');
+  final MainController mainController = Get.find<MainController>();
+  final MySocket mySocket = MySocket();
 
-Future<List?> signInUserFirebase(String email, String pass) async {
-  MainController mainController = Get.find<MainController>();
-  try {
-    var userCredential = await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(email: email, password: pass);
-    var userInstance = usersRef.doc(userCredential.user?.uid);
-    await userInstance.set(mainController.currentUserData.toJson());
-    mainController.currentUserData.id = userCredential.user?.uid;
-    return [true, ''];
-  } on FirebaseAuthException catch (e) {
-    if (e.code == 'weak-password') {
-      return [false, 'Please enter a stronger password'];
-    } else if (e.code == 'email-already-in-use') {
-      return [false, 'Email already in use'];
-    } else {
-      debugPrint('An error occurred: ${e.message}');
-      return [
-        false,
-        'An error occurred while registering your user, Pls try again later'
-      ];
-    }
-  } catch (e) {
-    debugPrint('An error occurred: $e');
-    return [false, 'An unknown error occurred, Pls try again later'];
-  }
-}
-
-Future<bool> logInUserFirebase(String email, String pass) async {
-  MainController mainController = Get.find<MainController>();
-  try {
-    var userCredential = await FirebaseAuth.instance
-        .signInWithEmailAndPassword(email: email, password: pass);
-    var userInstance = usersRef.doc(userCredential.user?.uid);
-    userInstance.update({'status': 'Online'});
-    var userData = await userInstance.get();
-
-    mainController.currentUserData =
-        UsersModel.fromJson(userData.data() as Map<String, dynamic>);
-    mainController.currentUserData.id = userCredential.user?.uid;
-    mainController.currentUserData.docRef = userData.reference;
-    return true;
-  } on FirebaseAuthException catch (e) {
-    if (e.code == 'user-not-found') {
-      debugPrint("Email not found. Please check and try again.");
-      return false;
-    } else {
-      debugPrint("An error occurred: ${e.message}");
-      return false;
-    }
-  } catch (e) {
-    debugPrint("An error occurred: $e");
-    return false;
-  }
-}
-
-Future<void> saveUserOnDevice(String email, String pass) async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.setString('email', email);
-  await prefs.setString('password', pass);
-}
-
-Future<bool> autoLoginFirebase() async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  MainController mainController = Get.find<MainController>();
-  var email = prefs.getString('email');
-  var pass = prefs.getString('password');
-  if (email != null && pass != null) {
+  Future<List?> signInUserFirebase(String email, String pass) async {
     try {
-      var userCredential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: pass);
+      var userCredential = await authRef.createUserWithEmailAndPassword(
+          email: email, password: pass);
       var userInstance = usersRef.doc(userCredential.user?.uid);
-      userInstance.update({'status': 'Online'});
+      await userInstance.set(mainController.currentUserData.toJson());
+      mySocket.connectSocket(userCredential.user?.uid);
+
+      mainController.currentUserData.id = userCredential.user?.uid;
+      return [true, ''];
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        return [false, 'Please enter a stronger password'];
+      } else if (e.code == 'email-already-in-use') {
+        return [false, 'Email already in use'];
+      } else {
+        debugPrint('An error occurred: ${e.message}');
+        return [
+          false,
+          'An error occurred while registering your user, Pls try again later'
+        ];
+      }
+    } catch (e) {
+      debugPrint('An error occurred: $e');
+      return [false, 'An unknown error occurred, Pls try again later'];
+    }
+  }
+
+  Future<bool> logInUserFirebase(String email, String pass) async {
+    try {
+      var userCredential = await authRef.signInWithEmailAndPassword(
+          email: email, password: pass);
+      var userInstance = usersRef.doc(userCredential.user?.uid);
       var userData = await userInstance.get();
+      mySocket.connectSocket(userCredential.user?.uid);
 
       mainController.currentUserData =
           UsersModel.fromJson(userData.data() as Map<String, dynamic>);
@@ -117,628 +74,685 @@ Future<bool> autoLoginFirebase() async {
         return false;
       }
     } catch (e) {
-      debugPrint("(catch) An error occurred: $e");
+      debugPrint("An error occurred: $e");
       return false;
     }
-  } else {
-    debugPrint('failed due to : No login data found');
-    return false;
   }
-}
 
-//TODO: stop using listener for this
-void profileListenerFirebase(String currentUserId) {
-  MainController mainController = Get.find<MainController>();
-  mainController.profileListenerRef =
-      usersRef.doc(currentUserId).snapshots().listen((event) {
-    mainController.currentUserData =
-        UsersModel.fromJson(event.data() as Map<String, dynamic>);
-    mainController.currentUserData.id = event.id;
-    mainController.currentUserData.docRef = event.reference;
-    mainController.update(['profileSection']);
-  });
-}
-
-Future<void> updateProfileFirebase(
-    currentUserId, displayName, pronouns, aboutMe, image) async {
-  var updateData = {
-    'displayName': displayName,
-    'pronouns': pronouns,
-    'aboutMe': aboutMe
-  };
-  if (image != null) {
-    var storageRef = FirebaseStorage.instance.ref().child(
-        'profile_pictures/$currentUserId-${DateTime.now().millisecondsSinceEpoch}.jpg');
-    var task = storageRef.putFile(File(image));
-    task.whenComplete(() async {
-      var downloadUrl = await task.snapshot.ref.getDownloadURL();
-      updateData['profilePicture'] = downloadUrl;
-      usersRef.doc(currentUserId).update(updateData);
-    }).catchError((error) {
-      debugPrint('Image Upload failed: $error');
-      usersRef.doc(currentUserId).update(updateData);
-      return error;
-    });
-  } else {
-    usersRef.doc(currentUserId).update(updateData);
+  Future<void> saveUserOnDevice(String email, String pass) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('email', email);
+    await prefs.setString('password', pass);
   }
-}
 
-Future<bool> updateStatusDisplayFirebase(
-    String userId, String displayStatus) async {
-  try {
-    await usersRef.doc(userId).update({'displayStatus': displayStatus});
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
+  Future<bool> autoLoginFirebase() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    var email = prefs.getString('email');
+    var pass = prefs.getString('password');
+    if (email != null && pass != null) {
+      try {
+        var userCredential = await authRef.signInWithEmailAndPassword(
+            email: email, password: pass);
+        var userInstance = usersRef.doc(userCredential.user?.uid);
+        var userData = await userInstance.get();
+        mySocket.connectSocket(userCredential.user?.uid);
 
-Future<List<UsersModel>> getInitialFriendsFirebase(String currentUserId) async {
-  var friendInstances = await FirebaseFirestore.instance
-      .collection('users')
-      .orderBy('displayName')
-      .where('friends', arrayContains: currentUserId)
-      .get();
-  // .get(const GetOptions( source: Source.cache)); // test this later
-  List<UsersModel> friends = [];
-  for (var doc in friendInstances.docs) {
-    UsersModel friendUserData = UsersModel.fromJson(doc.data());
-    friendUserData.id = doc.id;
-    friendUserData.docRef = doc.reference;
-    friends.add(friendUserData);
-  }
-  return friends;
-}
-
-StreamSubscription friendsListenerFirebase(
-    String currentUserId, Function updateFriends) {
-  return FirebaseFirestore.instance
-      .collection('users')
-      .orderBy('displayName')
-      .where('friends', arrayContains: currentUserId)
-      .snapshots()
-      .map((snapshot) => snapshot.docChanges)
-      .listen((event) {
-    for (var change in event) {
-      var updateData = UsersModel.fromJson(change.doc.data()!);
-      updateData.id = change.doc.id;
-      updateData.docRef = change.doc.reference;
-      if (change.type == DocumentChangeType.modified) {
-        updateFriends(updateData, 'modified');
-      } else if (change.type == DocumentChangeType.added) {
-        updateFriends(updateData, 'added');
-      } else if (change.type == DocumentChangeType.removed) {
-        updateFriends(updateData, 'removed');
-      }
-    }
-  });
-}
-
-Future<UsersModel> getUserProfileFirebase(String userId) async {
-  var user = await usersRef.doc(userId).get();
-  UsersModel userData =
-      UsersModel.fromJson(user.data() as Map<String, dynamic>);
-  userData.id = user.id;
-  userData.docRef = user.reference;
-  return userData;
-}
-
-void removeFriendFirebase(String currentUserId, String friendId) {
-  usersRef.doc(currentUserId).update({
-    'friends': FieldValue.arrayRemove([friendId])
-  });
-  usersRef.doc(friendId).update({
-    'friends': FieldValue.arrayRemove([currentUserId])
-  });
-}
-
-Future<List> getInitialRequestFirebase(String currentUserId) async {
-  var incomingRequestInstances = await requestsRef
-      .orderBy('timeStamp', descending: true)
-      .where('receiverId', isEqualTo: currentUserId)
-      .get();
-  List<RequestsModel> incoming = [];
-  for (var doc in incomingRequestInstances.docs) {
-    RequestsModel requestData =
-        RequestsModel.fromJson(doc.data() as Map<String, dynamic>);
-    requestData.id = doc.id;
-    var user = await usersRef.doc(requestData.senderId).get();
-    if (user.data() != null) {
-      UsersModel userData =
-          UsersModel.fromJson(user.data() as Map<String, dynamic>);
-      userData.id = user.id;
-      userData.docRef = user.reference;
-      requestData.user = userData;
-    }
-    incoming.add(requestData);
-  }
-  var outgoingRequestInstances = await requestsRef
-      .orderBy('timeStamp', descending: true)
-      .where('senderId', isEqualTo: currentUserId)
-      .get();
-  List<RequestsModel> outgoing = [];
-  for (var doc in outgoingRequestInstances.docs) {
-    RequestsModel requestData =
-        RequestsModel.fromJson(doc.data() as Map<String, dynamic>);
-    requestData.id = doc.id;
-    var user = await usersRef.doc(requestData.receiverId).get();
-    if (user.data() != null) {
-      UsersModel userData =
-          UsersModel.fromJson(user.data() as Map<String, dynamic>);
-      userData.id = user.id;
-      userData.docRef = user.reference;
-      requestData.user = userData;
-    }
-    outgoing.add(requestData);
-  }
-  return [incoming, outgoing];
-}
-
-StreamSubscription requestsListenersFirebase(
-    String currentUserId, Function updateRequests) {
-  return requestsRef
-      .orderBy('timeStamp', descending: true)
-      .where(Filter.or(
-        Filter('receiverId', isEqualTo: currentUserId),
-        Filter('senderId', isEqualTo: currentUserId),
-      ))
-      .snapshots()
-      .map((snapshot) => snapshot.docChanges)
-      .listen((event) async {
-    for (var change in event) {
-      RequestsModel requestData =
-          RequestsModel.fromJson(change.doc.data() as Map<String, dynamic>);
-      requestData.id = change.doc.id;
-      bool sender = requestData.senderId == currentUserId ? true : false;
-      if (change.type == DocumentChangeType.added) {
-        requestData.user = await getUserProfileFirebase(
-            sender ? requestData.receiverId : requestData.senderId);
-        updateRequests(requestData, 'added', sender);
-      } else if (change.type == DocumentChangeType.removed) {
-        updateRequests(requestData, 'removed', sender);
-      }
-    }
-  });
-}
-
-Future<void> sendRequestFirebase(
-    UsersModel currentUser, String receiverName) async {
-  var ref = FirebaseFirestore.instance.collection('requests');
-  var receiverRef =
-      await usersRef.where('username', isEqualTo: receiverName).get();
-  if (receiverRef.docs.isNotEmpty) {
-    var check1 = await ref
-        .where('senderId', isEqualTo: currentUser.id)
-        .where('receiverId', isEqualTo: receiverRef.docs[0].id)
-        .get();
-    var check2 = await ref
-        .where('senderId', isEqualTo: currentUser.id)
-        .where('receiverId', isEqualTo: receiverRef.docs[0].id)
-        .get();
-    if (check1.docs.isEmpty && check2.docs.isEmpty) {
-      RequestsModel requestData = RequestsModel(
-          senderId: currentUser.id!,
-          receiverId: receiverRef.docs[0].id,
-          timeStamp: DateTime.now(),
-          senderDocRef: currentUser.docRef!,
-          receiverDocRef: receiverRef.docs[0].reference);
-      ref.add(requestData.toJson());
-    }
-  }
-}
-
-Future<void> requestActionFirebase(String requestId, String action) async {
-  try {
-    var ref = FirebaseFirestore.instance.collection('requests').doc(requestId);
-    var batch = FirebaseFirestore.instance.batch();
-    RequestsModel requestData = RequestsModel.fromJson(
-        (await ref.get()).data() as Map<String, dynamic>);
-    if (action == 'accept') {
-      batch.update(requestData.receiverDocRef, {
-        'friends': FieldValue.arrayUnion([requestData.senderId])
-      });
-      batch.update(requestData.senderDocRef, {
-        'friends': FieldValue.arrayUnion([requestData.receiverId])
-      });
-      NotificationsModel notificationsData = NotificationsModel(
-          sourceType: 'requests',
-          fromUser: '',
-          toUsers: [requestData.senderId, requestData.receiverId],
-          timeStamp: DateTime.now());
-      batch.set(notificationsRef.doc(), notificationsData.toJson());
-      getUserChatFirebase(requestData.receiverId, requestData.senderId);
-      batch.delete(ref);
-      batch.commit();
-    } else if (action == 'deny') {
-      ref.delete();
-    }
-  } catch (e) {
-    debugPrint('error $e');
-  }
-}
-
-Future<List<ChatsModel>> getInitialChatsFirebase(String currentUserId) async {
-  var chatInstances = await FirebaseFirestore.instance
-      .collection('chats')
-      .orderBy('timeStamp', descending: true)
-      .where('visible', arrayContains: currentUserId)
-      .get();
-  List<ChatsModel> chats = [];
-  for (var doc in chatInstances.docs) {
-    ChatsModel chatData = ChatsModel.fromJson(doc.data());
-    chatData.receiverData = [];
-    chatData.id = doc.id;
-    chatData.docRef = doc.reference;
-    chatData.users.removeWhere((element) => element == currentUserId);
-    for (var user in chatData.users) {
-      chatData.receiverData?.add(await getUserProfileFirebase(user));
-    }
-    chats.add(chatData);
-  }
-  return chats;
-}
-
-StreamSubscription chatsListenerFirebase(
-    String currentUserId, Function updateChats) {
-  return FirebaseFirestore.instance
-      .collection('chats')
-      .orderBy('timeStamp', descending: true)
-      .where('visible', arrayContains: currentUserId)
-      .snapshots()
-      .map((snapshot) => snapshot.docChanges)
-      .listen((event) async {
-    for (var change in event) {
-      ChatsModel updateData = ChatsModel.fromJson(change.doc.data()!);
-      updateData.id = change.doc.id;
-      updateData.docRef = change.doc.reference;
-      if (change.type == DocumentChangeType.modified) {
-        updateChats(updateData, 'modified');
-      } else if (change.type == DocumentChangeType.added) {
-        updateData.receiverData = [];
-        updateData.users.removeWhere((element) => element == currentUserId);
-        for (var userId in updateData.users) {
-          updateData.receiverData?.add(await getUserProfileFirebase(userId));
+        mainController.currentUserData =
+            UsersModel.fromJson(userData.data() as Map<String, dynamic>);
+        mainController.currentUserData.id = userCredential.user?.uid;
+        mainController.currentUserData.docRef = userData.reference;
+        return true;
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'user-not-found') {
+          debugPrint("Email not found. Please check and try again.");
+          return false;
+        } else {
+          debugPrint("An error occurred: ${e.message}");
+          return false;
         }
-        updateChats(updateData, 'added');
-      } else if (change.type == DocumentChangeType.removed) {
-        updateChats(updateData, 'removed');
+      } catch (e) {
+        debugPrint("(catch) An error occurred: $e");
+        return false;
       }
+    } else {
+      debugPrint('failed due to : No login data found');
+      return false;
     }
-  });
+  }
 }
 
-Future<void> createGroupFirebase(List<String> users, String groupName) async {
-  ChatsModel newChat = ChatsModel(
-      chatType: 'group',
-      latestMessage: '',
-      attachmentCount: 0,
-      timeStamp: DateTime.now(),
-      chatGroupName: groupName,
-      users: users,
-      visible: users,
-      groupOwner: users.last,
-      noNotifications: [],
-      onlyMentions: []);
-  await chatsRef.add(newChat.toJson());
-}
+class MyFirestore {
+  final MainController mainController = Get.find<MainController>();
+  final FirebaseFirestore firestoreRef = FirebaseFirestore.instance;
+  final CollectionReference<Map<String, dynamic>> usersRef =
+      FirebaseFirestore.instance.collection('users');
+  final CollectionReference<Map<String, dynamic>> requestsRef =
+      FirebaseFirestore.instance.collection('requests');
+  final CollectionReference<Map<String, dynamic>> chatsRef =
+      FirebaseFirestore.instance.collection('chats');
+  final CollectionReference<Map<String, dynamic>> postsRef =
+      FirebaseFirestore.instance.collection('posts');
+  final CollectionReference<Map<String, dynamic>> notificationsRef =
+      FirebaseFirestore.instance.collection('notifications');
 
-Future<ChatsModel> getUserChatFirebase(
-    String currentUserId, String otherUserId) async {
-  var instances = await chatsRef
-      .where('chatType', isEqualTo: 'dm')
-      .where('users', whereIn: [
-    [currentUserId, otherUserId],
-    [otherUserId, currentUserId]
-  ]).get();
-  if (instances.docs.isNotEmpty) {
-    ChatsModel chatData =
-        ChatsModel.fromJson(instances.docs[0].data() as Map<String, dynamic>);
-    chatData.id = instances.docs[0].id;
-    chatData.docRef = instances.docs[0].reference;
-    if (!(chatData.visible.contains(currentUserId))) {
-      chatData.docRef?.update({
-        'visible': FieldValue.arrayUnion([currentUserId])
+//TODO: stop using listener for this (maybe)
+  void profileListenerFirebase(String currentUserId) {
+    mainController.profileListenerRef =
+        usersRef.doc(currentUserId).snapshots().listen((event) {
+      mainController.currentUserData =
+          UsersModel.fromJson(event.data() as Map<String, dynamic>);
+      mainController.currentUserData.id = event.id;
+      mainController.currentUserData.docRef = event.reference;
+      mainController.update(['profileSection']);
+    });
+  }
+
+  Future<void> updateProfileFirebase(
+      currentUserId, displayName, pronouns, aboutMe, image) async {
+    var updateData = {
+      'displayName': displayName,
+      'pronouns': pronouns,
+      'aboutMe': aboutMe
+    };
+    if (image != null) {
+      var storageRef = FirebaseStorage.instance.ref().child(
+          'profile_pictures/$currentUserId-${DateTime.now().millisecondsSinceEpoch}.jpg');
+      var task = storageRef.putFile(File(image));
+      task.whenComplete(() async {
+        var downloadUrl = await task.snapshot.ref.getDownloadURL();
+        updateData['profilePicture'] = downloadUrl;
+        usersRef.doc(currentUserId).update(updateData);
+      }).catchError((error) {
+        debugPrint('Image Upload failed: $error');
+        usersRef.doc(currentUserId).update(updateData);
+        return error;
       });
+    } else {
+      usersRef.doc(currentUserId).update(updateData);
     }
-    chatData.users.removeWhere((element) => element == currentUserId);
-    chatData.receiverData = [];
-    for (var user in chatData.users) {
-      await getUserProfileFirebase(user);
-      chatData.receiverData?.add(await getUserProfileFirebase(user));
+  }
+
+  Future<bool> updateStatusDisplayFirebase(
+      String userId, String displayStatus) async {
+    try {
+      await usersRef.doc(userId).update({'displayStatus': displayStatus});
+      return true;
+    } catch (e) {
+      return false;
     }
-    return chatData;
-  } else {
+  }
+
+  Future<List<UsersModel>> getInitialFriendsFirebase(
+      String currentUserId) async {
+    var friendInstances = await usersRef
+        .orderBy('displayName')
+        .where('friends', arrayContains: currentUserId)
+        .get();
+    // .get(const GetOptions( source: Source.cache)); // test this later
+    List<UsersModel> friends = [];
+    for (var doc in friendInstances.docs) {
+      UsersModel friendUserData = UsersModel.fromJson(doc.data());
+      friendUserData.id = doc.id;
+      friendUserData.docRef = doc.reference;
+      friends.add(friendUserData);
+    }
+    return friends;
+  }
+
+  StreamSubscription friendsListenerFirebase(
+      String currentUserId, Function updateFriends) {
+    return usersRef
+        .orderBy('displayName')
+        .where('friends', arrayContains: currentUserId)
+        .snapshots()
+        .map((snapshot) => snapshot.docChanges)
+        .listen((event) {
+      for (var change in event) {
+        var updateData = UsersModel.fromJson(change.doc.data()!);
+        updateData.id = change.doc.id;
+        updateData.docRef = change.doc.reference;
+        if (change.type == DocumentChangeType.modified) {
+          updateFriends(updateData, 'modified');
+        } else if (change.type == DocumentChangeType.added) {
+          updateFriends(updateData, 'added');
+        } else if (change.type == DocumentChangeType.removed) {
+          updateFriends(updateData, 'removed');
+        }
+      }
+    });
+  }
+
+  Future<UsersModel> getUserProfileFirebase(String userId) async {
+    var user = await usersRef.doc(userId).get();
+    UsersModel userData =
+        UsersModel.fromJson(user.data() as Map<String, dynamic>);
+    userData.id = user.id;
+    userData.docRef = user.reference;
+    return userData;
+  }
+
+  void removeFriendFirebase(String currentUserId, String friendId) {
+    usersRef.doc(currentUserId).update({
+      'friends': FieldValue.arrayRemove([friendId])
+    });
+    usersRef.doc(friendId).update({
+      'friends': FieldValue.arrayRemove([currentUserId])
+    });
+  }
+
+  Future<List> getInitialRequestFirebase(String currentUserId) async {
+    var incomingRequestInstances = await requestsRef
+        .orderBy('timeStamp', descending: true)
+        .where('receiverId', isEqualTo: currentUserId)
+        .get();
+    List<RequestsModel> incoming = [];
+    for (var doc in incomingRequestInstances.docs) {
+      RequestsModel requestData = RequestsModel.fromJson(doc.data());
+      requestData.id = doc.id;
+      var user = await usersRef.doc(requestData.senderId).get();
+      if (user.data() != null) {
+        UsersModel userData =
+            UsersModel.fromJson(user.data() as Map<String, dynamic>);
+        userData.id = user.id;
+        userData.docRef = user.reference;
+        requestData.user = userData;
+      }
+      incoming.add(requestData);
+    }
+    var outgoingRequestInstances = await requestsRef
+        .orderBy('timeStamp', descending: true)
+        .where('senderId', isEqualTo: currentUserId)
+        .get();
+    List<RequestsModel> outgoing = [];
+    for (var doc in outgoingRequestInstances.docs) {
+      RequestsModel requestData = RequestsModel.fromJson(doc.data());
+      requestData.id = doc.id;
+      var user = await usersRef.doc(requestData.receiverId).get();
+      if (user.data() != null) {
+        UsersModel userData =
+            UsersModel.fromJson(user.data() as Map<String, dynamic>);
+        userData.id = user.id;
+        userData.docRef = user.reference;
+        requestData.user = userData;
+      }
+      outgoing.add(requestData);
+    }
+    return [incoming, outgoing];
+  }
+
+  StreamSubscription requestsListenersFirebase(
+      String currentUserId, Function updateRequests) {
+    return requestsRef
+        .orderBy('timeStamp', descending: true)
+        .where(Filter.or(
+          Filter('receiverId', isEqualTo: currentUserId),
+          Filter('senderId', isEqualTo: currentUserId),
+        ))
+        .snapshots()
+        .map((snapshot) => snapshot.docChanges)
+        .listen((event) async {
+      for (var change in event) {
+        RequestsModel requestData =
+            RequestsModel.fromJson(change.doc.data() as Map<String, dynamic>);
+        requestData.id = change.doc.id;
+        bool sender = requestData.senderId == currentUserId ? true : false;
+        if (change.type == DocumentChangeType.added) {
+          requestData.user = await getUserProfileFirebase(
+              sender ? requestData.receiverId : requestData.senderId);
+          updateRequests(requestData, 'added', sender);
+        } else if (change.type == DocumentChangeType.removed) {
+          updateRequests(requestData, 'removed', sender);
+        }
+      }
+    });
+  }
+
+  Future<String> sendRequestFirebase(
+      UsersModel currentUser, String receiverName) async {
+    var receiverRef =
+        await usersRef.where('username', isEqualTo: receiverName).get();
+    if (receiverRef.docs.isNotEmpty) {
+      var check1 = await requestsRef
+          .where('senderId', isEqualTo: currentUser.id)
+          .where('receiverId', isEqualTo: receiverRef.docs[0].id)
+          .get();
+      var check2 = await requestsRef
+          .where('senderId', isEqualTo: currentUser.id)
+          .where('receiverId', isEqualTo: receiverRef.docs[0].id)
+          .get();
+      if (check1.docs.isEmpty && check2.docs.isEmpty) {
+        RequestsModel requestData = RequestsModel(
+            senderId: currentUser.id!,
+            receiverId: receiverRef.docs[0].id,
+            timeStamp: DateTime.now(),
+            senderDocRef: currentUser.docRef!,
+            receiverDocRef: receiverRef.docs[0].reference);
+        requestsRef.add(requestData.toJson());
+        return "Request Already Sent";
+      } else {
+        return "Request Sent";
+      }
+    } else {
+      return "User Not Found";
+    }
+  }
+
+  Future<void> requestActionFirebase(String requestId, String action) async {
+    try {
+      var ref = requestsRef.doc(requestId);
+      var batch = firestoreRef.batch();
+      RequestsModel requestData = RequestsModel.fromJson(
+          (await ref.get()).data() as Map<String, dynamic>);
+      if (action == 'accept') {
+        batch.update(requestData.receiverDocRef, {
+          'friends': FieldValue.arrayUnion([requestData.senderId])
+        });
+        batch.update(requestData.senderDocRef, {
+          'friends': FieldValue.arrayUnion([requestData.receiverId])
+        });
+        NotificationsModel notificationsData = NotificationsModel(
+            sourceType: 'requests',
+            fromUser: '',
+            toUsers: [requestData.senderId, requestData.receiverId],
+            timeStamp: DateTime.now());
+        batch.set(notificationsRef.doc(), notificationsData.toJson());
+        getUserChatFirebase(requestData.receiverId, requestData.senderId);
+        batch.delete(ref);
+        batch.commit();
+      } else if (action == 'deny') {
+        ref.delete();
+      }
+    } catch (e) {
+      debugPrint('error $e');
+    }
+  }
+
+  Future<List<ChatsModel>> getInitialChatsFirebase(String currentUserId) async {
+    var chatInstances = await chatsRef
+        .orderBy('timeStamp', descending: true)
+        .where('visible', arrayContains: currentUserId)
+        .get();
+    List<ChatsModel> chats = [];
+    for (var doc in chatInstances.docs) {
+      ChatsModel chatData = ChatsModel.fromJson(doc.data());
+      chatData.receiverData = [];
+      chatData.id = doc.id;
+      chatData.docRef = doc.reference;
+      chatData.users.removeWhere((element) => element == currentUserId);
+      for (var user in chatData.users) {
+        chatData.receiverData?.add(await getUserProfileFirebase(user));
+      }
+      chats.add(chatData);
+    }
+    return chats;
+  }
+
+  StreamSubscription chatsListenerFirebase(
+      String currentUserId, Function updateChats) {
+    return chatsRef
+        .orderBy('timeStamp', descending: true)
+        .where('visible', arrayContains: currentUserId)
+        .snapshots()
+        .map((snapshot) => snapshot.docChanges)
+        .listen((event) async {
+      for (var change in event) {
+        ChatsModel updateData = ChatsModel.fromJson(change.doc.data()!);
+        updateData.id = change.doc.id;
+        updateData.docRef = change.doc.reference;
+        if (change.type == DocumentChangeType.modified) {
+          updateChats(updateData, 'modified');
+        } else if (change.type == DocumentChangeType.added) {
+          updateData.receiverData = [];
+          updateData.users.removeWhere((element) => element == currentUserId);
+          for (var userId in updateData.users) {
+            updateData.receiverData?.add(await getUserProfileFirebase(userId));
+          }
+          updateChats(updateData, 'added');
+        } else if (change.type == DocumentChangeType.removed) {
+          updateChats(updateData, 'removed');
+        }
+      }
+    });
+  }
+
+  Future<void> createGroupFirebase(List<String> users, String groupName) async {
     ChatsModel newChat = ChatsModel(
-        chatType: 'dm',
+        chatType: 'group',
         latestMessage: '',
         attachmentCount: 0,
         timeStamp: DateTime.now(),
-        users: [currentUserId, otherUserId],
-        visible: [currentUserId, otherUserId],
-        groupOwner: '',
-        chatGroupName: '',
+        chatGroupName: groupName,
+        users: users,
+        visible: users,
+        groupOwner: users.last,
         noNotifications: [],
         onlyMentions: []);
     await chatsRef.add(newChat.toJson());
-    return getUserChatFirebase(currentUserId, otherUserId);
   }
-}
 
-Future<bool> hideChatFirebase(String chatId, String currentUserId) async {
-  try {
-    await chatsRef.doc(chatId).update({
-      'visible': FieldValue.arrayRemove([currentUserId])
-    });
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-
-Future<List<MessagesModel>> getInitialMessagesFirebase(
-    DocumentReference docRef) async {
-  var messageInstances = await docRef
-      .collection('messages')
-      .orderBy('timeStamp', descending: true)
-      .limit(50)
-      .get();
-  List<MessagesModel> messages = [];
-  for (var message in messageInstances.docs) {
-    MessagesModel messageData = MessagesModel.fromJson(message.data());
-    messageData.id = message.id;
-    messageData.docRef = message.reference;
-    if (messageData.repliedTo != null) {
-      var rmData =
-          await docRef.collection('messages').doc(messageData.repliedTo).get();
-      if (rmData.data() != null) {
-        messageData.repliedMessage =
-            MessagesModel.fromJson(rmData.data() as Map<String, dynamic>);
-        messageData.repliedMessage!.id = rmData.id;
-        messageData.repliedMessage!.docRef = rmData.reference;
+  Future<ChatsModel> getUserChatFirebase(
+      String currentUserId, String otherUserId) async {
+    var instances = await chatsRef
+        .where('chatType', isEqualTo: 'dm')
+        .where('users', whereIn: [
+      [currentUserId, otherUserId],
+      [otherUserId, currentUserId]
+    ]).get();
+    if (instances.docs.isNotEmpty) {
+      ChatsModel chatData = ChatsModel.fromJson(instances.docs[0].data());
+      chatData.id = instances.docs[0].id;
+      chatData.docRef = instances.docs[0].reference;
+      if (!(chatData.visible.contains(currentUserId))) {
+        chatData.docRef?.update({
+          'visible': FieldValue.arrayUnion([currentUserId])
+        });
       }
+      chatData.users.removeWhere((element) => element == currentUserId);
+      chatData.receiverData = [];
+      for (var user in chatData.users) {
+        await getUserProfileFirebase(user);
+        chatData.receiverData?.add(await getUserProfileFirebase(user));
+      }
+      return chatData;
+    } else {
+      ChatsModel newChat = ChatsModel(
+          chatType: 'dm',
+          latestMessage: '',
+          attachmentCount: 0,
+          timeStamp: DateTime.now(),
+          users: [currentUserId, otherUserId],
+          visible: [currentUserId, otherUserId],
+          groupOwner: '',
+          chatGroupName: '',
+          noNotifications: [],
+          onlyMentions: []);
+      await chatsRef.add(newChat.toJson());
+      return getUserChatFirebase(currentUserId, otherUserId);
     }
-    messages.add(messageData);
   }
-  return messages;
-}
 
-StreamSubscription messagesListenerFirebase(
-    DocumentReference docRef, Function updateMessages) {
-  return docRef
-      .collection('messages')
-      .orderBy('timeStamp', descending: true)
-      .limit(50)
-      .snapshots()
-      .map((snapshot) => snapshot.docChanges)
-      .listen((event) async {
-    for (var change in event) {
-      MessagesModel updateData = MessagesModel.fromJson(change.doc.data()!);
-      updateData.id = change.doc.id;
-      updateData.docRef = change.doc.reference;
-      if (updateData.repliedTo != null) {
-        var rmData =
-            await docRef.collection('messages').doc(updateData.repliedTo).get();
+  Future<bool> hideChatFirebase(String chatId, String currentUserId) async {
+    try {
+      await chatsRef.doc(chatId).update({
+        'visible': FieldValue.arrayRemove([currentUserId])
+      });
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<List<MessagesModel>> getInitialMessagesFirebase(
+      DocumentReference docRef) async {
+    var messageInstances = await docRef
+        .collection('messages')
+        .orderBy('timeStamp', descending: true)
+        .limit(50)
+        .get();
+    List<MessagesModel> messages = [];
+    for (var message in messageInstances.docs) {
+      MessagesModel messageData = MessagesModel.fromJson(message.data());
+      messageData.id = message.id;
+      messageData.docRef = message.reference;
+      if (messageData.repliedTo != null) {
+        var rmData = await docRef
+            .collection('messages')
+            .doc(messageData.repliedTo)
+            .get();
         if (rmData.data() != null) {
-          updateData.repliedMessage =
+          messageData.repliedMessage =
               MessagesModel.fromJson(rmData.data() as Map<String, dynamic>);
-          updateData.repliedMessage!.id = rmData.id;
-          updateData.repliedMessage!.docRef = rmData.reference;
+          messageData.repliedMessage!.id = rmData.id;
+          messageData.repliedMessage!.docRef = rmData.reference;
         }
       }
-      if (change.type == DocumentChangeType.added) {
-        updateMessages(updateData, 'added');
-      } else if (change.type == DocumentChangeType.modified) {
-        updateMessages(updateData, 'modified');
-      } else if (change.type == DocumentChangeType.removed) {
-        updateMessages(updateData, 'removed');
-      }
+      messages.add(messageData);
     }
-  });
-}
-
-Future<List> getMessageHistoryFirebase(
-    DocumentReference docRef, MessagesModel lastMessage) async {
-  var messageInstances = await docRef
-      .collection('messages')
-      .orderBy('timeStamp', descending: true)
-      .where('timeStamp', isLessThan: lastMessage.timeStamp)
-      .limit(20)
-      .get();
-  List<MessagesModel> messages = [];
-  var historyRemaining = true;
-  if (messageInstances.docs.length < 20) {
-    historyRemaining = false;
+    return messages;
   }
-  for (var message in messageInstances.docs) {
-    MessagesModel messageData = MessagesModel.fromJson(message.data());
-    messageData.id = message.id;
-    messageData.docRef = message.reference;
-    if (messageData.repliedTo != null) {
-      var rmData =
-          await docRef.collection('messages').doc(messageData.repliedTo).get();
-      if (rmData.data() != null) {
-        messageData.repliedMessage =
-            MessagesModel.fromJson(rmData.data() as Map<String, dynamic>);
-        messageData.repliedMessage!.id = rmData.id;
-        messageData.repliedMessage!.docRef = rmData.reference;
+
+  StreamSubscription messagesListenerFirebase(
+      DocumentReference docRef, Function updateMessages) {
+    return docRef
+        .collection('messages')
+        .orderBy('timeStamp', descending: true)
+        .limit(50)
+        .snapshots()
+        .map((snapshot) => snapshot.docChanges)
+        .listen((event) async {
+      for (var change in event) {
+        MessagesModel updateData = MessagesModel.fromJson(change.doc.data()!);
+        updateData.id = change.doc.id;
+        updateData.docRef = change.doc.reference;
+        if (updateData.repliedTo != null) {
+          var rmData = await docRef
+              .collection('messages')
+              .doc(updateData.repliedTo)
+              .get();
+          if (rmData.data() != null) {
+            updateData.repliedMessage =
+                MessagesModel.fromJson(rmData.data() as Map<String, dynamic>);
+            updateData.repliedMessage!.id = rmData.id;
+            updateData.repliedMessage!.docRef = rmData.reference;
+          }
+        }
+        if (change.type == DocumentChangeType.added) {
+          updateMessages(updateData, 'added');
+        } else if (change.type == DocumentChangeType.modified) {
+          updateMessages(updateData, 'modified');
+        } else if (change.type == DocumentChangeType.removed) {
+          updateMessages(updateData, 'removed');
+        }
       }
-    }
-    messages.add(messageData);
-  }
-  return [messages, historyRemaining];
-}
-
-Future<void> sendMessageFirebase(String collection, DocumentReference docRef,
-    MessagesModel messageData, List attachments) async {
-  var storageRef = FirebaseStorage.instance.ref();
-  List<String> fileLinks = [];
-
-  if (attachments.isNotEmpty) {
-    fileLinks =
-        await Future.wait(attachments.map<Future<String>>((attachment) async {
-      var attachmentRef = storageRef.child('attachments/${attachment.name}');
-      var task = await attachmentRef.putFile(File(attachment.path));
-      var downloadUrl = task.ref.getDownloadURL();
-      return downloadUrl;
-    }));
-    attachments = [];
-  }
-  messageData.timeStamp = DateTime.now();
-  messageData.attachments = fileLinks;
-
-  var batch = FirebaseFirestore.instance.batch();
-  batch.set(docRef.collection('messages').doc(), messageData.toJson());
-  if (collection == 'chats') {
-    batch.update(docRef, {
-      'latestMessage': messageData.message,
-      'attachmentCount': attachments.length,
-      'timeStamp': messageData.timeStamp
     });
-  } else if (collection == 'posts'){
-    //TODO: finish later
   }
-  batch.commit();
-}
 
-void editMessageFirebase(DocumentReference docRef, String message) {
-  docRef.update({
-    'message': message,
-    'edited': true,
-  });
-}
-
-void deleteMessageFirebase(MessagesModel message) {
-  if (message.attachments.isNotEmpty) {
-    for (String attachment in message.attachments) {
-      FirebaseStorage.instance.refFromURL(attachment).delete();
+  Future<List> getMessageHistoryFirebase(
+      DocumentReference docRef, MessagesModel lastMessage) async {
+    var messageInstances = await docRef
+        .collection('messages')
+        .orderBy('timeStamp', descending: true)
+        .where('timeStamp', isLessThan: lastMessage.timeStamp)
+        .limit(20)
+        .get();
+    List<MessagesModel> messages = [];
+    var historyRemaining = true;
+    if (messageInstances.docs.length < 20) {
+      historyRemaining = false;
     }
-  }
-  message.docRef!.delete();
-}
-
-Future<List> getInitialPostsFirebase(
-    String currentUserId, List<String> preference) async {
-  processPostData(data) async {
-    List<PostsModel> processedPosts = [];
-    for (var doc in data.docs) {
-      PostsModel postData =
-          PostsModel.fromJson(doc.data() as Map<String, dynamic>);
-      postData.id = doc.id;
-      postData.docRef = doc.reference;
-      postData.participants.removeWhere((element) => element == currentUserId);
-      postData.participants
-          .removeWhere((element) => element == postData.poster);
-      var posterData = await usersRef.doc(postData.poster).get();
-      postData.posterData =
-          UsersModel.fromJson(posterData.data() as Map<String, dynamic>);
-      postData.posterData!.id = posterData.id;
-      postData.posterData!.docRef = posterData.reference;
-      postData.receiverData = [];
-      for (var participant in postData.participants) {
-        postData.receiverData?.add(await getUserProfileFirebase(participant));
+    for (var message in messageInstances.docs) {
+      MessagesModel messageData = MessagesModel.fromJson(message.data());
+      messageData.id = message.id;
+      messageData.docRef = message.reference;
+      if (messageData.repliedTo != null) {
+        var rmData = await docRef
+            .collection('messages')
+            .doc(messageData.repliedTo)
+            .get();
+        if (rmData.data() != null) {
+          messageData.repliedMessage =
+              MessagesModel.fromJson(rmData.data() as Map<String, dynamic>);
+          messageData.repliedMessage!.id = rmData.id;
+          messageData.repliedMessage!.docRef = rmData.reference;
+        }
       }
-      processedPosts.add(postData);
+      messages.add(messageData);
     }
-    return processedPosts;
+    return [messages, historyRemaining];
   }
 
-  var publicPostsInstances = await postsRef
-      .orderBy('timeStamp', descending: true)
-      .where('categories', arrayContainsAny: preference)
-      .limit(20)
-      .get();
+  Future<void> sendMessageFirebase(String collection, DocumentReference docRef,
+      MessagesModel messageData, List attachments) async {
+    var storageRef = FirebaseStorage.instance.ref();
+    List<String> fileLinks = [];
 
-  var followingPostsInstances = await postsRef
-      .orderBy('timeStamp', descending: true)
-      .where('followers', arrayContains: currentUserId)
-      .limit(20)
-      .get();
-  return [
-    await processPostData(publicPostsInstances),
-    await processPostData(followingPostsInstances)
-  ];
-}
-
-Future<bool> sendPostFirebase(
-    PostsModel newPost, MessagesModel firstMessage, List attachments) async {
-  try {
-    var docRef = await postsRef.add(newPost.toJson());
-    await sendMessageFirebase('posts', docRef, firstMessage, attachments);
-    return true;
-  } catch (e) {
-    debugPrint('(catch)$e');
-    return false;
-  }
-}
-
-Future<List<NotificationsModel>> getNotificationsFirebase(
-    String currentUserId) async {
-  var instances = await notificationsRef
-      .where('toUsers', arrayContains: currentUserId)
-      .orderBy('timeStamp', descending: true)
-      .limit(30)
-      .get();
-  List<NotificationsModel> notifications = [];
-  for (var doc in instances.docs) {
-    NotificationsModel notificationData =
-        NotificationsModel.fromJson(doc.data() as Map<String, dynamic>);
-    notificationData.id = doc.id;
-    notificationData.docRef = doc.reference;
-
-    if (notificationData.sourceType == 'posts') {
-      notificationData.fromUserData =
-          await getUserProfileFirebase(notificationData.fromUser);
-      var postData = await notificationData.sourceDoc!.get();
-      notificationData.sourcePostData =
-          PostsModel.fromJson(postData.data() as Map<String, dynamic>);
-      notificationData.sourcePostData!.id = postData.id;
-      notificationData.sourcePostData!.docRef = postData.reference;
-    } else if (notificationData.sourceType == 'requests') {
-      notificationData.toUsers.remove(currentUserId);
-      notificationData.fromUserData =
-          await getUserProfileFirebase(notificationData.toUsers[0]);
+    if (attachments.isNotEmpty) {
+      fileLinks =
+          await Future.wait(attachments.map<Future<String>>((attachment) async {
+        var attachmentRef = storageRef.child('attachments/${attachment.name}');
+        var task = await attachmentRef.putFile(File(attachment.path));
+        var downloadUrl = task.ref.getDownloadURL();
+        return downloadUrl;
+      }));
+      attachments = [];
     }
-    notifications.add(notificationData);
+    messageData.timeStamp = DateTime.now();
+    messageData.attachments = fileLinks;
+
+    var batch = firestoreRef.batch();
+    batch.set(docRef.collection('messages').doc(), messageData.toJson());
+    if (collection == 'chats') {
+      batch.update(docRef, {
+        'latestMessage': messageData.message,
+        'attachmentCount': attachments.length,
+        'timeStamp': messageData.timeStamp
+      });
+    } else if (collection == 'posts') {
+      //TODO: finish later
+    }
+    batch.commit();
   }
-  return notifications;
-}
 
-StreamSubscription notificationsListenerFirebase(
-    String currentUserId, Function updateNotifications) {
-  return notificationsRef
-      .where('toUsers', arrayContains: currentUserId)
-      .orderBy('timeStamp', descending: true)
-      .limit(30)
-      .snapshots()
-      .map((snapshot) => snapshot.docChanges)
-      .listen((event) async {
-    for (var change in event) {
-      NotificationsModel updateData = NotificationsModel.fromJson(
-          change.doc.data() as Map<String, dynamic>);
-      updateData.id = change.doc.id;
-      updateData.docRef = change.doc.reference;
+  void editMessageFirebase(DocumentReference docRef, String message) {
+    docRef.update({
+      'message': message,
+      'edited': true,
+    });
+  }
 
-      if (updateData.sourceType == 'posts') {
-        updateData.fromUserData =
-            await getUserProfileFirebase(updateData.fromUser);
-        var postData = await updateData.sourceDoc!.get();
-        updateData.sourcePostData =
+  void deleteMessageFirebase(MessagesModel message) {
+    if (message.attachments.isNotEmpty) {
+      for (String attachment in message.attachments) {
+        FirebaseStorage.instance.refFromURL(attachment).delete();
+      }
+    }
+    message.docRef!.delete();
+  }
+
+  Future<List> getInitialPostsFirebase(
+      String currentUserId, List<String> preference) async {
+    processPostData(data) async {
+      List<PostsModel> processedPosts = [];
+      for (var doc in data.docs) {
+        PostsModel postData =
+            PostsModel.fromJson(doc.data() as Map<String, dynamic>);
+        postData.id = doc.id;
+        postData.docRef = doc.reference;
+        postData.participants
+            .removeWhere((element) => element == currentUserId);
+        postData.participants
+            .removeWhere((element) => element == postData.poster);
+        var posterData = await usersRef.doc(postData.poster).get();
+        postData.posterData =
+            UsersModel.fromJson(posterData.data() as Map<String, dynamic>);
+        postData.posterData!.id = posterData.id;
+        postData.posterData!.docRef = posterData.reference;
+        postData.receiverData = [];
+        for (var participant in postData.participants) {
+          postData.receiverData?.add(await getUserProfileFirebase(participant));
+        }
+        processedPosts.add(postData);
+      }
+      return processedPosts;
+    }
+
+    var publicPostsInstances = await postsRef
+        .orderBy('timeStamp', descending: true)
+        .where('categories', arrayContainsAny: preference)
+        .limit(20)
+        .get();
+
+    var followingPostsInstances = await postsRef
+        .orderBy('timeStamp', descending: true)
+        .where('followers', arrayContains: currentUserId)
+        .limit(20)
+        .get();
+    return [
+      await processPostData(publicPostsInstances),
+      await processPostData(followingPostsInstances)
+    ];
+  }
+
+  Future<bool> sendPostFirebase(
+      PostsModel newPost, MessagesModel firstMessage, List attachments) async {
+    try {
+      var docRef = await postsRef.add(newPost.toJson());
+      await sendMessageFirebase('posts', docRef, firstMessage, attachments);
+      return true;
+    } catch (e) {
+      debugPrint('(catch)$e');
+      return false;
+    }
+  }
+
+  Future<List<NotificationsModel>> getNotificationsFirebase(
+      String currentUserId) async {
+    var instances = await notificationsRef
+        .where('toUsers', arrayContains: currentUserId)
+        .orderBy('timeStamp', descending: true)
+        .limit(30)
+        .get();
+    List<NotificationsModel> notifications = [];
+    for (var doc in instances.docs) {
+      NotificationsModel notificationData =
+          NotificationsModel.fromJson(doc.data());
+      notificationData.id = doc.id;
+      notificationData.docRef = doc.reference;
+
+      if (notificationData.sourceType == 'posts') {
+        notificationData.fromUserData =
+            await getUserProfileFirebase(notificationData.fromUser);
+        var postData = await notificationData.sourceDoc!.get();
+        notificationData.sourcePostData =
             PostsModel.fromJson(postData.data() as Map<String, dynamic>);
-        updateData.sourcePostData!.id = postData.id;
-        updateData.sourcePostData!.docRef = postData.reference;
-      } else if (updateData.sourceType == 'requests') {
-        updateData.toUsers.remove(currentUserId);
-        updateData.fromUserData =
-            await getUserProfileFirebase(updateData.toUsers[0]);
+        notificationData.sourcePostData!.id = postData.id;
+        notificationData.sourcePostData!.docRef = postData.reference;
+      } else if (notificationData.sourceType == 'requests') {
+        notificationData.toUsers.remove(currentUserId);
+        notificationData.fromUserData =
+            await getUserProfileFirebase(notificationData.toUsers[0]);
       }
-      if (change.type == DocumentChangeType.added) {
-        updateNotifications(updateData, 'added');
-      } else if (change.type == DocumentChangeType.modified) {
-        updateNotifications(updateData, 'modified');
-      } else if (change.type == DocumentChangeType.removed) {
-        updateNotifications(updateData, 'removed');
-      }
+      notifications.add(notificationData);
     }
-  });
+    return notifications;
+  }
+
+  StreamSubscription notificationsListenerFirebase(
+      String currentUserId, Function updateNotifications) {
+    return notificationsRef
+        .where('toUsers', arrayContains: currentUserId)
+        .orderBy('timeStamp', descending: true)
+        .limit(30)
+        .snapshots()
+        .map((snapshot) => snapshot.docChanges)
+        .listen((event) async {
+      for (var change in event) {
+        NotificationsModel updateData = NotificationsModel.fromJson(
+            change.doc.data() as Map<String, dynamic>);
+        updateData.id = change.doc.id;
+        updateData.docRef = change.doc.reference;
+
+        if (updateData.sourceType == 'posts') {
+          updateData.fromUserData =
+              await getUserProfileFirebase(updateData.fromUser);
+          var postData = await updateData.sourceDoc!.get();
+          updateData.sourcePostData =
+              PostsModel.fromJson(postData.data() as Map<String, dynamic>);
+          updateData.sourcePostData!.id = postData.id;
+          updateData.sourcePostData!.docRef = postData.reference;
+        } else if (updateData.sourceType == 'requests') {
+          updateData.toUsers.remove(currentUserId);
+          updateData.fromUserData =
+              await getUserProfileFirebase(updateData.toUsers[0]);
+        }
+        if (change.type == DocumentChangeType.added) {
+          updateNotifications(updateData, 'added');
+        } else if (change.type == DocumentChangeType.modified) {
+          updateNotifications(updateData, 'modified');
+        } else if (change.type == DocumentChangeType.removed) {
+          updateNotifications(updateData, 'removed');
+        }
+      }
+    });
+  }
 }

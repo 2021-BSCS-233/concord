@@ -10,8 +10,10 @@ import 'package:concord/services/firebase_services.dart';
 import 'package:concord/widgets/status_icons.dart';
 import 'package:concord/widgets/option_tile.dart';
 
+//TODO: make a controller for popup menus, someone i forgot
 class UserGroupPopup extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
+  final MyFirestore myFirestore = MyFirestore();
 
   // final List tileContent;
 
@@ -63,7 +65,8 @@ class UserGroupPopup extends StatelessWidget {
                 mainController.selectedChatType == 'dm'
                     ? OptionTile(
                         action: () {
-                          hideChatFirebase(mainController.selectedChatId,
+                          myFirestore.hideChatFirebase(
+                              mainController.selectedChatId,
                               mainController.currentUserData.id!);
                         },
                         actionIcon: Icons.remove_circle_outline,
@@ -223,8 +226,9 @@ class PostMessagePopup extends StatelessWidget {
 
 class ProfilePopup extends StatelessWidget {
   final String selectedUser;
+  final MyFirestore myFirestore = MyFirestore();
 
-  const ProfilePopup({super.key, required this.selectedUser});
+  ProfilePopup({super.key, required this.selectedUser});
 
   @override
   Widget build(BuildContext context) {
@@ -245,7 +249,8 @@ class ProfilePopup extends StatelessWidget {
 
   Future<Widget> _buildContent(BuildContext context) async {
     var shSize = MediaQuery.sizeOf(context).height;
-    UsersModel userProfileData = await getUserProfileFirebase(selectedUser);
+    UsersModel userProfileData =
+        await myFirestore.getUserProfileFirebase(selectedUser);
     return SizedBox(
       height: shSize * 0.65,
       width: double.infinity,
@@ -400,6 +405,7 @@ class ProfilePopup extends StatelessWidget {
 var selectedValue = 1.obs;
 
 class StatusPopup extends StatelessWidget {
+  final MyFirestore myFirestore = MyFirestore();
   final String status;
   final String id;
 
@@ -471,8 +477,8 @@ class StatusPopup extends StatelessWidget {
                                   onChanged: (value) async {
                                     var temp = selectedValue.value;
                                     selectedValue.value = value as int;
-                                    var result =
-                                        await updateStatusDisplayFirebase(
+                                    var result = await myFirestore
+                                        .updateStatusDisplayFirebase(
                                             id, 'Online');
                                     if (!result) {
                                       selectedValue.value = temp;
@@ -488,9 +494,8 @@ class StatusPopup extends StatelessWidget {
                                   onChanged: (value) async {
                                     var temp = selectedValue.value;
                                     selectedValue.value = value as int;
-                                    var result =
-                                        await updateStatusDisplayFirebase(
-                                            id, 'DND');
+                                    var result = await myFirestore
+                                        .updateStatusDisplayFirebase(id, 'DND');
                                     if (!result) {
                                       selectedValue.value = temp;
                                     }
@@ -505,8 +510,8 @@ class StatusPopup extends StatelessWidget {
                                   onChanged: (value) async {
                                     var temp = selectedValue.value;
                                     selectedValue.value = value as int;
-                                    var result =
-                                        await updateStatusDisplayFirebase(
+                                    var result = await myFirestore
+                                        .updateStatusDisplayFirebase(
                                             id, 'Asleep');
                                     if (!result) {
                                       selectedValue.value = temp;
@@ -522,8 +527,8 @@ class StatusPopup extends StatelessWidget {
                                   onChanged: (value) async {
                                     var temp = selectedValue.value;
                                     selectedValue.value = value as int;
-                                    var result =
-                                        await updateStatusDisplayFirebase(
+                                    var result = await myFirestore
+                                        .updateStatusDisplayFirebase(
                                             id, 'Offline');
                                     if (!result) {
                                       selectedValue.value = temp;

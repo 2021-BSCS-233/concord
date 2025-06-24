@@ -1,3 +1,4 @@
+import 'package:concord/models/chats_model.dart';
 import 'package:concord/pages/chat_page.dart';
 import 'package:concord/widgets/profile_picture.dart';
 import 'package:flutter/cupertino.dart';
@@ -135,12 +136,9 @@ class FriendsPage extends StatelessWidget {
                                     child: const Icon(
                                         CupertinoIcons.chat_bubble_text_fill),
                                     onTap: () async {
-                                      var chatData =
-                                          await getUserChatFirebase(
-                                              mainController
-                                                  .currentUserData.id!,
-                                              controller
-                                                  .friendsData[index].id!);
+                                      ChatsModel chatData =
+                                          await friendsController
+                                              .getUserChat(index);
                                       Get.to(ChatPage(chatData: chatData));
                                     },
                                   ),
@@ -153,10 +151,7 @@ class FriendsPage extends StatelessWidget {
                                       Icons.person_remove,
                                       color: Colors.red,
                                     ),
-                                    onTap: () {
-                                      removeFriendFirebase(
-                                          mainController.currentUserData.id!,
-                                          controller.friendsData[index].id!);
+                                    onTap: () { friendsController.removeFriend(index);
                                     },
                                   )
                                 ],

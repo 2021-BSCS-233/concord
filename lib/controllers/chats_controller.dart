@@ -4,14 +4,15 @@ import 'package:concord/models/chats_model.dart';
 import 'package:concord/services/firebase_services.dart';
 
 class ChatsController extends GetxController {
-  MainController mainController = Get.find<MainController>();
+  final MainController mainController = Get.find<MainController>();
+  final MyFirestore myFirestore = MyFirestore();
   bool initial = true;
   List<ChatsModel> chatsData = [];
 
   getInitialData(currentUserId) async {
-    chatsData = await getInitialChatsFirebase(currentUserId);
+    chatsData = await myFirestore.getInitialChatsFirebase(currentUserId);
     mainController.chatsListenerRef =
-        chatsListenerFirebase(currentUserId, updateChats);
+        myFirestore.chatsListenerFirebase(currentUserId, updateChats);
     initial = false;
   }
 
@@ -25,7 +26,7 @@ class ChatsController extends GetxController {
       chatsData.sort((a, b) => b.timeStamp.compareTo(a.timeStamp));
     } else if (updateType == 'removed' && !(index < 0)) {
       chatsData.removeAt(index);
-      if(mainController.selectedChatId == updateData.id){
+      if (mainController.selectedChatId == updateData.id) {
         mainController.showMenu.value = false;
       }
     }

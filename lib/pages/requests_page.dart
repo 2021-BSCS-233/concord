@@ -123,12 +123,9 @@ class RequestsPage extends StatelessWidget {
                                                 Icons.check,
                                                 color: Colors.green,
                                               )),
-                                          onTap: () async {
-                                            await requestActionFirebase(
-                                                controller
-                                                    .incomingRequestsData[index]
-                                                    .id!,
-                                                'accept');
+                                          onTap: () {
+                                            requestsController.requestAction(
+                                                index, 'accept');
                                           },
                                         ),
                                         const SizedBox(
@@ -143,11 +140,8 @@ class RequestsPage extends StatelessWidget {
                                                 color: Colors.red,
                                               )),
                                           onTap: () {
-                                            requestActionFirebase(
-                                                controller
-                                                    .incomingRequestsData[index]
-                                                    .id!,
-                                                'deny');
+                                            requestsController.requestAction(
+                                                index, 'deny');
                                           },
                                         )
                                       ],
@@ -185,14 +179,7 @@ class RequestsPage extends StatelessWidget {
                           height: 40,
                           child: TextButton(
                             onPressed: () {
-                              requestsController.fieldCheck.value = false;
-                              sendRequestFirebase(
-                                  mainController.currentUserData,
-                                  requestsController
-                                      .requestsFieldTextController.text
-                                      .trim().toLowerCase());
-                              requestsController
-                                  .requestsFieldTextController.text = '';
+                              requestsController.sendRequest();
                             },
                             style: ButtonStyle(
                               padding: WidgetStateProperty.all<EdgeInsets>(
@@ -257,11 +244,8 @@ class RequestsPage extends StatelessWidget {
                                             color: Colors.red,
                                           )),
                                       onTap: () {
-                                        requestActionFirebase(
-                                            controller
-                                                .outgoingRequestsData[index]
-                                                .id!,
-                                            'deny');
+                                        requestsController.requestAction(
+                                            index, 'deny');
                                       },
                                     ),
                                   ),

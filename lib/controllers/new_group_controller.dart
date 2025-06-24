@@ -5,7 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
 class NewGroupController extends GetxController {
-  MainController mainController = Get.find<MainController>();
+  final MainController mainController = Get.find<MainController>();
+  final MyFirestore myFirestore = MyFirestore();
   TextEditingController groupNameTextController = TextEditingController();
   List<UsersModel> friendsData;
   List<bool> markedUsers = [];
@@ -31,7 +32,7 @@ class NewGroupController extends GetxController {
         groupName = usersDisplayName.take(3).join(', ') +
             (usersDisplayName.length > 3 ? ', ...' : '');
       }
-      await createGroupFirebase(usersId, groupName);
+      await myFirestore.createGroupFirebase(usersId, groupName);
     } else {
       debugPrint('not enough users to create group');
     }

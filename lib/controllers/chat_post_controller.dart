@@ -8,7 +8,8 @@ import 'package:concord/models/messages_model.dart';
 import 'package:concord/services/firebase_services.dart';
 
 class PostController extends GetxController {
-  MainController mainController = Get.find<MainController>();
+  final MainController mainController = Get.find<MainController>();
+  final MyFirestore myFirestore = MyFirestore();
   MessagesModel messageSelected = MessagesModel(
       senderId: '', message: '', edited: false, pinged: [], attachments: []);
   List<MessagesModel> chatContent = [];
@@ -46,9 +47,9 @@ class PostController extends GetxController {
   }
 
   getMessages() async {
-    chatContent = await getInitialMessagesFirebase(docRef!);
+    chatContent = await myFirestore.getInitialMessagesFirebase(docRef!);
     mainController.chatListenerRef =
-        messagesListenerFirebase(docRef!, updateMessages);
+        myFirestore.messagesListenerFirebase(docRef!, updateMessages);
     initial = false;
   }
 
@@ -69,7 +70,7 @@ class PostController extends GetxController {
         updateData.timeStamp!.isAtSameMomentAs(chatContent.last.timeStamp!)) {
       if (userMap[updateData.senderId] != null) {
         userMap[updateData.senderId] =
-            await getUserProfileFirebase(updateData.senderId);
+            await myFirestore.getUserProfileFirebase(updateData.senderId);
       }
       var index = chatContent.indexWhere((map) => map.id == updateData.id);
       if (updateType == 'added' && index < 0) {
@@ -135,14 +136,15 @@ class PostController extends GetxController {
       replyMode.value = false;
       replyingTo.clear();
       attachments.isNotEmpty ? uploadCount++ : null;
-      await sendMessageFirebase(collection, docRef!, messageData, attachments);
+      await myFirestore.sendMessageFirebase(
+          collection, docRef!, messageData, attachments);
       attachments.isNotEmpty ? uploadCount-- : null;
     }
     attachments = [];
   }
 
   sendEditedMessage() {
-    editMessageFirebase(
+    myFirestore.editMessageFirebase(
         messageSelected.docRef!, chatFieldTextController.text.trim());
     chatFieldTextController.clear();
     chatFocusNode.unfocus();
@@ -151,7 +153,7 @@ class PostController extends GetxController {
   }
 
   deleteMessage() {
-    deleteMessageFirebase(messageSelected);
+    myFirestore.deleteMessageFirebase(messageSelected);
     showMenu.value = false;
   }
 
@@ -190,7 +192,7 @@ class ChatController extends PostController {
   ChatController({required super.collection});
 
   getMessageHistory() async {
-    var result = await getMessageHistoryFirebase(
+    var result = await myFirestore.getMessageHistoryFirebase(
         docRef!, chatHistory.isEmpty ? chatContent.last : chatHistory.last);
     chatHistory.addAll(result[0]);
     historyRemaining = result[1];

@@ -15,14 +15,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
 class NotificationController extends GetxController {
-  MainController mainController = Get.find<MainController>();
+  final MainController mainController = Get.find<MainController>();
+  final MyFirestore myFirestore = MyFirestore();
   List<NotificationsModel> notificationContent = [];
   bool initial = true;
 
   getInitialData(currentUserId) async {
-    notificationContent = await getNotificationsFirebase(currentUserId);
-    mainController.notificationListenerRef =
-        notificationsListenerFirebase(currentUserId, updateNotifications);
+    notificationContent =
+        await myFirestore.getNotificationsFirebase(currentUserId);
+    mainController.notificationListenerRef = myFirestore
+        .notificationsListenerFirebase(currentUserId, updateNotifications);
     initial = false;
   }
 
