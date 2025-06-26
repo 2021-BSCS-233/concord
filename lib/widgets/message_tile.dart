@@ -38,7 +38,7 @@ class MessageTileFull extends StatelessWidget {
     }
 
     return Container(
-      margin: const EdgeInsets.only(left: 18, top: 16, right: 18, bottom: 0),
+      margin: const EdgeInsets.only(left: 18, top: 12, right: 18, bottom: 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -96,12 +96,12 @@ class MessageTileFull extends StatelessWidget {
                       ),
                       messageData.message == ''
                           ? const SizedBox()
-                          : RichText(
-                              text: TextSpan(
+                          : Text.rich(
+                              TextSpan(
                               text: messageData.message,
                               style: const TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w400,
+                                  fontSize: 16,
+                                  // fontWeight: FontWeight.w100,
                                   color: Color(0xFFDEDEE2)),
                               children: messageData.edited
                                   ? [
@@ -175,7 +175,7 @@ class MessageTileCompact extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(left: 20, right: 20, top: 0, bottom: 1),
+      margin: const EdgeInsets.only(left: 20, right: 20, top: 0, bottom: 0),
       child: InkWell(
         onLongPress: () {
           toggleMenu(messageData);
@@ -196,24 +196,22 @@ class MessageTileCompact extends StatelessWidget {
                 children: [
                   messageData.message == ''
                       ? const SizedBox()
-                      : RichText(
-                          text: TextSpan(
-                            text: messageData.message,
-                            style: const TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xFFDEDEE2)),
-                            children: messageData.edited
-                                ? [
-                                    TextSpan(
-                                        text: ' (edited)',
-                                        style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.grey.shade400)),
-                                  ]
-                                : null,
-                          ),
-                        ),
+                      : Text.rich(
+                      TextSpan(
+                        text: messageData.message,
+                        style: const TextStyle(
+                            fontSize: 16,
+                            color: Color(0xFFDEDEE2)),
+                        children: messageData.edited
+                            ? [
+                          TextSpan(
+                              text: ' (edited)',
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey.shade500)),
+                        ]
+                            : null,
+                      )),
                   messageData.attachments.isEmpty
                       ? const SizedBox()
                       : attachments(messageData.attachments,

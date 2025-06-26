@@ -90,6 +90,7 @@ class MainController extends GetxController {
     friendsListenerRef?.cancel();
     requestListenerRef?.cancel();
     notificationListenerRef?.cancel();
+    selectedIndex.value = 0;
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('email');
     await prefs.remove('password');

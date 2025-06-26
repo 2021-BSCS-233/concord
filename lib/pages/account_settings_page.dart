@@ -4,14 +4,14 @@ import 'package:concord/controllers/language_controller.dart';
 import 'package:concord/controllers/main_controller.dart';
 import 'package:concord/controllers/settings_controller.dart';
 
-class SettingsPage extends StatelessWidget {
+class AccountSettingsPage extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
   final SettingsController editSettingsController =
       Get.put(SettingsController());
   final LocalizationController localizationController =
       Get.find<LocalizationController>();
 
-  SettingsPage({super.key}) {
+  AccountSettingsPage({super.key}) {
     editSettingsController.usernameTextController.text =
         mainController.currentUserData.username;
     editSettingsController.emailTextController.text =
@@ -89,10 +89,10 @@ class SettingsPage extends StatelessWidget {
                           child: Container(
                             height: 45,
                             width: 140,
-                            decoration: BoxDecoration(
-                                color: Colors.blueAccent.shade700,
+                            decoration:const BoxDecoration(
+                                color: Color.fromARGB(255, 255, 77, 0),
                                 borderRadius:
-                                    const BorderRadius.all(Radius.circular(10))),
+                                    BorderRadius.all(Radius.circular(10))),
                             child: Center(
                               child: Text(
                                 'changePass'.tr,
@@ -109,9 +109,9 @@ class SettingsPage extends StatelessWidget {
                           child: Container(
                             height: 45,
                             width: 140,
-                            decoration: BoxDecoration(
-                                color: Colors.blueAccent.shade700,
-                                borderRadius: const BorderRadius.all(
+                            decoration:const BoxDecoration(
+                                color: Color.fromARGB(255, 255, 77, 0),
+                                borderRadius: BorderRadius.all(
                                     Radius.circular(10))),
                             child: Center(
                               child: Text(
@@ -160,14 +160,15 @@ class SettingsPage extends StatelessWidget {
                   child: Container(
                     height: 45,
                     width: 140,
-                    decoration: const BoxDecoration(
-                        color: Colors.redAccent,
-                        borderRadius: BorderRadius.all(Radius.circular(10))),
+                    decoration:  BoxDecoration(
+                        color: Colors.transparent,
+                        border: Border.all(color: Colors.red, width: 2),
+                        borderRadius: const BorderRadius.all(Radius.circular(10))),
                     child: Center(
                       child: Text(
                         'logout'.tr,
                         style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15),
+                            fontWeight: FontWeight.bold, fontSize: 15, color: Colors.red),
                       ),
                     ),
                   ),

@@ -23,30 +23,27 @@ class NotificationsPage extends StatelessWidget {
               fontSize: 22),
         ),
       ),
-      body: Container(
-        padding: const EdgeInsets.only(left: 15),
-        child: FutureBuilder<Widget>(
-          future: notificationUI(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return snapshot.data!;
-            } else if (snapshot.hasError) {
-              debugPrint('${snapshot.error}');
-              return const Material(
-                  color: Colors.transparent,
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text("We could not access our services"),
-                        Text("Check your connection or try again later"),
-                      ],
-                    ),
-                  ));
-            }
-            return const Center(child: CircularProgressIndicator());
-          },
-        ),
+      body: FutureBuilder<Widget>(
+        future: notificationUI(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return snapshot.data!;
+          } else if (snapshot.hasError) {
+            debugPrint('${snapshot.error}');
+            return const Material(
+                color: Colors.transparent,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("We could not access our services"),
+                      Text("Check your connection or try again later"),
+                    ],
+                  ),
+                ));
+          }
+          return const Center(child: CircularProgressIndicator());
+        },
       ),
     );
   }
@@ -92,86 +89,73 @@ class NotificationsPage extends StatelessWidget {
                         debugPrint('open friends chat');
                       }
                     },
-                    child: ListTile(
-                      titleAlignment: ListTileTitleAlignment.top,
-                      leading: ProfilePicture(
-                        profileLink: notificationController
-                            .notificationContent[index]
-                            .fromUserData!
-                            .profilePicture,
-                        profileRadius: 25,
+                    child: Container(
+                      margin: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF121218),
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
                       ),
-                      title: notificationController
-                                  .notificationContent[index].sourceType ==
-                              'requests'
-                          ? RichText(
-                              text: TextSpan(
-                                text: notificationController
-                                    .notificationContent[index]
-                                    .fromUserData!
-                                    .displayName,
-                                style: const TextStyle(
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color(0xFF9E9EAA)),
-                                children: const <TextSpan>[
-                                  TextSpan(
-                                      text: ' was added as a friend',
-                                      style: TextStyle(
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.w300,
-                                          color: Color(0xFF9E9EAA))),
-                                ],
-                              ),
-                            )
-                          //TODO: use a function in controller to make this string? its getting messy
-                          : RichText(
-                        text: TextSpan(
-                          text:
-                          '${notificationController.notificationContent[index].fromUserData!.displayName}'
-                              ' ${notificationController.notificationContent[index].sourcePostData!.poster == mainController.currentUserData.id! ? 'sent a message in your post' : 'replied to you in post'}',
-                          style: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w300,
-                              color: Color(0xFF9E9EB1)),
-                          children: [
-                            TextSpan(
-                                text:
-                                ' "${notificationController.notificationContent[index].sourcePostData!.title}"',
-                                style: const TextStyle(
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.w400,
-                                    color: Color(0xFF9E9EB1))),
-                          ],
+                      child: ListTile(
+                        titleAlignment: ListTileTitleAlignment.top,
+                        leading: ProfilePicture(
+                          profileLink: notificationController
+                              .notificationContent[index]
+                              .fromUserData!
+                              .profilePicture,
+                          profileRadius: 20,
                         ),
+                        title: notificationController
+                                    .notificationContent[index].sourceType ==
+                                'requests'
+                            ? Text.rich(
+                                TextSpan(
+                                  text: notificationController
+                                      .notificationContent[index]
+                                      .fromUserData!
+                                      .displayName,
+                                  style: const TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF9E9EAA)),
+                                  children: const [
+                                    TextSpan(
+                                        text: ' was added as a friend',
+                                        style: TextStyle(
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.w300,
+                                            color: Color(0xFF9E9EAA))),
+                                  ],
+                                ),
+                              )
+                            //TODO: use a function in controller to make this string? its getting messy
+                            : Text.rich(
+                                TextSpan(
+                                  text:
+                                      '${notificationController.notificationContent[index].fromUserData!.displayName}'
+                                      ' ${notificationController.notificationContent[index].sourcePostData!.poster == mainController.currentUserData.id! ? 'sent a message in your post' : 'replied to you in post'}',
+                                  style: const TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w300,
+                                      color: Color(0xFF9E9EB1)),
+                                  children: [
+                                    TextSpan(
+                                        text:
+                                            ' "${notificationController.notificationContent[index].sourcePostData!.title}"',
+                                        style: const TextStyle(
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xFF9E9EB1))),
+                                  ],
+                                ),
+                              ),
+                        trailing: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 6),
+                            child: Text(timeDifference,
+                                style: const TextStyle(
+                                    // fontSize: 15,
+                                    fontWeight: FontWeight.w400,
+                                    color: Color(0xFF9E9EB1)))),
                       ),
-                      trailing: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 6),
-                          child: Text(timeDifference,
-                              style: const TextStyle(
-                                  // fontSize: 15,
-                                  fontWeight: FontWeight.w400,
-                                  color: Color(0xFF9E9EB1)))),
-                      // subtitle: RichText(
-                      //   text: TextSpan(
-                      //     text:
-                      //         '${notificationController.notificationContent[index].fromUserData!.displayName}'
-                      //         ' ${notificationController.notificationContent[index].sourcePostData!.poster == mainController.currentUserData.id! ? 'sent a message in your post' : 'replied to you in post'}',
-                      //     style: const TextStyle(
-                      //         fontSize: 17,
-                      //         fontWeight: FontWeight.bold,
-                      //         color: Color(0xFF9E9EB1)),
-                      //     children: [
-                      //       TextSpan(
-                      //           text:
-                      //               ' "${notificationController.notificationContent[index].sourcePostData!.title}"',
-                      //           style: const TextStyle(
-                      //               fontSize: 17,
-                      //               fontWeight: FontWeight.w500,
-                      //               color: Color(0xFF9E9EB1))),
-                      //     ],
-                      //   ),
-                      // ),
                     ),
                   ),
                 );

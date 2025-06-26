@@ -113,11 +113,14 @@ class SignInPage extends StatelessWidget {
                     child: Container(
                       height: 40,
                       width: double.infinity,
-                      decoration: BoxDecoration(
-                          color: Colors.blueAccent.shade700,
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(5))),
-                      child: const Center(child: Text('Sign In')),
+                      decoration: const BoxDecoration(
+                          color: Color.fromARGB(255, 255, 77, 0),
+                          borderRadius: BorderRadius.all(Radius.circular(5))),
+                      child: const Center(
+                          child: Text(
+                        'Sign In',
+                        style: TextStyle(fontWeight: FontWeight.w900),
+                      )),
                     ),
                   ),
                 ],
@@ -177,10 +180,10 @@ class SignInPage extends StatelessWidget {
                           child: Container(
                             height: 50,
                             width: 130,
-                            decoration: BoxDecoration(
-                                color: Colors.blueAccent.shade700,
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(10))),
+                            decoration: const BoxDecoration(
+                                color: Color.fromARGB(255, 255, 77, 0),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
                             child: const Center(
                               child: Text(
                                 'Close',

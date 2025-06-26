@@ -21,24 +21,6 @@ class NewPostPage extends StatelessWidget {
               fontSize: 22),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          var result =
-              await newPostController.sendPost(mainController.currentUserData.id);
-          if(result){
-            Get.delete<NewPostController>();
-            Get.back();
-          } else {
-            debugPrint('Error occurred');
-          }
-        },
-        backgroundColor: Colors.blueAccent.shade400,
-        shape: const CircleBorder(),
-        child: const Icon(
-          Icons.send,
-          size: 30,
-        ),
-      ),
       body: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.all(10),
@@ -46,12 +28,19 @@ class NewPostPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Title:',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-              ),
+                const Text(
+                  'Title:',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+                ),
               // const SizedBox(height: 5),
-              TextFormField(
+
+          Container(
+            margin: const EdgeInsets.only(top: 15),
+            decoration: const BoxDecoration(
+              color: Color(0xFF121218),
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+            ),
+              child :TextFormField(
                 minLines: 1,
                 maxLines: 3,
                 maxLength: 90,
@@ -61,16 +50,23 @@ class NewPostPage extends StatelessWidget {
                 ),
                 controller: newPostController.titleTextController,
               ),
+          ),
               // const SizedBox(height: 10),
-              const Divider(
-                thickness: 2,
-              ),
+              // const Divider(
+              //   thickness: 2,
+              // ),
               const Text(
                 'Description:',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
               ),
               // const SizedBox(height: 5),
-              TextFormField(
+              Container(
+                margin: const EdgeInsets.only(top: 15),
+                decoration: const BoxDecoration(
+                  color: Color(0xFF121218),
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                ),
+              child: TextFormField(
                 minLines: 5,
                 maxLines: 14,
                 maxLength: 900,
@@ -79,16 +75,42 @@ class NewPostPage extends StatelessWidget {
                   border: InputBorder.none,
                 ),
                 controller: newPostController.descriptionTextController,
-              ),
-              const Divider(),
-              const Text('Categories: (debug only, divide with ",")'),
-              TextFormField(
+                  ),
+                ),
+              // const Divider(),
+              const Text('Categories: (debug only, divide with ",")',style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),),
+              Container(
+                margin: const EdgeInsets.only(top: 15,bottom: 15),
+                decoration: const BoxDecoration(
+                  color: Color(0xFF121218),
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                ),
+                child: TextFormField(
                 maxLines: 1,
                 decoration: const InputDecoration(
                   border: InputBorder.none,
                 ),
                 controller: newPostController.debugCategoriesTextController,
               ),
+              ),
+              ElevatedButton(onPressed: () async {
+                var result =
+                await newPostController.sendPost(mainController.currentUserData.id);
+                if(result){
+                  Get.delete<NewPostController>();
+                  Get.back();
+                } else {
+                  debugPrint('Error occurred');
+                }
+              },
+                  style: ElevatedButton.styleFrom(
+                    // backgroundColor: Colors.blue,
+                    backgroundColor: const Color.fromARGB(255, 255, 77, 0),
+                  ),
+                  child:const Text("Create post",
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600,color: Colors.white),
+              )
+              )
             ],
           ),
         ),

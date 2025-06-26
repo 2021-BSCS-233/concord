@@ -93,11 +93,14 @@ class LogInPage extends StatelessWidget {
                     child: Container(
                       height: 40,
                       width: double.infinity,
-                      decoration: BoxDecoration(
-                          color: Colors.blueAccent.shade700,
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(5))),
-                      child: const Center(child: Text('Log In')),
+                      decoration: const BoxDecoration(
+                          color: Color.fromARGB(255, 255, 77, 0),
+                          borderRadius: BorderRadius.all(Radius.circular(5))),
+                      child: const Center(
+                          child: Text(
+                        'Log In',
+                        style: TextStyle(fontWeight: FontWeight.w900),
+                      )),
                     ),
                   ),
                   const SizedBox(
@@ -110,11 +113,12 @@ class LogInPage extends StatelessWidget {
                       onTap: () {
                         Get.to(SignInPage());
                       },
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 10, bottom: 10, left: 10),
+                      child: const Padding(
+                        padding: EdgeInsets.only(top: 10, bottom: 10, left: 10),
                         child: Text(
                           'Create Account',
-                          style: TextStyle(color: Colors.blueAccent.shade200),
+                          style:
+                              TextStyle(color: Color.fromARGB(255, 255, 77, 0)),
                         ),
                       ),
                     ),
@@ -171,10 +175,10 @@ class LogInPage extends StatelessWidget {
                           child: Container(
                             height: 50,
                             width: 130,
-                            decoration: BoxDecoration(
-                                color: Colors.blueAccent.shade700,
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(10))),
+                            decoration: const BoxDecoration(
+                                color: Color.fromARGB(255, 255, 77, 0),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
                             child: const Center(
                               child: Text(
                                 'Close',

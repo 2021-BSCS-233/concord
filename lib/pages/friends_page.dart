@@ -35,9 +35,9 @@ class FriendsPage extends StatelessWidget {
             child: Container(
               height: 40,
               width: 130,
-              decoration: BoxDecoration(
-                  color: Colors.blueAccent.shade700,
-                  borderRadius: const BorderRadius.all(Radius.circular(25))),
+              decoration: const BoxDecoration(
+                  color: Color.fromARGB(255, 255, 77, 0),
+                  borderRadius: BorderRadius.all(Radius.circular(25))),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

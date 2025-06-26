@@ -2,9 +2,9 @@ import 'package:concord/controllers/main_controller.dart';
 import 'package:concord/controllers/posts_controller.dart';
 import 'package:concord/pages/new_post_page.dart';
 import 'package:concord/widgets/post_tile.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 class PostsPage extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
@@ -39,10 +39,10 @@ class PostsPage extends StatelessWidget {
               refreshContent();
             });
           },
-          backgroundColor: Colors.blueAccent.shade400,
+          backgroundColor: const Color.fromARGB(255, 255, 77, 0),
           shape: const CircleBorder(),
           child: const Icon(
-            CupertinoIcons.add,
+            Iconsax.add_square,
             size: 30,
           ),
         ),

@@ -94,7 +94,6 @@ class Home extends StatelessWidget {
   Home({
     super.key,
   }) {
-    mainController.selectedIndex.value = 0;
     myFirestore.profileListenerFirebase(mainController.currentUserData.id!);
   }
 

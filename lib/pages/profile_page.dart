@@ -1,9 +1,9 @@
+import 'package:concord/pages/settings_list_page.dart';
 import 'package:concord/widgets/profile_picture.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:concord/pages/edit_profile_page.dart';
-import 'package:concord/pages/settings_page.dart';
 import 'package:concord/controllers/main_controller.dart';
 import 'package:concord/widgets/status_icons.dart';
 
@@ -30,8 +30,8 @@ class ProfilePage extends StatelessWidget {
                             Container(
                               width: double.infinity,
                               height: 150,
-                              color: Colors.yellow
-                                  .shade700, //make it adapt to the major color of profile
+                              // Colors.yellow.shade700, //make it adapt to the major color of profile
+                              color: const Color.fromARGB(255, 255, 77, 0),
                             ),
                             Container(
                               width: double.infinity,
@@ -74,7 +74,7 @@ class ProfilePage extends StatelessWidget {
                             top: 40,
                             child: InkWell(
                               onTap: () {
-                                Get.to(SettingsPage());
+                                Get.to(const SettingsListPage());
                               },
                               child: Container(
                                   height: 35,
@@ -140,9 +140,9 @@ class ProfilePage extends StatelessWidget {
                                       width: 140,
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 10),
-                                      decoration: BoxDecoration(
-                                          color: Colors.blueAccent.shade400,
-                                          borderRadius: const BorderRadius.all(
+                                      decoration: const BoxDecoration(
+                                          color: Color.fromARGB(255, 255, 77, 0),
+                                          borderRadius: BorderRadius.all(
                                               Radius.circular(20))),
                                       child: Row(
                                         mainAxisAlignment:
@@ -170,9 +170,9 @@ class ProfilePage extends StatelessWidget {
                                     width: 140,
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 10),
-                                    decoration: BoxDecoration(
-                                        color: Colors.blueAccent.shade400,
-                                        borderRadius: const BorderRadius.all(
+                                    decoration: const BoxDecoration(
+                                        color: Color.fromARGB(255, 255, 77, 0),
+                                        borderRadius: BorderRadius.all(
                                             Radius.circular(20))),
                                     child: Row(
                                       mainAxisAlignment:

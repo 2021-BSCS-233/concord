@@ -48,7 +48,7 @@ class EditProfilePage extends StatelessWidget {
                 child: Text(
                   'save'.tr,
                   style: const TextStyle(
-                      color: Colors.blueAccent,
+                      color: Color.fromARGB(255, 255, 77, 0),
                       fontSize: 16,
                       fontWeight: FontWeight.bold),
                 ),
@@ -67,7 +67,7 @@ class EditProfilePage extends StatelessWidget {
                     Container(
                       width: double.infinity,
                       height: 150,
-                      color: Colors.yellow.shade700,
+                      color: const Color.fromARGB(255, 255, 77, 0),
                     ),
                     Container(
                       width: double.infinity,
