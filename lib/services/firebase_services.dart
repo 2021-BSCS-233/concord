@@ -144,6 +144,7 @@ class MyFirestore {
       mainController.currentUserData.id = event.id;
       mainController.currentUserData.docRef = event.reference;
       mainController.update(['profileSection']);
+      debugPrint('testing profile update');
     });
   }
 

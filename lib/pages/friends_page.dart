@@ -7,7 +7,6 @@ import 'package:get/get.dart';
 import 'package:concord/pages/requests_page.dart';
 import 'package:concord/controllers/main_controller.dart';
 import 'package:concord/controllers/friends_controller.dart';
-import 'package:concord/services/firebase_services.dart';
 
 class FriendsPage extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();

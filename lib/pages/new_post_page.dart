@@ -28,6 +28,8 @@ class NewPostPage extends StatelessWidget {
           if(result){
             Get.delete<NewPostController>();
             Get.back();
+          } else {
+            debugPrint('Error occurred');
           }
         },
         backgroundColor: Colors.blueAccent.shade400,

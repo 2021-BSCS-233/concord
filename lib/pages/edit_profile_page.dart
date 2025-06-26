@@ -5,10 +5,9 @@ import 'package:get/get.dart';
 import 'package:concord/controllers/main_controller.dart';
 import 'package:concord/controllers/edit_profile_controller.dart';
 import 'package:concord/widgets/status_icons.dart';
-import 'package:concord/services/firebase_services.dart';
 import 'package:image_picker/image_picker.dart';
 
-// var _selectedColor = Color(0xFFFFC42C).obs;
+
 class EditProfilePage extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
   final EditProfileController editProfileController =

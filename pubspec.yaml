@@ -53,6 +53,7 @@ dependencies:
   json_annotation: ^4.9.0
   socket_io_client: ^3.1.2
   connectivity_plus: ^6.1.4
+  http: ^1.4.0
 
 dev_dependencies:
   flutter_test:

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:concord/controllers/main_controller.dart';
 import 'package:concord/widgets/input_field.dart';
-import 'package:concord/services/firebase_services.dart';
 import 'package:concord/controllers/requests_controller.dart';
 
 class RequestsPage extends StatelessWidget {
