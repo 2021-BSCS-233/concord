@@ -9,38 +9,40 @@ class NewPostController extends GetxController {
   final MyFirestore myFirestore = MyFirestore();
   TextEditingController titleTextController = TextEditingController();
   TextEditingController descriptionTextController = TextEditingController();
-  TextEditingController debugCategoriesTextController = TextEditingController();
   List<String> categories = [];
 
   Future<bool> sendPost(posterId) async {
     APICalls apiCalls = APICalls();
+    if (titleTextController.text.trim() == '' ||
+        descriptionTextController.text.trim() == '') {
+      debugPrint('pls fill all fields');
+      return false;
+    }
     String text =
         '${titleTextController.text.trim()}:${descriptionTextController.text.trim()}';
 
     categories = await apiCalls.classifyTextPerform(text);
-    if(categories.isEmpty){
+    if (categories.isEmpty) {
+      debugPrint('api response failed');
       return false;
-    } else {
-      // categories = debugCategoriesTextController.text.trim().split(',');
-      PostsModel newPost = PostsModel(
-          poster: posterId,
-          title: titleTextController.text.trim(),
-          description: descriptionTextController.text.trim(),
-          topAttachment: '',
-          categories: categories,
-          followers: [posterId],
-          participants: [posterId],
-          allNotifications: [posterId],
-          noNotifications: [],
-          timeStamp: DateTime.now());
-      MessagesModel firstMessage = MessagesModel(
-          senderId: posterId,
-          message: descriptionTextController.text.trim(),
-          edited: false,
-          pinged: [],
-          attachments: []);
-      await myFirestore.sendPostFirebase(newPost, firstMessage, []);
-      return true;
     }
+    PostsModel newPost = PostsModel(
+        poster: posterId,
+        title: titleTextController.text.trim(),
+        description: descriptionTextController.text.trim(),
+        topAttachment: '',
+        categories: categories,
+        followers: [posterId],
+        participants: [posterId],
+        allNotifications: [posterId],
+        noNotifications: [],
+        timeStamp: DateTime.now());
+    MessagesModel firstMessage = MessagesModel(
+        senderId: posterId,
+        message: descriptionTextController.text.trim(),
+        edited: false,
+        pinged: [],
+        attachments: []);
+    return await myFirestore.sendPostFirebase(newPost, firstMessage, []);
   }
 }

@@ -86,10 +86,15 @@ class MainController extends GetxController {
 
   logOut() async {
     chatsListenerRef?.cancel();
+    chatListenerRef = null;
     profileListenerRef?.cancel();
+    profileListenerRef = null;
     friendsListenerRef?.cancel();
+    friendsListenerRef = null;
     requestListenerRef?.cancel();
+    requestListenerRef = null;
     notificationListenerRef?.cancel();
+    notificationListenerRef = null;
     selectedIndex.value = 0;
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('email');

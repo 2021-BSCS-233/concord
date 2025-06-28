@@ -23,7 +23,7 @@ class NotificationController extends GetxController {
   getInitialData(currentUserId) async {
     notificationContent =
         await myFirestore.getNotificationsFirebase(currentUserId);
-    mainController.notificationListenerRef = myFirestore
+    mainController.notificationListenerRef ??= myFirestore
         .notificationsListenerFirebase(currentUserId, updateNotifications);
     initial = false;
   }

@@ -72,26 +72,24 @@ class MySocket {
 }
 
 class APICalls {
-  classifyTextPerform(String text) async {
+  Future<List<String>> classifyTextPerform(String text) async {
     var url = Uri.parse('$serverUrl/classify-text');
     Map data = {'text': text};
     var response = await http.post(url, body: data);
     try {
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
-        debugPrint("$data");
-        // return data;
-        return [];
+        return data['categories'].cast<String>();
       } else if (response.statusCode == 400) {
         debugPrint('invalid input');
-        return [];
+        return <String>[];
       } else {
         debugPrint('communication error');
-        return [];
+        return <String>[];
       }
     } catch (e) {
-      debugPrint('error in post data $e');
-      return [];
+      debugPrint('error in post data: $e');
+      return <String>[];
     }
   }
 }

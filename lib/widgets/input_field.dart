@@ -14,11 +14,13 @@ class CustomInputField extends StatelessWidget {
   final double? horizontalMargin;
   final double? verticalMargin;
   final double? contentTopPadding;
+  final double? contentBottomPadding;
   final Function? onChange;
   final Function? hideLetters;
   final bool? hidden;
   final List<TextInputFormatter>? inputFormats;
   final int? maxLength;
+  final int? minLines;
   final int? maxLines;
   final FocusNode? fieldFocusNode;
 
@@ -40,8 +42,10 @@ class CustomInputField extends StatelessWidget {
       this.verticalMargin,
       this.maxLength,
       this.contentTopPadding,
+      this.contentBottomPadding,
       this.maxLines,
-      this.fieldFocusNode});
+      this.fieldFocusNode,
+      this.minLines});
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +57,7 @@ class CustomInputField extends StatelessWidget {
         focusNode: fieldFocusNode,
         inputFormatters: inputFormats,
         maxLength: maxLength,
-        minLines: 1,
+        minLines: minLines ?? 1,
         maxLines: maxLines ?? 1,
         onChanged: (e) {
           onChange != null ? onChange!() : null;
@@ -64,7 +68,7 @@ class CustomInputField extends StatelessWidget {
           counterText: '',
           isCollapsed: true,
           contentPadding: EdgeInsets.fromLTRB(prefixIcon != null ? 5.0 : 15,
-              contentTopPadding == null ? 6.5 : contentTopPadding!, 5.0, 5.0),
+              contentTopPadding ?? 6.5, 5.0, contentBottomPadding ?? 5.0),
           //made it so if you pass all_inclusive icon it becomes invisible as a
           //temp solution for this field height not working problem
           //PS all_inclusive icon cuz its the least used apparently
@@ -104,7 +108,8 @@ class CustomInputField extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
           hintText: fieldHint ?? '',
-          hintStyle:TextStyle(fontWeight: FontWeight.normal, color: Colors.grey.shade600),
+          hintStyle: TextStyle(
+              fontWeight: FontWeight.normal, color: Colors.grey.shade600),
           floatingLabelBehavior: FloatingLabelBehavior.never,
         ),
       ),

@@ -137,7 +137,7 @@ class MyFirestore {
 
 //TODO: stop using listener for this (maybe)
   void profileListenerFirebase(String currentUserId) {
-    mainController.profileListenerRef =
+    mainController.profileListenerRef ??=
         usersRef.doc(currentUserId).snapshots().listen((event) {
       mainController.currentUserData =
           UsersModel.fromJson(event.data() as Map<String, dynamic>);

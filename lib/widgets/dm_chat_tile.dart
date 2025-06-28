@@ -36,6 +36,7 @@ class DmChatTile extends StatelessWidget {
         onTap: () {
           Get.to(ChatPage(chatData: chatData))?.then((value) {
             mainController.chatListenerRef?.cancel();
+            mainController.chatListenerRef = null;
           });
         },
         onLongPress: () {

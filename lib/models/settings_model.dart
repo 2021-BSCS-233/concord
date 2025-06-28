@@ -1,0 +1,1 @@
+//TODO: make model for all user settings

@@ -71,6 +71,7 @@ class PostTile extends StatelessWidget {
                 onTap: (){
                   Get.to(PostPage(postData: postData))?.then((value){
                     mainController.chatListenerRef?.cancel();
+                    mainController.chatListenerRef = null;
                   });
                 },
                 contentPadding: EdgeInsets.zero,
@@ -108,7 +109,7 @@ class PostTile extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 15),
                   child: Text(
                     postData.description,
-                    maxLines: 14,
+                    maxLines: 8,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -116,7 +117,10 @@ class PostTile extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  const Text("32.k"),
+                  const Padding(
+                    padding: EdgeInsets.only(top:2),
+                    child: Text("3.2k", style: TextStyle(fontSize: 16)),
+                  ),
                   Container(
                     margin: const EdgeInsets.only(left:  10,bottom: 0,top: 0),
                     child: const Row(
@@ -129,7 +133,10 @@ class PostTile extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const Text("2.1k"),
+                  const Padding(
+                    padding: EdgeInsets.only(top:2),
+                    child: Text("2.1k", style: TextStyle(fontSize: 16)),
+                  ),
                 ],
               ),
             ],

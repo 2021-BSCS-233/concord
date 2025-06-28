@@ -12,7 +12,7 @@ class FriendsController extends GetxController {
 
   Future<void> getInitialData(currentUserId) async {
     friendsData = await myFirestore.getInitialFriendsFirebase(currentUserId);
-    mainController.friendsListenerRef =
+    mainController.friendsListenerRef ??=
         myFirestore.friendsListenerFirebase(currentUserId, updateFriends);
     initial = false;
   }

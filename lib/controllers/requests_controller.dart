@@ -19,7 +19,7 @@ class RequestsController extends GetxController {
 
   getInitialData(currentUserId) async {
     var result = await myFirestore.getInitialRequestFirebase(currentUserId);
-    mainController.requestListenerRef =
+    mainController.requestListenerRef ??=
         myFirestore.requestsListenersFirebase(currentUserId, updateRequests);
     incomingRequestsData = result[0];
     outgoingRequestsData = result[1];

@@ -4,6 +4,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const admin = require('firebase-admin');
 const { LanguageServiceClient } = require('@google-cloud/language');
+const { classifyPostByEntities } = require('./classifier');
 
 const app = express();
 const server = http.createServer(app);
@@ -37,19 +38,22 @@ app.post('/classify-text', async (req, res) => {
     if ((!text || typeof text !== 'string') && text != '') {
         return res.status(400).json({ error: 'Invalid input: "text" field is required.' });
     }
+    const SALIENCE_THRESHOLD = 0.1;
     try {
         const document = { content: text, type: 'PLAIN_TEXT' };
         const features = {extractEntities: true};
         const [result] = await nlClient.annotateText({ document, features });
         const entities = result.entities.map(entity => ({
                     name: entity.name,
-                    type: entity.type, // e.g., 'OTHER', 'ORGANIZATION', 'COMPUTER'
-                    salience: entity.salience, // How relevant the entity is to the text
-                    mentions: entity.mentions.map(mention => mention.text.content) // Where it appeared in text
+                    type: entity.type,
+                    salience: entity.salience,
+                    mentions: entity.mentions.map(mention => mention.text.content)
                 }));
+//        const relevantEntities = entities.filter(entity => entity.salience >= SALIENCE_THRESHOLD)
         console.log(entities);
-        categoriesPost(entities);
-        res.status(200).json({ entities: entities });
+        categories = classifyPostByEntities(entities, text);
+        console.log(categories);
+        res.status(200).json({ categories: categories });
     } catch (error) {
         console.error('Error classifying text:', error);
         res.status(500).json({ error: 'Failed to classify text.' });
@@ -89,7 +93,8 @@ io.on('connection', (socket) => {
             await db.collection('users').doc(userId).update({
                 status: "Offline",
             }).then(async ()=>{
-                connectedUsers.delete(userId);
+                console.log(`${userId} set offline`)
+                await connectedUsers.delete(userId);
             }).catch(err => console.error(`Error setting ${userId} offline:`, err));
         }
     });
@@ -133,10 +138,6 @@ async function gracefulShutdown() {
 
 process.on('SIGINT', gracefulShutdown);
 process.on('SIGTERM', gracefulShutdown);
-
-function categoriesPost(entities){
-    //TODO: finish this
-}
 
 server.listen(port, () => {
     console.log(`Server listening at http://localhost:${port}`);
