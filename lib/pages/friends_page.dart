@@ -145,14 +145,50 @@ class FriendsPage extends StatelessWidget {
                                     width: 20,
                                   ),
                                   InkWell(
-                                    enableFeedback: true,
-                                    child: const Icon(
-                                      Icons.person_remove,
-                                      color: Colors.red,
-                                    ),
-                                    onTap: () { friendsController.removeFriend(index);
-                                    },
-                                  )
+                                      enableFeedback: true,
+                                      child: const Icon(
+                                        Icons.person_remove,
+                                        color: Colors.red,
+                                      ),
+                                      // onTap: () {
+                                      //   friendsController.removeFriend(index);
+                                      // },
+                                      onTap: () {
+                                        Get.defaultDialog(
+                                            contentPadding:
+                                                const EdgeInsetsGeometry
+                                                    .symmetric(
+                                                    horizontal: 30,
+                                                    vertical: 20),
+                                            titlePadding:
+                                                const EdgeInsetsGeometry.only(
+                                                    top: 10),
+                                            backgroundColor:
+                                                const Color(0xFF121212),
+                                            barrierDismissible: false,
+                                            title: 'Alert',
+                                            titleStyle: const TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.w700,
+                                                fontFamily: 'gg_sans',
+                                                color: Colors.white),
+                                            middleText:
+                                                'Are you sure you want to unfriend ${friendsController.friendsData[index].displayName}',
+                                            middleTextStyle: const TextStyle(
+                                                fontFamily: 'gg_sans',
+                                                color: Colors.white,
+                                                fontSize: 15),
+                                            textCancel: "Cancel",
+                                            textConfirm: "Confirm",
+                                            cancelTextColor: Colors.white,
+                                            confirmTextColor: Colors.white,
+                                            buttonColor: const Color.fromARGB(
+                                                255, 255, 77, 0),
+                                            onConfirm: () {
+                                              friendsController
+                                                  .removeFriend(index);
+                                            });
+                                      })
                                 ],
                               ),
                             ),

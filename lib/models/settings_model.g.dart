@@ -15,25 +15,18 @@ SettingsModel _$SettingsModelFromJson(Map<String, dynamic> json) =>
           json['notifications'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$SettingsModelToJson(SettingsModel instance) =>
-    <String, dynamic>{
-      'language': instance.language,
-      'accessibility': instance.accessibility,
-      'notifications': instance.notifications,
-    };
-
 AccessibilitySettings _$AccessibilitySettingsFromJson(
         Map<String, dynamic> json) =>
     AccessibilitySettings(
-      toggleUserColors: json['toggleUserColors'] as bool,
-      disablePostAttachments: json['disablePostAttachments'] as bool,
+      userColors: json['userColors'] as bool,
+      postAtt: json['postAtt'] as bool,
     );
 
 Map<String, dynamic> _$AccessibilitySettingsToJson(
         AccessibilitySettings instance) =>
     <String, dynamic>{
-      'toggleUserColors': instance.toggleUserColors,
-      'disablePostAttachments': instance.disablePostAttachments,
+      'userColors': instance.userColors,
+      'postAtt': instance.postAtt,
     };
 
 NotificationSettings _$NotificationSettingsFromJson(
@@ -48,17 +41,6 @@ NotificationSettings _$NotificationSettingsFromJson(
       postNotifications: PostNotificationSettings.fromJson(
           json['postNotifications'] as Map<String, dynamic>),
     );
-
-Map<String, dynamic> _$NotificationSettingsToJson(
-        NotificationSettings instance) =>
-    <String, dynamic>{
-      'overallOff': instance.overallOff,
-      'deviceNotif': instance.deviceNotif,
-      'inAppNotif': instance.inAppNotif,
-      'inAppNotifPanel': instance.inAppNotifPanel,
-      'chatNotifications': instance.chatNotifications,
-      'postNotifications': instance.postNotifications,
-    };
 
 ChatNotificationSettings _$ChatNotificationSettingsFromJson(
         Map<String, dynamic> json) =>

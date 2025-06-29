@@ -129,74 +129,10 @@ class SignInPage extends StatelessWidget {
           ),
         ),
         Obx(() => Visibility(
-              visible: signInController.showOverlaySignIn.value ||
-                  signInController.showMessageSignIn.value,
-              child: GestureDetector(
-                onTap: signInController.showMessageSignIn.value
-                    ? () {
-                        signInController.showMessageSignIn.value = false;
-                        signInController.showOverlaySignIn.value = false;
-                        signInController.messageHeightSignIn = 250;
-                        signInController.failMessage = '';
-                      }
-                    : () {},
-                child: Container(
-                  color: const Color(0xC01D1D1F),
-                  child: const Center(child: CircularProgressIndicator()),
-                ),
-              ),
-            )),
-        Obx(() => Material(
-              color: Colors.transparent,
-              child: Visibility(
-                visible: signInController.showMessageSignIn.value,
-                child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.all(20),
-                    height: signInController.messageHeightSignIn,
-                    width: 300,
-                    decoration: const BoxDecoration(
-                        color: Color(0xFF121218),
-                        borderRadius: BorderRadius.all(Radius.circular(15))),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text('SignIn Failed',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 18)),
-                        const SizedBox(height: 5),
-                        Text(signInController.failMessage,
-                            // textAlign: TextAlign.center,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 15)),
-                        const SizedBox(height: 35),
-                        InkWell(
-                          onTap: () {
-                            signInController.showMessageSignIn.value = false;
-                            signInController.showOverlaySignIn.value = false;
-                            signInController.messageHeightSignIn = 250;
-                            signInController.failMessage = '';
-                          },
-                          child: Container(
-                            height: 50,
-                            width: 130,
-                            decoration: const BoxDecoration(
-                                color: Color.fromARGB(255, 255, 77, 0),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
-                            child: const Center(
-                              child: Text(
-                                'Close',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 17),
-                              ),
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
+              visible: signInController.showOverlaySignIn.value,
+              child: Container(
+                color: const Color(0xC01D1D1F),
+                child: const Center(child: CircularProgressIndicator()),
               ),
             )),
       ],

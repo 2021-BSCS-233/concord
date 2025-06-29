@@ -62,7 +62,7 @@ class MyAuthentication {
         ];
       }
     } catch (e) {
-      debugPrint('An error occurred: $e');
+      debugPrint('An error occurred during signin: $e');
       return [false, 'An unknown error occurred, Pls try again later'];
     }
   }
@@ -103,7 +103,7 @@ class MyAuthentication {
         return false;
       }
     } catch (e) {
-      debugPrint("An error occurred: $e");
+      debugPrint("An error occurred during login: $e");
       return false;
     }
   }
@@ -126,9 +126,16 @@ class MyAuthentication {
 
         var userData = await usersRef.doc(userId).get();
         var settingsData = await settingsRef.doc(userId).get();
-        SettingsModel userSettings =
-        SettingsModel.fromJson(settingsData.data() as Map<String, dynamic>);
-        userSettings.docRef = settingsData.reference;
+        SettingsModel userSettings;
+        if (!settingsData.exists){
+          userSettings = SettingsModel.defaultSettings();
+          userSettings.docRef = settingsRef.doc(userId);
+          await userSettings.docRef!.set(userSettings.toJson());
+        } else {
+          userSettings =
+              SettingsModel.fromJson(settingsData.data() as Map<String, dynamic>);
+          userSettings.docRef = settingsData.reference;
+        }
 
         mainController.currentUserData =
             UsersModel.fromJson(userData.data() as Map<String, dynamic>);
@@ -147,7 +154,7 @@ class MyAuthentication {
           return false;
         }
       } catch (e) {
-        debugPrint("(catch) An error occurred: $e");
+        debugPrint("(catch) An error occurred during auto login: $e");
         return false;
       }
     } else {

@@ -1,5 +1,5 @@
 import 'package:concord/controllers/main_controller.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:concord/models/users_model.dart';
 import 'package:concord/services/firebase_services.dart';
@@ -13,8 +13,6 @@ class SignInController extends GetxController {
   TextEditingController signInPassTextController = TextEditingController();
   var hidePassword = true.obs;
   var showOverlaySignIn = false.obs;
-  var showMessageSignIn = false.obs;
-  double messageHeightSignIn = 250;
   String failMessage = '';
 
   sendSignIn() async {
@@ -47,36 +45,59 @@ class SignInController extends GetxController {
       );
       var response = await authentication.signInUserFirebase(email, pass);
       if (response?[0]) {
-        await authentication.saveUserOnDevice(email, signInPassTextController.text.trim());
+        await authentication.saveUserOnDevice(
+            email, signInPassTextController.text.trim());
         showOverlaySignIn.value = false;
         return response?[0];
       } else {
-        failMessage = '• ${response?[1]}';
-        showOverlaySignIn.value = true;
-        showMessageSignIn.value = true;
+        showOverlaySignIn.value = false;
+        errorMessage(response?[1]);
         return false;
       }
     } else {
       if (user == '') {
-        failMessage = '• Pls Enter a Username';
+        failMessage = 'Pls Enter a Username';
       } else if (user.length < 3 || user.length > 20) {
-        failMessage = '• Length of Username Must Between 3 to 20';
+        failMessage = 'Length of Username Must Between 3 to 20';
       } else if (!(RegExp(r'^[a-zA-Z][a-zA-Z0-9_]+?$').hasMatch(user))) {
         failMessage =
-            '• Username Must Start With An Alphabet And Can Only Container Letters, Numbers and \'_\'';
-        messageHeightSignIn += 15;
+            'Username Must Start With An Alphabet And Can Only Container Letters, Numbers and \'_\'';
       }
       if (!(RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(email))) {
-        failMessage = "$failMessage\n• Invalid Email Format";
-        messageHeightSignIn += 10;
+        failMessage = "$failMessage\nInvalid Email Format";
       }
       if (!(RegExp(r'.{8,}').hasMatch(pass))) {
-        failMessage = "$failMessage\n• Password Must be At Least 8 Characters";
-        messageHeightSignIn += 10;
+        failMessage = "$failMessage\nPassword Must be At Least 8 Characters";
       }
-      showOverlaySignIn.value = true;
-      showMessageSignIn.value = true;
+      showOverlaySignIn.value = false;
+      errorMessage(failMessage);
       return false;
     }
+  }
+
+  errorMessage(String text) {
+    Get.defaultDialog(
+      contentPadding:
+          const EdgeInsetsGeometry.symmetric(horizontal: 30, vertical: 20),
+      titlePadding: const EdgeInsetsGeometry.only(top: 10),
+      backgroundColor: const Color(0xFF121212),
+      title: 'Alert',
+      titleStyle: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+          fontFamily: 'gg_sans',
+          color: Colors.white),
+      middleText: text,
+      middleTextStyle: const TextStyle(
+        fontFamily: 'gg_sans',
+        color: Colors.white,
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
+      ),
+      textCancel: "Close",
+      cancelTextColor: Colors.white,
+      confirmTextColor: Colors.white,
+      buttonColor: const Color.fromARGB(255, 255, 77, 0),
+    );
   }
 }

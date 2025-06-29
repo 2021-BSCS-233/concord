@@ -27,12 +27,14 @@ class ProfilePage extends StatelessWidget {
                       children: [
                         Column(
                           children: [
-                            Container(
-                              width: double.infinity,
-                              height: 150,
-                              // Colors.yellow.shade700, //make it adapt to the major color of profile
-                              color: const Color.fromARGB(255, 255, 77, 0),
-                            ),
+                            mainController.currentUserData.bannerImg == ''
+                                ? Container(
+                                    width: double.infinity,
+                                    height: 150,
+                                    color: Color(mainController
+                                        .currentUserData.bannerColor),
+                                  )
+                                : Container(),
                             Container(
                               width: double.infinity,
                               height: 50,
@@ -141,7 +143,8 @@ class ProfilePage extends StatelessWidget {
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 10),
                                       decoration: const BoxDecoration(
-                                          color: Color.fromARGB(255, 255, 77, 0),
+                                          color:
+                                              Color.fromARGB(255, 255, 77, 0),
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(20))),
                                       child: Row(

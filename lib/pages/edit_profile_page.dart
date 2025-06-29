@@ -7,7 +7,6 @@ import 'package:concord/controllers/edit_profile_controller.dart';
 import 'package:concord/widgets/status_icons.dart';
 import 'package:image_picker/image_picker.dart';
 
-
 class EditProfilePage extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
   final EditProfileController editProfileController =
@@ -41,16 +40,18 @@ class EditProfilePage extends StatelessWidget {
               await editProfileController.updateProfile();
               Get.back();
             },
-            child: SizedBox(
-              height: 50,
+            child: Container(
+              margin: const EdgeInsetsGeometry.only(right: 5),
+              height: 40,
               width: 80,
+              decoration: const BoxDecoration(
+                  color: Color.fromARGB(255, 255, 77, 0),
+                  borderRadius: BorderRadius.all(Radius.circular(15))),
               child: Center(
                 child: Text(
                   'save'.tr,
                   style: const TextStyle(
-                      color: Color.fromARGB(255, 255, 77, 0),
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold),
+                      fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -64,11 +65,15 @@ class EditProfilePage extends StatelessWidget {
               children: [
                 Column(
                   children: [
-                    Container(
-                      width: double.infinity,
-                      height: 150,
-                      color: const Color.fromARGB(255, 255, 77, 0),
-                    ),
+                    mainController.currentUserData.bannerImg == ''
+                        ? Container(
+                            width: double.infinity,
+                            height: 150,
+                            //make it adapt to the major color of profile
+                            color: Color(
+                                mainController.currentUserData.bannerColor),
+                          )
+                        : Container(), //work on this
                     Container(
                       width: double.infinity,
                       height: 60,

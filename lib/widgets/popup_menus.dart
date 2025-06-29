@@ -272,7 +272,7 @@ class ProfilePopup extends StatelessWidget {
                           width: double.infinity,
                           height: 100,
                           decoration: BoxDecoration(
-                              color: Colors.yellow.shade700,
+                              color: Color(userProfileData.bannerColor),
                               //make it adapt to the major color of profile
                               borderRadius: const BorderRadius.only(
                                   topLeft: Radius.circular(25),
@@ -290,17 +290,20 @@ class ProfilePopup extends StatelessWidget {
                       left: 20,
                       child: Stack(
                         children: [
-                          Container(
-                            height: 80,
-                            width: 80,
-                            decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                shape: BoxShape.circle,
-                                border:
-                                    Border.all(width: 6, color: Colors.black)),
-                            child: ProfilePicture(
-                                profileLink: userProfileData.profilePicture),
-                          ),
+                          userProfileData.bannerImg == ''
+                              ? Container(
+                                  height: 80,
+                                  width: 80,
+                                  decoration: BoxDecoration(
+                                      color: Colors.transparent,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                          width: 6, color: Colors.black)),
+                                  child: ProfilePicture(
+                                      profileLink:
+                                          userProfileData.profilePicture),
+                                )
+                              : Container(),
                           Positioned(
                             bottom: 3,
                             right: 3,

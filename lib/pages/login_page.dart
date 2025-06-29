@@ -129,69 +129,10 @@ class LogInPage extends StatelessWidget {
           ),
         ),
         Obx(() => Visibility(
-              visible: logInController.showOverlayLogIn.value ||
-                  logInController.showMessageLogIn.value,
-              child: GestureDetector(
-                onTap: logInController.showMessageLogIn.value
-                    ? () {
-                        logInController.showOverlayLogIn.value = false;
-                        logInController.showMessageLogIn.value = false;
-                      }
-                    : () {},
-                child: Container(
-                  color: const Color(0xC01D1D1F),
-                  child: const Center(child: CircularProgressIndicator()),
-                ),
-              ),
-            )),
-        Obx(() => Material(
-              color: Colors.transparent,
-              child: Visibility(
-                visible: logInController.showMessageLogIn.value,
-                child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.all(20),
-                    height: 200,
-                    width: 300,
-                    decoration: const BoxDecoration(
-                        color: Color(0xFF121218),
-                        borderRadius: BorderRadius.all(Radius.circular(15))),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text('LogIn Failed',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 18)),
-                        const SizedBox(height: 5),
-                        const Text('Email or Password is Wrong',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 15)),
-                        const SizedBox(height: 35),
-                        InkWell(
-                          onTap: () {
-                            logInController.showMessageLogIn.value = false;
-                            logInController.showOverlayLogIn.value = false;
-                          },
-                          child: Container(
-                            height: 50,
-                            width: 130,
-                            decoration: const BoxDecoration(
-                                color: Color.fromARGB(255, 255, 77, 0),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
-                            child: const Center(
-                              child: Text(
-                                'Close',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 17),
-                              ),
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
+              visible: logInController.showOverlayLogIn.value,
+              child: Container(
+                color: const Color(0xC01D1D1F),
+                child: const Center(child: CircularProgressIndicator()),
               ),
             )),
       ],

@@ -8,7 +8,9 @@ class SettingsModel {
   @JsonKey(includeToJson: false, includeFromJson: false)
   DocumentReference? docRef;
   String language;
+  @JsonKey()
   AccessibilitySettings accessibility;
+  @JsonKey()
   NotificationSettings notifications;
 
   SettingsModel({
@@ -21,14 +23,20 @@ class SettingsModel {
   factory SettingsModel.fromJson(Map<String, dynamic> json) =>
       _$SettingsModelFromJson(json);
 
-  Map<String, dynamic> toJson() => _$SettingsModelToJson(this);
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'language': language,
+      'accessibility': accessibility.toJson(),
+      'notifications': notifications.toJson(),
+    };
+  }
 
   factory SettingsModel.defaultSettings() {
     return SettingsModel(
       language: 'en', // Default language
       accessibility: AccessibilitySettings(
-        toggleUserColors: true,
-        disablePostAttachments: false,
+        userColors: true,
+        postAtt: true,
       ),
       notifications: NotificationSettings.defaultSettings(),
     );
@@ -37,12 +45,12 @@ class SettingsModel {
 
 @JsonSerializable()
 class AccessibilitySettings {
-  bool toggleUserColors;
-  bool disablePostAttachments;
+  bool userColors;
+  bool postAtt;
 
   AccessibilitySettings({
-    required this.toggleUserColors,
-    required this.disablePostAttachments,
+    required this.userColors,
+    required this.postAtt,
   });
 
   factory AccessibilitySettings.fromJson(Map<String, dynamic> json) =>
@@ -72,7 +80,16 @@ class NotificationSettings {
   factory NotificationSettings.fromJson(Map<String, dynamic> json) =>
       _$NotificationSettingsFromJson(json);
 
-  Map<String, dynamic> toJson() => _$NotificationSettingsToJson(this);
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'overallOff': overallOff,
+      'deviceNotif': deviceNotif,
+      'inAppNotif': inAppNotif,
+      'inAppNotifPanel': inAppNotifPanel,
+      'chatNotifications': chatNotifications.toJson(),
+      'postNotifications': postNotifications.toJson(),
+    };
+  }
 
   factory NotificationSettings.defaultSettings() {
     return NotificationSettings(

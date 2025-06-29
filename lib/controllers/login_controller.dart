@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:concord/services/firebase_services.dart';
 
@@ -8,7 +8,8 @@ class LogInController extends GetxController {
   TextEditingController logInPassTextController = TextEditingController();
   var hidePassword = true.obs;
   var showOverlayLogIn = false.obs;
-  var showMessageLogIn = false.obs;
+
+  // var showMessageLogIn = false.obs;
 
   Future<bool> sendLogIn() async {
     var email = logInEmailTextController.text.trim();
@@ -22,14 +23,40 @@ class LogInController extends GetxController {
         await authentication.saveUserOnDevice(email, pass);
         showOverlayLogIn.value = false;
       } else {
-        showOverlayLogIn.value = true;
-        showMessageLogIn.value = true;
+        showOverlayLogIn.value = false;
+        errorMessage('Incorrect Email or Password Input');
       }
       return response;
     } else {
-      showOverlayLogIn.value = true;
-      showMessageLogIn.value = true;
+      showOverlayLogIn.value = false;
+      errorMessage('Invalid Email or Password');
       return false;
     }
+  }
+
+  errorMessage(String text) {
+    Get.defaultDialog(
+      contentPadding:
+          const EdgeInsetsGeometry.symmetric(horizontal: 30, vertical: 20),
+      titlePadding: const EdgeInsetsGeometry.only(top: 10),
+      backgroundColor: const Color(0xFF121212),
+      title: 'Alert',
+      titleStyle: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+          fontFamily: 'gg_sans',
+          color: Colors.white),
+      middleText: text,
+      middleTextStyle: const TextStyle(
+        fontFamily: 'gg_sans',
+        color: Colors.white,
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
+      ),
+      textCancel: "Close",
+      cancelTextColor: Colors.white,
+      confirmTextColor: Colors.white,
+      buttonColor: const Color.fromARGB(255, 255, 77, 0),
+    );
   }
 }
