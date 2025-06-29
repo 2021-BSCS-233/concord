@@ -6,15 +6,14 @@ import 'package:concord/controllers/settings_controller.dart';
 
 class AccountSettingsPage extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
-  final SettingsController editSettingsController =
-      Get.put(SettingsController());
+  final SettingsController settingsController = Get.find<SettingsController>();
   final LocalizationController localizationController =
       Get.find<LocalizationController>();
 
   AccountSettingsPage({super.key}) {
-    editSettingsController.usernameTextController.text =
+    settingsController.usernameTextController.text =
         mainController.currentUserData.username;
-    editSettingsController.emailTextController.text =
+    settingsController.emailTextController.text =
         mainController.currentUserData.email;
   }
 
@@ -48,7 +47,7 @@ class AccountSettingsPage extends StatelessWidget {
                             color: Colors.grey.shade400,
                             fontSize: 12)),
                     TextFormField(
-                      controller: editSettingsController.usernameTextController,
+                      controller: settingsController.usernameTextController,
                       decoration: InputDecoration(
                         contentPadding:
                             const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
@@ -67,7 +66,7 @@ class AccountSettingsPage extends StatelessWidget {
                             color: Colors.grey.shade400,
                             fontSize: 12)),
                     TextFormField(
-                      controller: editSettingsController.emailTextController,
+                      controller: settingsController.emailTextController,
                       decoration: InputDecoration(
                         contentPadding:
                             const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
@@ -84,7 +83,7 @@ class AccountSettingsPage extends StatelessWidget {
                       children: [
                         InkWell(
                           onTap: () {
-                            editSettingsController.toggleMenu();
+                            settingsController.toggleMenu();
                           },
                           child: Container(
                             height: 45,
@@ -178,10 +177,10 @@ class AccountSettingsPage extends StatelessWidget {
           ),
         ),
         Obx(() => Visibility(
-              visible: editSettingsController.showMenu.value,
+              visible: settingsController.showMenu.value,
               child: GestureDetector(
                 onTap: () {
-                  editSettingsController.toggleMenu();
+                  settingsController.toggleMenu();
                 },
                 child: Container(
                   color: const Color(0xC01D1D1F),
@@ -191,7 +190,7 @@ class AccountSettingsPage extends StatelessWidget {
         Obx(() => Material(
               color: Colors.transparent,
               child: Visibility(
-                visible: editSettingsController.showMenu.value,
+                visible: settingsController.showMenu.value,
                 child: SingleChildScrollView(
                   child: Center(
                     child: Container(
@@ -210,7 +209,7 @@ class AccountSettingsPage extends StatelessWidget {
                                   fontSize: 12)),
                           TextFormField(
                             controller:
-                                editSettingsController.passwordTextController,
+                                settingsController.passwordTextController,
                             decoration: const InputDecoration(
                               contentPadding: EdgeInsets.symmetric(
                                   vertical: 5, horizontal: 10),
@@ -229,7 +228,7 @@ class AccountSettingsPage extends StatelessWidget {
                                   fontSize: 12)),
                           TextFormField(
                             controller:
-                                editSettingsController.passwordTextController,
+                                settingsController.passwordTextController,
                             decoration: const InputDecoration(
                               contentPadding: EdgeInsets.symmetric(
                                   vertical: 5, horizontal: 10),

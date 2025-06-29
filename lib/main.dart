@@ -212,41 +212,16 @@ class Home extends StatelessWidget {
   }
 }
 
-//TODO:check out bottom sheet
-//TODO:also check out snack bar
-
-//future builder code cuz i keep forgetting
-// @override
-// Widget build(BuildContext context) {
-//   return FutureBuilder<Widget>(
-//     future: _buildContent(context),
-// builder: (context, snapshot) {
-// if (snapshot.hasData) {
-// return snapshot.data!;
-// } else if (snapshot.hasError) {
-// debugPrint('${snapshot.error}');
-// return const Material(
-// color: Colors.transparent,
-// child: Center(
-// child: Column(
-// mainAxisAlignment: MainAxisAlignment.center,
-// children: [
-// Text("We could not access our services"),
-// Text("Check your connection or try again later"),
-// ],
-// ),
-// ));
-// }
-// return const Center(child: CircularProgressIndicator());
-// }
-//
-
 /* things to add in UI page
   account page:
-    all usual stuff
+    change email
+    change username
+    change password
+    log out
+    delete account(maybe)
   connections: (optional)
     ability to connect other accounts with a link to access them
-  appearance:
+  appearance: (not happening)
     themes, light, dark, true dark,
     maybe: text size,
     change post attachment size,
@@ -255,7 +230,7 @@ class Home extends StatelessWidget {
     disable post attachments,
   language:
     options for various languages
-  notifications:
+  notifications: (important)
     overall off,
     chat notifications section:
       posts created by friends,

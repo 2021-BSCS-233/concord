@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:concord/controllers/settings_controller.dart';
 import 'package:concord/models/chats_model.dart';
 import 'package:concord/models/messages_model.dart';
 import 'package:concord/models/notifications_model.dart';
 import 'package:concord/models/posts_model.dart';
 import 'package:concord/models/request_model.dart';
+import 'package:concord/models/settings_model.dart';
 import 'package:concord/services/services.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -21,18 +23,31 @@ class MyAuthentication {
   final FirebaseAuth authRef = FirebaseAuth.instance;
   final CollectionReference usersRef =
       FirebaseFirestore.instance.collection('users');
+  final CollectionReference settingsRef =
+      FirebaseFirestore.instance.collection('settings');
   final MainController mainController = Get.find<MainController>();
+  final SettingsController settingsController = Get.put(SettingsController());
   final MySocket mySocket = MySocket();
 
   Future<List?> signInUserFirebase(String email, String pass) async {
     try {
       var userCredential = await authRef.createUserWithEmailAndPassword(
           email: email, password: pass);
-      var userInstance = usersRef.doc(userCredential.user?.uid);
-      await userInstance.set(mainController.currentUserData.toJson());
-      mySocket.connectSocket(userCredential.user?.uid);
+      var userId = userCredential.user?.uid;
 
-      mainController.currentUserData.id = userCredential.user?.uid;
+      DocumentReference userInstance = usersRef.doc(userId);
+      await userInstance.set(mainController.currentUserData.toJson());
+
+      SettingsModel userSettings = SettingsModel.defaultSettings();
+      DocumentReference settingsInstance = settingsRef.doc(userId);
+      await settingsInstance.set(userSettings.toJson());
+      userSettings.docRef = settingsInstance;
+
+      mainController.currentUserData.id = userId;
+      mainController.currentUserData.docRef = userInstance;
+      mainController.currentUserData.userSettings = userSettings;
+
+      mySocket.connectSocket(userId);
       return [true, ''];
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
@@ -56,14 +71,28 @@ class MyAuthentication {
     try {
       var userCredential = await authRef.signInWithEmailAndPassword(
           email: email, password: pass);
-      var userInstance = usersRef.doc(userCredential.user?.uid);
-      var userData = await userInstance.get();
-      mySocket.connectSocket(userCredential.user?.uid);
+      var userId = userCredential.user?.uid;
+
+      var userData = await usersRef.doc(userId).get();
+      var settingsData = await settingsRef.doc(userId).get();
+      SettingsModel userSettings;
+      if (!settingsData.exists){
+        userSettings = SettingsModel.defaultSettings();
+        userSettings.docRef = settingsRef.doc(userId);
+        await userSettings.docRef!.set(userSettings.toJson());
+      } else {
+        userSettings =
+        SettingsModel.fromJson(settingsData.data() as Map<String, dynamic>);
+        userSettings.docRef = settingsData.reference;
+      }
 
       mainController.currentUserData =
           UsersModel.fromJson(userData.data() as Map<String, dynamic>);
-      mainController.currentUserData.id = userCredential.user?.uid;
+      mainController.currentUserData.id = userId;
       mainController.currentUserData.docRef = userData.reference;
+      mainController.currentUserData.userSettings = userSettings;
+
+      mySocket.connectSocket(userId);
       return true;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
@@ -93,14 +122,21 @@ class MyAuthentication {
       try {
         var userCredential = await authRef.signInWithEmailAndPassword(
             email: email, password: pass);
-        var userInstance = usersRef.doc(userCredential.user?.uid);
-        var userData = await userInstance.get();
-        mySocket.connectSocket(userCredential.user?.uid);
+        var userId = userCredential.user?.uid;
+
+        var userData = await usersRef.doc(userId).get();
+        var settingsData = await settingsRef.doc(userId).get();
+        SettingsModel userSettings =
+        SettingsModel.fromJson(settingsData.data() as Map<String, dynamic>);
+        userSettings.docRef = settingsData.reference;
 
         mainController.currentUserData =
             UsersModel.fromJson(userData.data() as Map<String, dynamic>);
-        mainController.currentUserData.id = userCredential.user?.uid;
+        mainController.currentUserData.id = userId;
         mainController.currentUserData.docRef = userData.reference;
+        mainController.currentUserData.userSettings = userSettings;
+
+        mySocket.connectSocket(userId);
         return true;
       } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {
