@@ -20,8 +20,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  Get.put(LocalizationController(prefs: prefs), permanent: true);
   Get.put(MainController(), permanent: true);
+  Get.put(LocalizationController(prefs: prefs), permanent: true);
   runApp(GetMaterialApp(
     debugShowCheckedModeBanner: false,
     theme: ThemeData.dark().copyWith(

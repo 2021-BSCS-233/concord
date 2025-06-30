@@ -8,7 +8,7 @@ import 'package:concord/controllers/requests_controller.dart';
 
 class RequestsPage extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
-  final RequestsController requestsController = Get.put(RequestsController());
+  final RequestsController requestsController = Get.find<RequestsController>();
 
   RequestsPage({super.key});
 

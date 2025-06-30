@@ -3,15 +3,15 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'settings_model.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(createToJson: false)
 class SettingsModel {
   @JsonKey(includeToJson: false, includeFromJson: false)
   DocumentReference? docRef;
   String language;
   @JsonKey()
-  AccessibilitySettings accessibility;
+  AccessibilitySettingsModel accessibility;
   @JsonKey()
-  NotificationSettings notifications;
+  NotificationSettingsModel notifications;
 
   SettingsModel({
     this.docRef,
@@ -34,120 +34,103 @@ class SettingsModel {
   factory SettingsModel.defaultSettings() {
     return SettingsModel(
       language: 'en', // Default language
-      accessibility: AccessibilitySettings(
+      accessibility: AccessibilitySettingsModel(
         userColors: true,
         postAtt: true,
       ),
-      notifications: NotificationSettings.defaultSettings(),
+      notifications: NotificationSettingsModel.defaultSettings(),
     );
   }
 }
 
 @JsonSerializable()
-class AccessibilitySettings {
+class AccessibilitySettingsModel {
   bool userColors;
   bool postAtt;
 
-  AccessibilitySettings({
+  AccessibilitySettingsModel({
     required this.userColors,
     required this.postAtt,
   });
 
-  factory AccessibilitySettings.fromJson(Map<String, dynamic> json) =>
-      _$AccessibilitySettingsFromJson(json);
+  factory AccessibilitySettingsModel.fromJson(Map<String, dynamic> json) =>
+      _$AccessibilitySettingsModelFromJson(json);
 
-  Map<String, dynamic> toJson() => _$AccessibilitySettingsToJson(this);
+  Map<String, dynamic> toJson() => _$AccessibilitySettingsModelToJson(this);
 }
 
-@JsonSerializable()
-class NotificationSettings {
-  bool overallOff;
+@JsonSerializable(createToJson: false)
+class NotificationSettingsModel {
+  bool overallNotif;
   bool deviceNotif;
   bool inAppNotif;
   bool inAppNotifPanel;
-  ChatNotificationSettings chatNotifications;
-  PostNotificationSettings postNotifications;
+  bool dmNotif;
+  String groupsNotif;
+  bool overallPostNotif;
+  PostNotificationSettingsModel postNotifications;
 
-  NotificationSettings({
-    required this.overallOff,
+  NotificationSettingsModel({
+    required this.overallNotif,
     required this.deviceNotif,
     required this.inAppNotif,
     required this.inAppNotifPanel,
-    required this.chatNotifications,
+    required this.dmNotif,
+    required this.groupsNotif,
+    required this.overallPostNotif,
     required this.postNotifications,
   });
 
-  factory NotificationSettings.fromJson(Map<String, dynamic> json) =>
-      _$NotificationSettingsFromJson(json);
+  factory NotificationSettingsModel.fromJson(Map<String, dynamic> json) =>
+      _$NotificationSettingsModelFromJson(json);
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
-      'overallOff': overallOff,
+      'overallNotif': overallNotif,
       'deviceNotif': deviceNotif,
       'inAppNotif': inAppNotif,
       'inAppNotifPanel': inAppNotifPanel,
-      'chatNotifications': chatNotifications.toJson(),
+      'dmNotif': dmNotif,
+      'groupsNotif': groupsNotif,
+      'overallPostNotif': overallPostNotif,
       'postNotifications': postNotifications.toJson(),
     };
   }
 
-  factory NotificationSettings.defaultSettings() {
-    return NotificationSettings(
-      overallOff: false,
+  factory NotificationSettingsModel.defaultSettings() {
+    return NotificationSettingsModel(
+      overallNotif: true,
       deviceNotif: true,
       inAppNotif: true,
       inAppNotifPanel: true,
-      chatNotifications: ChatNotificationSettings.defaultSettings(),
-      postNotifications: PostNotificationSettings.defaultSettings(),
+      dmNotif: true,
+      groupsNotif: 'All',
+      overallPostNotif: true,
+      postNotifications: PostNotificationSettingsModel.defaultSettings(),
     );
   }
 }
 
 // possible options "All", "MentionOnly", "None"
 @JsonSerializable()
-class ChatNotificationSettings {
-  String dms;
-  String groups;
-
-  ChatNotificationSettings({
-    required this.dms,
-    required this.groups,
-  });
-
-  factory ChatNotificationSettings.fromJson(Map<String, dynamic> json) =>
-      _$ChatNotificationSettingsFromJson(json);
-
-  Map<String, dynamic> toJson() => _$ChatNotificationSettingsToJson(this);
-
-  factory ChatNotificationSettings.defaultSettings() {
-    return ChatNotificationSettings(dms: 'All', groups: 'All');
-  }
-}
-
-@JsonSerializable()
-class PostNotificationSettings {
-  bool friendCreatePost;
-  bool overallToggleForFollowing;
+class PostNotificationSettingsModel {
+  bool friendPostNotif;
   String ownCreatedPosts;
   String followedPosts;
 
-  PostNotificationSettings({
-    required this.overallToggleForFollowing,
-    required this.friendCreatePost,
+  PostNotificationSettingsModel({
+    required this.friendPostNotif,
     required this.ownCreatedPosts,
     required this.followedPosts,
   });
 
-  factory PostNotificationSettings.fromJson(Map<String, dynamic> json) =>
-      _$PostNotificationSettingsFromJson(json);
+  factory PostNotificationSettingsModel.fromJson(Map<String, dynamic> json) =>
+      _$PostNotificationSettingsModelFromJson(json);
 
-  Map<String, dynamic> toJson() => _$PostNotificationSettingsToJson(this);
+  Map<String, dynamic> toJson() => _$PostNotificationSettingsModelToJson(this);
 
-  factory PostNotificationSettings.defaultSettings() {
-    return PostNotificationSettings(
-        overallToggleForFollowing: true,
-        friendCreatePost: true,
-        followedPosts: 'All',
-        ownCreatedPosts: 'All');
+  factory PostNotificationSettingsModel.defaultSettings() {
+    return PostNotificationSettingsModel(
+        friendPostNotif: true, followedPosts: 'All', ownCreatedPosts: 'All');
   }
 }

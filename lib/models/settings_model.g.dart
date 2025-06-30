@@ -9,67 +9,52 @@ part of 'settings_model.dart';
 SettingsModel _$SettingsModelFromJson(Map<String, dynamic> json) =>
     SettingsModel(
       language: json['language'] as String,
-      accessibility: AccessibilitySettings.fromJson(
+      accessibility: AccessibilitySettingsModel.fromJson(
           json['accessibility'] as Map<String, dynamic>),
-      notifications: NotificationSettings.fromJson(
+      notifications: NotificationSettingsModel.fromJson(
           json['notifications'] as Map<String, dynamic>),
     );
 
-AccessibilitySettings _$AccessibilitySettingsFromJson(
+AccessibilitySettingsModel _$AccessibilitySettingsModelFromJson(
         Map<String, dynamic> json) =>
-    AccessibilitySettings(
+    AccessibilitySettingsModel(
       userColors: json['userColors'] as bool,
       postAtt: json['postAtt'] as bool,
     );
 
-Map<String, dynamic> _$AccessibilitySettingsToJson(
-        AccessibilitySettings instance) =>
+Map<String, dynamic> _$AccessibilitySettingsModelToJson(
+        AccessibilitySettingsModel instance) =>
     <String, dynamic>{
       'userColors': instance.userColors,
       'postAtt': instance.postAtt,
     };
 
-NotificationSettings _$NotificationSettingsFromJson(
+NotificationSettingsModel _$NotificationSettingsModelFromJson(
         Map<String, dynamic> json) =>
-    NotificationSettings(
-      overallOff: json['overallOff'] as bool,
+    NotificationSettingsModel(
+      overallNotif: json['overallNotif'] as bool,
       deviceNotif: json['deviceNotif'] as bool,
       inAppNotif: json['inAppNotif'] as bool,
       inAppNotifPanel: json['inAppNotifPanel'] as bool,
-      chatNotifications: ChatNotificationSettings.fromJson(
-          json['chatNotifications'] as Map<String, dynamic>),
-      postNotifications: PostNotificationSettings.fromJson(
+      dmNotif: json['dmNotif'] as bool,
+      groupsNotif: json['groupsNotif'] as String,
+      overallPostNotif: json['overallPostNotif'] as bool,
+      postNotifications: PostNotificationSettingsModel.fromJson(
           json['postNotifications'] as Map<String, dynamic>),
     );
 
-ChatNotificationSettings _$ChatNotificationSettingsFromJson(
+PostNotificationSettingsModel _$PostNotificationSettingsModelFromJson(
         Map<String, dynamic> json) =>
-    ChatNotificationSettings(
-      dms: json['dms'] as String,
-      groups: json['groups'] as String,
-    );
-
-Map<String, dynamic> _$ChatNotificationSettingsToJson(
-        ChatNotificationSettings instance) =>
-    <String, dynamic>{
-      'dms': instance.dms,
-      'groups': instance.groups,
-    };
-
-PostNotificationSettings _$PostNotificationSettingsFromJson(
-        Map<String, dynamic> json) =>
-    PostNotificationSettings(
-      overallToggleForFollowing: json['overallToggleForFollowing'] as bool,
-      friendCreatePost: json['friendCreatePost'] as bool,
+    PostNotificationSettingsModel(
+      friendPostNotif: json['friendPostNotif'] as bool,
       ownCreatedPosts: json['ownCreatedPosts'] as String,
       followedPosts: json['followedPosts'] as String,
     );
 
-Map<String, dynamic> _$PostNotificationSettingsToJson(
-        PostNotificationSettings instance) =>
+Map<String, dynamic> _$PostNotificationSettingsModelToJson(
+        PostNotificationSettingsModel instance) =>
     <String, dynamic>{
-      'friendCreatePost': instance.friendCreatePost,
-      'overallToggleForFollowing': instance.overallToggleForFollowing,
+      'friendPostNotif': instance.friendPostNotif,
       'ownCreatedPosts': instance.ownCreatedPosts,
       'followedPosts': instance.followedPosts,
     };

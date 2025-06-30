@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:concord/controllers/settings_controller.dart';
 import 'package:concord/models/chats_model.dart';
 import 'package:concord/models/messages_model.dart';
 import 'package:concord/models/notifications_model.dart';
@@ -14,7 +13,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:concord/controllers/main_controller.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:concord/models/users_model.dart';
 
 //TODO: figure proper use of cache data for faster loading
@@ -25,11 +23,10 @@ class MyAuthentication {
       FirebaseFirestore.instance.collection('users');
   final CollectionReference settingsRef =
       FirebaseFirestore.instance.collection('settings');
-  final MainController mainController = Get.find<MainController>();
-  final SettingsController settingsController = Get.put(SettingsController());
   final MySocket mySocket = MySocket();
 
   Future<List?> signInUserFirebase(String email, String pass) async {
+    MainController mainController = Get.find<MainController>();
     try {
       var userCredential = await authRef.createUserWithEmailAndPassword(
           email: email, password: pass);
@@ -45,7 +42,7 @@ class MyAuthentication {
 
       mainController.currentUserData.id = userId;
       mainController.currentUserData.docRef = userInstance;
-      mainController.currentUserData.userSettings = userSettings;
+      mainController.initializeControllers(userSettings);
 
       mySocket.connectSocket(userId);
       return [true, ''];
@@ -68,6 +65,7 @@ class MyAuthentication {
   }
 
   Future<bool> logInUserFirebase(String email, String pass) async {
+    MainController mainController = Get.find<MainController>();
     try {
       var userCredential = await authRef.signInWithEmailAndPassword(
           email: email, password: pass);
@@ -76,13 +74,13 @@ class MyAuthentication {
       var userData = await usersRef.doc(userId).get();
       var settingsData = await settingsRef.doc(userId).get();
       SettingsModel userSettings;
-      if (!settingsData.exists){
+      if (!settingsData.exists) {
         userSettings = SettingsModel.defaultSettings();
         userSettings.docRef = settingsRef.doc(userId);
         await userSettings.docRef!.set(userSettings.toJson());
       } else {
         userSettings =
-        SettingsModel.fromJson(settingsData.data() as Map<String, dynamic>);
+            SettingsModel.fromJson(settingsData.data() as Map<String, dynamic>);
         userSettings.docRef = settingsData.reference;
       }
 
@@ -90,7 +88,7 @@ class MyAuthentication {
           UsersModel.fromJson(userData.data() as Map<String, dynamic>);
       mainController.currentUserData.id = userId;
       mainController.currentUserData.docRef = userData.reference;
-      mainController.currentUserData.userSettings = userSettings;
+      mainController.initializeControllers(userSettings);
 
       mySocket.connectSocket(userId);
       return true;
@@ -108,32 +106,22 @@ class MyAuthentication {
     }
   }
 
-  Future<void> saveUserOnDevice(String email, String pass) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('email', email);
-    await prefs.setString('password', pass);
-  }
-
   Future<bool> autoLoginFirebase() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    var email = prefs.getString('email');
-    var pass = prefs.getString('password');
-    if (email != null && pass != null) {
+    MainController mainController = Get.find<MainController>();
+    User? currentUser = authRef.currentUser;
+    if (currentUser != null) {
+      String userId = currentUser.uid;
       try {
-        var userCredential = await authRef.signInWithEmailAndPassword(
-            email: email, password: pass);
-        var userId = userCredential.user?.uid;
-
         var userData = await usersRef.doc(userId).get();
         var settingsData = await settingsRef.doc(userId).get();
         SettingsModel userSettings;
-        if (!settingsData.exists){
+        if (!settingsData.exists) {
           userSettings = SettingsModel.defaultSettings();
           userSettings.docRef = settingsRef.doc(userId);
           await userSettings.docRef!.set(userSettings.toJson());
         } else {
-          userSettings =
-              SettingsModel.fromJson(settingsData.data() as Map<String, dynamic>);
+          userSettings = SettingsModel.fromJson(
+              settingsData.data() as Map<String, dynamic>);
           userSettings.docRef = settingsData.reference;
         }
 
@@ -141,7 +129,7 @@ class MyAuthentication {
             UsersModel.fromJson(userData.data() as Map<String, dynamic>);
         mainController.currentUserData.id = userId;
         mainController.currentUserData.docRef = userData.reference;
-        mainController.currentUserData.userSettings = userSettings;
+        mainController.initializeControllers(userSettings);
 
         mySocket.connectSocket(userId);
         return true;
@@ -162,6 +150,9 @@ class MyAuthentication {
       return false;
     }
   }
+  static logoutUser() async {
+    await FirebaseAuth.instance.signOut();
+  }
 }
 
 class MyFirestore {
@@ -169,6 +160,8 @@ class MyFirestore {
   final FirebaseFirestore firestoreRef = FirebaseFirestore.instance;
   final CollectionReference<Map<String, dynamic>> usersRef =
       FirebaseFirestore.instance.collection('users');
+  final CollectionReference<Map<String, dynamic>> settingsRef =
+      FirebaseFirestore.instance.collection('settings');
   final CollectionReference<Map<String, dynamic>> requestsRef =
       FirebaseFirestore.instance.collection('requests');
   final CollectionReference<Map<String, dynamic>> chatsRef =
@@ -189,6 +182,10 @@ class MyFirestore {
       mainController.update(['profileSection']);
       debugPrint('testing profile update');
     });
+  }
+
+  void saveSettingsFirebase(SettingsModel settings) {
+    settingsRef.doc(mainController.currentUserData.id).set(settings.toJson());
   }
 
   Future<void> updateProfileFirebase(

@@ -152,98 +152,78 @@ class AccountSettingsPage extends StatelessWidget {
                 const SizedBox(
                   height: 20,
                 ),
-                InkWell(
-                  onTap: () async {
-                    mainController.logOut();
-                  },
-                  child: Container(
-                    height: 45,
-                    width: 140,
-                    decoration:  BoxDecoration(
-                        color: Colors.transparent,
-                        border: Border.all(color: Colors.red, width: 2),
-                        borderRadius: const BorderRadius.all(Radius.circular(10))),
-                    child: Center(
-                      child: Text(
-                        'logout'.tr,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15, color: Colors.red),
-                      ),
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
         ),
-        Obx(() => Visibility(
-              visible: settingsController.showMenu.value,
-              child: GestureDetector(
-                onTap: () {
-                  settingsController.toggleMenu();
-                },
-                child: Container(
-                  color: const Color(0xC01D1D1F),
-                ),
-              ),
-            )),
-        Obx(() => Material(
-              color: Colors.transparent,
-              child: Visibility(
-                visible: settingsController.showMenu.value,
-                child: SingleChildScrollView(
-                  child: Center(
-                    child: Container(
-                      height: 400,
-                      width: 300,
-                      decoration: const BoxDecoration(
-                          color: Color(0xFF121218),
-                          borderRadius: BorderRadius.all(Radius.circular(15))),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('oldPassU'.tr,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey.shade400,
-                                  fontSize: 12)),
-                          TextFormField(
-                            controller:
-                                settingsController.passwordTextController,
-                            decoration: const InputDecoration(
-                              contentPadding: EdgeInsets.symmetric(
-                                  vertical: 5, horizontal: 10),
-                              floatingLabelBehavior:
-                                  FloatingLabelBehavior.never,
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 40,
-                          ),
-                          Text('oldPassU'.tr,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey.shade400,
-                                  fontSize: 12)),
-                          TextFormField(
-                            controller:
-                                settingsController.passwordTextController,
-                            decoration: const InputDecoration(
-                              contentPadding: EdgeInsets.symmetric(
-                                  vertical: 5, horizontal: 10),
-                              floatingLabelBehavior:
-                                  FloatingLabelBehavior.never,
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            )),
+        // Obx(() => Visibility(
+        //       visible: settingsController.showMenu.value,
+        //       child: GestureDetector(
+        //         onTap: () {
+        //           settingsController.toggleMenu();
+        //         },
+        //         child: Container(
+        //           color: const Color(0xC01D1D1F),
+        //         ),
+        //       ),
+        //     )),
+        // Obx(() => Material(
+        //       color: Colors.transparent,
+        //       child: Visibility(
+        //         visible: settingsController.showMenu.value,
+        //         child: SingleChildScrollView(
+        //           child: Center(
+        //             child: Container(
+        //               height: 400,
+        //               width: 300,
+        //               decoration: const BoxDecoration(
+        //                   color: Color(0xFF121218),
+        //                   borderRadius: BorderRadius.all(Radius.circular(15))),
+        //               child: Column(
+        //                 crossAxisAlignment: CrossAxisAlignment.start,
+        //                 children: [
+        //                   Text('oldPassU'.tr,
+        //                       style: TextStyle(
+        //                           fontWeight: FontWeight.bold,
+        //                           color: Colors.grey.shade400,
+        //                           fontSize: 12)),
+        //                   TextFormField(
+        //                     controller:
+        //                         settingsController.passwordTextController,
+        //                     decoration: const InputDecoration(
+        //                       contentPadding: EdgeInsets.symmetric(
+        //                           vertical: 5, horizontal: 10),
+        //                       floatingLabelBehavior:
+        //                           FloatingLabelBehavior.never,
+        //                       border: OutlineInputBorder(),
+        //                     ),
+        //                   ),
+        //                   const SizedBox(
+        //                     height: 40,
+        //                   ),
+        //                   Text('oldPassU'.tr,
+        //                       style: TextStyle(
+        //                           fontWeight: FontWeight.bold,
+        //                           color: Colors.grey.shade400,
+        //                           fontSize: 12)),
+        //                   TextFormField(
+        //                     controller:
+        //                         settingsController.passwordTextController,
+        //                     decoration: const InputDecoration(
+        //                       contentPadding: EdgeInsets.symmetric(
+        //                           vertical: 5, horizontal: 10),
+        //                       floatingLabelBehavior:
+        //                           FloatingLabelBehavior.never,
+        //                       border: OutlineInputBorder(),
+        //                     ),
+        //                   ),
+        //                 ],
+        //               ),
+        //             ),
+        //           ),
+        //         ),
+        //       ),
+        //     )),
       ],
     );
   }

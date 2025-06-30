@@ -44,10 +44,50 @@ class SettingsNavTile extends StatelessWidget {
 }
 
 class SettingsToggleTile extends StatelessWidget {
-  const SettingsToggleTile({super.key});
+  final String tileText;
+  final bool toggleValue;
+  final IconData tileIcon;
+  final Function(bool value) toggleFunction;
+
+  const SettingsToggleTile(
+      {super.key,
+      required this.toggleValue,
+      required this.toggleFunction,
+      required this.tileText,
+      required this.tileIcon});
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Container(
+      margin: const EdgeInsets.all(7),
+      decoration: const BoxDecoration(
+        color: Color(0xFF121218),
+        borderRadius: BorderRadius.all(Radius.circular(20)),
+      ),
+      child: ListTile(
+        leading: Icon(
+          tileIcon, // Globe icon
+          color: Colors.white,
+          size: 24.0,
+        ),
+        title: Text(
+          tileText,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 18.0,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        trailing: Switch(
+          value: toggleValue,
+          onChanged: (value) {
+            toggleFunction(value);
+          },
+          activeColor: Colors.blue,
+          inactiveThumbColor: Colors.grey,
+          inactiveTrackColor: Colors.grey[700],
+        ),
+      ),
+    );
   }
 }

@@ -7,7 +7,7 @@ import 'package:concord/controllers/main_controller.dart';
 class NotificationsPage extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
   final NotificationController notificationController =
-      Get.put(NotificationController());
+      Get.find<NotificationController>();
 
   NotificationsPage({super.key});
 

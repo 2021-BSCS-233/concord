@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:concord/models/settings_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'users_model.g.dart';
@@ -21,8 +20,6 @@ class UsersModel {
   List<String> friends;
   List<String> preference;
   List<String> followingPosts;
-  @JsonKey(includeToJson: false, includeFromJson: false)
-  SettingsModel? userSettings;
   @JsonKey(includeToJson: false, includeFromJson: false)
   DocumentReference? docRef;
   @JsonKey(includeToJson: false, includeFromJson: false)

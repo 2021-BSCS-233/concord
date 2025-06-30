@@ -20,7 +20,6 @@ class LogInController extends GetxController {
       var response = await authentication.logInUserFirebase(email, pass);
       debugPrint('error: $response');
       if (response) {
-        await authentication.saveUserOnDevice(email, pass);
         showOverlayLogIn.value = false;
       } else {
         showOverlayLogIn.value = false;
@@ -40,6 +39,7 @@ class LogInController extends GetxController {
           const EdgeInsetsGeometry.symmetric(horizontal: 30, vertical: 20),
       titlePadding: const EdgeInsetsGeometry.only(top: 10),
       backgroundColor: const Color(0xFF121212),
+      barrierDismissible: false,
       title: 'Alert',
       titleStyle: const TextStyle(
           fontSize: 20,

@@ -45,8 +45,6 @@ class SignInController extends GetxController {
       );
       var response = await authentication.signInUserFirebase(email, pass);
       if (response?[0]) {
-        await authentication.saveUserOnDevice(
-            email, signInPassTextController.text.trim());
         showOverlaySignIn.value = false;
         return response?[0];
       } else {
@@ -81,6 +79,7 @@ class SignInController extends GetxController {
           const EdgeInsetsGeometry.symmetric(horizontal: 30, vertical: 20),
       titlePadding: const EdgeInsetsGeometry.only(top: 10),
       backgroundColor: const Color(0xFF121212),
+      barrierDismissible: false,
       title: 'Alert',
       titleStyle: const TextStyle(
           fontSize: 20,

@@ -1,11 +1,20 @@
 import 'dart:async';
-import 'package:concord/models/users_model.dart';
-import 'package:flutter/material.dart';
+import 'settings_controller.dart';
+import 'requests_controller.dart';
+import 'posts_controller.dart';
+import 'chats_controller.dart';
+import 'friends_controller.dart';
+import 'notification_controller.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/material.dart';
 import 'package:concord/pages/login_page.dart';
+import 'package:concord/models/users_model.dart';
+import 'package:concord/models/settings_model.dart';
+import 'package:concord/services/firebase_services.dart';
+
 
 class MainController extends GetxController {
+
   late UsersModel currentUserData;
   var selectedIndex = 0.obs;
   var showMenu = false.obs;
@@ -24,6 +33,15 @@ class MainController extends GetxController {
   StreamSubscription? notificationListenerRef;
   Timer? overlayTimer;
   OverlayEntry? currentOverlayEntry;
+
+  void initializeControllers(SettingsModel userSettings){
+    Get.put(SettingsController(userSettings: userSettings));
+    Get.put(ChatsController());
+    Get.put(FriendsController());
+    Get.put(RequestsController());
+    Get.put(PostsController());
+    Get.put(NotificationController());
+  }
 
   void toggleMenu(dataList) {
     selectedChatId = dataList[0];
@@ -84,7 +102,7 @@ class MainController extends GetxController {
     });
   }
 
-  logOut() async {
+  logOut(){
     chatsListenerRef?.cancel();
     chatListenerRef = null;
     profileListenerRef?.cancel();
@@ -96,9 +114,7 @@ class MainController extends GetxController {
     notificationListenerRef?.cancel();
     notificationListenerRef = null;
     selectedIndex.value = 0;
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('email');
-    await prefs.remove('password');
+    MyAuthentication.logoutUser();
     Get.deleteAll();
     Get.offAll(LogInPage());
   }

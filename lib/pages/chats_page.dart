@@ -12,8 +12,8 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 class ChatsPage extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
-  final ChatsController chatsController = Get.put(ChatsController());
-  final FriendsController friendsController = Get.put(FriendsController());
+  final ChatsController chatsController = Get.find<ChatsController>();
+  final FriendsController friendsController = Get.find<FriendsController>();
 
   ChatsPage({super.key}) {
     chatsController.initial = true;

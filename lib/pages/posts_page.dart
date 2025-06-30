@@ -8,7 +8,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 class PostsPage extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
-  final PostsController postsController = Get.put(PostsController());
+  final PostsController postsController = Get.find<PostsController>();
 
   PostsPage({super.key});
 

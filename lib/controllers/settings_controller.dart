@@ -1,10 +1,15 @@
 import 'package:concord/models/settings_model.dart';
+import 'package:concord/services/firebase_services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
 class SettingsController extends GetxController {
-  late SettingsModel settingsModel;
-  var showMenu = false.obs;
+  SettingsModel userSettings;
+  SettingsController({required this.userSettings});
+
+  final MyFirestore myFirestore = MyFirestore();
+  bool didChange = false;
+  Rx<bool> showMenu = false.obs;
 
   TextEditingController usernameTextController = TextEditingController();
   TextEditingController emailTextController = TextEditingController();
@@ -12,5 +17,10 @@ class SettingsController extends GetxController {
 
   void toggleMenu() {
     showMenu.value = !showMenu.value;
+  }
+  void saveSettings(){
+    if(didChange) {
+      myFirestore.saveSettingsFirebase(userSettings);
+    }
   }
 }
