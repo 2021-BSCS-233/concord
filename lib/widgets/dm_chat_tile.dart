@@ -1,7 +1,7 @@
 import 'package:concord/controllers/main_controller.dart';
 import 'package:concord/models/chats_model.dart';
 import 'package:concord/widgets/profile_picture.dart';
-import 'package:concord/widgets/status_icons.dart';
+// import 'package:concord/widgets/status_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:concord/pages/chat_page.dart';
@@ -59,17 +59,17 @@ class DmChatTile extends StatelessWidget {
                     profileLink: chatData.receiverData![0].profilePicture,
                     profileRadius: 20,
                   ),
-                  Positioned(
-                    bottom: -2,
-                    right: -2,
-                    child: StatusIcon(
-                      iconType: chatData.receiverData![0].status == 'Online'
-                          ? chatData.receiverData![0].displayStatus
-                          : chatData.receiverData![0].status,
-                      iconSize: 16.0,
-                      iconBorder: 3,
-                    ),
-                  ),
+                  // Positioned(
+                  //   bottom: -2,
+                  //   right: -2,
+                  //   child: StatusIcon(
+                  //     iconType: chatData.receiverData![0].status == 'Online'
+                  //         ? chatData.receiverData![0].displayStatus
+                  //         : chatData.receiverData![0].status,
+                  //     iconSize: 16.0,
+                  //     iconBorder: 3,
+                  //   ),
+                  // ),
                 ],
               )
             : SizedBox(

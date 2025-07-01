@@ -106,8 +106,6 @@ class SignInPage extends StatelessWidget {
                       if (response) {
                         Get.deleteAll();
                         Get.offAll(Home());
-                      } else {
-                        debugPrint('SingIn failed');
                       }
                     },
                     child: Container(

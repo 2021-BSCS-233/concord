@@ -8,14 +8,14 @@ class SettingsModel {
   @JsonKey(includeToJson: false, includeFromJson: false)
   DocumentReference? docRef;
   String language;
-  @JsonKey()
+  Set<String> postPreference;
   AccessibilitySettingsModel accessibility;
-  @JsonKey()
   NotificationSettingsModel notifications;
 
   SettingsModel({
     this.docRef,
     required this.language,
+    required this.postPreference,
     required this.accessibility,
     required this.notifications,
   });
@@ -26,6 +26,7 @@ class SettingsModel {
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'language': language,
+      'postPreference':postPreference.toList(),
       'accessibility': accessibility.toJson(),
       'notifications': notifications.toJson(),
     };
@@ -33,7 +34,8 @@ class SettingsModel {
 
   factory SettingsModel.defaultSettings() {
     return SettingsModel(
-      language: 'en', // Default language
+      language: 'en',
+      postPreference: {},
       accessibility: AccessibilitySettingsModel(
         userColors: true,
         postAtt: true,

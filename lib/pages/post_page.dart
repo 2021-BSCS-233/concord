@@ -293,6 +293,8 @@ class PostPage extends StatelessWidget {
                         postController.chatContent.length - (index + 1)];
                     if (message.repliedTo != null) {
                       return MessageTileFull(
+                        localUser: message.senderId ==
+                            mainController.currentUserData.id,
                         messageData: message,
                         sendingUser: postController.userMap[message.senderId]!,
                         toggleMenu: postController.toggleMenu,
@@ -304,6 +306,8 @@ class PostPage extends StatelessWidget {
                       );
                     } else {
                       return MessageTileFull(
+                          localUser: message.senderId ==
+                              mainController.currentUserData.id,
                           messageData: message,
                           sendingUser:
                               postController.userMap[message.senderId]!,

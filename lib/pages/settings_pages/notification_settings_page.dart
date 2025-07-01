@@ -23,7 +23,10 @@ class NotificationSettingsPage extends StatelessWidget {
         appBar: AppBar(
           title: const Text(
             "Notification Settings",
-            style: TextStyle(color: Colors.white, fontSize: 18),
+            style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Color(0xD0FFFFFF),
+                fontSize: 22),
           ),
         ),
         body: GetBuilder(

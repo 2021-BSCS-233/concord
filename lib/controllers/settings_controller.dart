@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 
 class SettingsController extends GetxController {
   SettingsModel userSettings;
+  var selectedLang = 0.obs;
   SettingsController({required this.userSettings});
 
   final MyFirestore myFirestore = MyFirestore();

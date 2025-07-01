@@ -125,33 +125,6 @@ class AccountSettingsPage extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Text('language'.tr,
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey.shade400,
-                        fontSize: 14)),
-                DropdownButton(
-                    value: localizationController.prefs.getString('locale') ??
-                        'en',
-                    items: const [
-                      DropdownMenuItem(
-                        value: 'en',
-                        child: Text('English'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'es',
-                        child: Text('Spanish'),
-                      )
-                    ],
-                    onChanged: (value) {
-                      localizationController.setLocal(value);
-                    }),
-                const SizedBox(
-                  height: 20,
-                ),
               ],
             ),
           ),

@@ -86,8 +86,6 @@ class LogInPage extends StatelessWidget {
                       if (response) {
                         Get.delete<LogInController>();
                         Get.offAll(Home());
-                      } else {
-                        debugPrint('login failed');
                       }
                     },
                     child: Container(

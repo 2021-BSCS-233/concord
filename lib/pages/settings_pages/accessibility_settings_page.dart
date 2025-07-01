@@ -24,37 +24,40 @@ class AccessibilitySettingsPage extends StatelessWidget {
         appBar: AppBar(
           title: const Text(
             "Accessibility Settings",
-            style: TextStyle(color: Colors.white, fontSize: 18),
+            style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Color(0xD0FFFFFF),
+                fontSize: 22),
           ),
         ),
         body: GetBuilder(
-          init: settingsController,
-          id: 'accessibilitySettings',
+            init: settingsController,
+            id: 'accessibilitySettings',
             builder: (controller) {
-          return ListView(
-            scrollDirection: Axis.vertical,
-            children: [
-              SettingsToggleTile(
-                  tileText: 'Username Colors',
-                  tileIcon: CupertinoIcons.color_filter_fill,
-                  toggleValue: modelRef.userColors,
-                  toggleFunction: (value) {
-                    modelRef.userColors = value;
-                    controller.didChange = true;
-                    controller.update(['accessibilitySettings']);
-                  }),
-              SettingsToggleTile(
-                  tileText: 'Post Attachments',
-                  tileIcon: Icons.image,
-                  toggleValue: modelRef.postAtt,
-                  toggleFunction: (value) {
-                    modelRef.postAtt = value;
-                    controller.didChange = true;
-                    controller.update(['accessibilitySettings']);
-                  }),
-            ],
-          );
-        }),
+              return ListView(
+                scrollDirection: Axis.vertical,
+                children: [
+                  SettingsToggleTile(
+                      tileText: 'Username Colors',
+                      tileIcon: CupertinoIcons.color_filter_fill,
+                      toggleValue: modelRef.userColors,
+                      toggleFunction: (value) {
+                        modelRef.userColors = value;
+                        controller.didChange = true;
+                        controller.update(['accessibilitySettings']);
+                      }),
+                  SettingsToggleTile(
+                      tileText: 'Post Attachments',
+                      tileIcon: Icons.image,
+                      toggleValue: modelRef.postAtt,
+                      toggleFunction: (value) {
+                        modelRef.postAtt = value;
+                        controller.didChange = true;
+                        controller.update(['accessibilitySettings']);
+                      }),
+                ],
+              );
+            }),
       ),
     );
   }

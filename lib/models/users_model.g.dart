@@ -21,9 +21,6 @@ UsersModel _$UsersModelFromJson(Map<String, dynamic> json) => UsersModel(
       aboutMe: json['aboutMe'] as String,
       friends:
           (json['friends'] as List<dynamic>).map((e) => e as String).toList(),
-      preference: (json['preference'] as List<dynamic>)
-          .map((e) => e as String)
-          .toList(),
       followingPosts: (json['followingPosts'] as List<dynamic>)
           .map((e) => e as String)
           .toList(),
@@ -44,6 +41,5 @@ Map<String, dynamic> _$UsersModelToJson(UsersModel instance) =>
       'pronouns': instance.pronouns,
       'aboutMe': instance.aboutMe,
       'friends': instance.friends,
-      'preference': instance.preference,
       'followingPosts': instance.followingPosts,
     };

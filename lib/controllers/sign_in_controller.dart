@@ -36,7 +36,6 @@ class SignInController extends GetxController {
         pronouns: '',
         aboutMe: '',
         friends: [],
-        preference: [],
         followingPosts: [],
         statusText: '',
         idle: false,

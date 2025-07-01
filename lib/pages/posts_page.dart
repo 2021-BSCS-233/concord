@@ -74,8 +74,7 @@ class PostsPage extends StatelessWidget {
   }
 
   refreshContent() async {
-    await postsController.getInitialPosts(mainController.currentUserData.id,
-        mainController.currentUserData.preference);
+    await postsController.getInitialPosts(mainController.currentUserData.id);
     postsController.update();
   }
 

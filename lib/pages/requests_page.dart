@@ -123,7 +123,7 @@ class RequestsPage extends StatelessWidget {
                                                 color: Colors.green,
                                               )),
                                           onTap: () {
-                                            requestsController.requestAction(
+                                            requestsController.inRequestAction(
                                                 index, 'accept');
                                           },
                                         ),
@@ -139,7 +139,7 @@ class RequestsPage extends StatelessWidget {
                                                 color: Colors.red,
                                               )),
                                           onTap: () {
-                                            requestsController.requestAction(
+                                            requestsController.inRequestAction(
                                                 index, 'deny');
                                           },
                                         )
@@ -243,7 +243,7 @@ class RequestsPage extends StatelessWidget {
                                             color: Colors.red,
                                           )),
                                       onTap: () {
-                                        requestsController.requestAction(
+                                        requestsController.outRequestAction(
                                             index, 'deny');
                                       },
                                     ),

@@ -2,8 +2,8 @@ import 'package:concord/models/messages_model.dart';
 import 'package:concord/models/posts_model.dart';
 import 'package:concord/services/firebase_services.dart';
 import 'package:concord/services/services.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:get/get_state_manager/src/simple/get_controllers.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class NewPostController extends GetxController {
   final MyFirestore myFirestore = MyFirestore();
@@ -15,7 +15,7 @@ class NewPostController extends GetxController {
     APICalls apiCalls = APICalls();
     if (titleTextController.text.trim() == '' ||
         descriptionTextController.text.trim() == '') {
-      debugPrint('pls fill all fields');
+      errorMessage('Please fill all fields');
       return false;
     }
     String text =
@@ -23,7 +23,8 @@ class NewPostController extends GetxController {
 
     categories = await apiCalls.classifyTextPerform(text);
     if (categories.isEmpty) {
-      debugPrint('api response failed');
+      errorMessage(
+          'There was an error during auto categorization. Please categorize the post manually or try again later');
       return false;
     }
     PostsModel newPost = PostsModel(
@@ -44,5 +45,32 @@ class NewPostController extends GetxController {
         pinged: [],
         attachments: []);
     return await myFirestore.sendPostFirebase(newPost, firstMessage, []);
+  }
+
+  errorMessage(String text) {
+    Get.defaultDialog(
+      contentPadding:
+          const EdgeInsetsGeometry.symmetric(horizontal: 30, vertical: 20),
+      titlePadding: const EdgeInsetsGeometry.only(top: 10),
+      backgroundColor: const Color(0xFF121212),
+      barrierDismissible: false,
+      title: 'Alert',
+      titleStyle: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+          fontFamily: 'gg_sans',
+          color: Colors.white),
+      middleText: text,
+      middleTextStyle: const TextStyle(
+        fontFamily: 'gg_sans',
+        color: Colors.white,
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
+      ),
+      textCancel: "Close",
+      cancelTextColor: Colors.white,
+      confirmTextColor: Colors.white,
+      buttonColor: const Color.fromARGB(255, 255, 77, 0),
+    );
   }
 }

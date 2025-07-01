@@ -420,6 +420,8 @@ class ChatPage extends StatelessWidget {
     try {
       if (content[index].repliedTo != null) {
         return MessageTileFull(
+          localUser:
+              content[index].senderId == mainController.currentUserData.id,
           messageData: content[index],
           sendingUser: chatController.userMap[content[index].senderId]!,
           toggleMenu: chatController.toggleMenu,
@@ -431,6 +433,8 @@ class ChatPage extends StatelessWidget {
         );
       } else if (content[index].senderId != content[index + 1].senderId) {
         return MessageTileFull(
+            localUser:
+                content[index].senderId == mainController.currentUserData.id,
             messageData: content[index],
             sendingUser: chatController.userMap[content[index].senderId]!,
             toggleMenu: chatController.toggleMenu,
@@ -456,6 +460,8 @@ class ChatPage extends StatelessWidget {
               toggleMenu: chatController.toggleMenu);
         } else {
           return MessageTileFull(
+            localUser:
+            content[index].senderId == mainController.currentUserData.id,
             messageData: content[index],
             sendingUser: chatController.userMap[content[index].senderId]!,
             toggleMenu: chatController.toggleMenu,
@@ -465,6 +471,8 @@ class ChatPage extends StatelessWidget {
       }
     } catch (e) {
       return MessageTileFull(
+        localUser:
+        content[index].senderId == mainController.currentUserData.id,
         messageData: content[index],
         sendingUser: chatController.userMap[content[index].senderId]!,
         toggleMenu: chatController.toggleMenu,

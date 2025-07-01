@@ -146,10 +146,11 @@ class MyAuthentication {
         return false;
       }
     } else {
-      debugPrint('failed due to : No login data found');
+      debugPrint('No login data found');
       return false;
     }
   }
+
   static logoutUser() async {
     await FirebaseAuth.instance.signOut();
   }
@@ -180,7 +181,6 @@ class MyFirestore {
       mainController.currentUserData.id = event.id;
       mainController.currentUserData.docRef = event.reference;
       mainController.update(['profileSection']);
-      debugPrint('testing profile update');
     });
   }
 
@@ -353,25 +353,30 @@ class MyFirestore {
     var receiverRef =
         await usersRef.where('username', isEqualTo: receiverName).get();
     if (receiverRef.docs.isNotEmpty) {
-      var check1 = await requestsRef
-          .where('senderId', isEqualTo: currentUser.id)
-          .where('receiverId', isEqualTo: receiverRef.docs[0].id)
-          .get();
-      var check2 = await requestsRef
-          .where('senderId', isEqualTo: currentUser.id)
-          .where('receiverId', isEqualTo: receiverRef.docs[0].id)
-          .get();
-      if (check1.docs.isEmpty && check2.docs.isEmpty) {
-        RequestsModel requestData = RequestsModel(
-            senderId: currentUser.id!,
-            receiverId: receiverRef.docs[0].id,
-            timeStamp: DateTime.now(),
-            senderDocRef: currentUser.docRef!,
-            receiverDocRef: receiverRef.docs[0].reference);
-        requestsRef.add(requestData.toJson());
-        return "Request Already Sent";
+      if (mainController.currentUserData.friends
+          .contains(receiverRef.docs[0].id)) {
+        return 'User is Friends with you';
       } else {
-        return "Request Sent";
+        var check1 = await requestsRef
+            .where('senderId', isEqualTo: currentUser.id)
+            .where('receiverId', isEqualTo: receiverRef.docs[0].id)
+            .get();
+        var check2 = await requestsRef
+            .where('senderId', isEqualTo: currentUser.id)
+            .where('receiverId', isEqualTo: receiverRef.docs[0].id)
+            .get();
+        if (check1.docs.isEmpty && check2.docs.isEmpty) {
+          RequestsModel requestData = RequestsModel(
+              senderId: currentUser.id!,
+              receiverId: receiverRef.docs[0].id,
+              timeStamp: DateTime.now(),
+              senderDocRef: currentUser.docRef!,
+              receiverDocRef: receiverRef.docs[0].reference);
+          requestsRef.add(requestData.toJson());
+          return "Request Sent";
+        } else {
+          return "Request Already Sent";
+        }
       }
     } else {
       return "User Not Found";

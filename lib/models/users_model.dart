@@ -18,7 +18,6 @@ class UsersModel {
   String pronouns;
   String aboutMe;
   List<String> friends;
-  List<String> preference;
   List<String> followingPosts;
   @JsonKey(includeToJson: false, includeFromJson: false)
   DocumentReference? docRef;
@@ -39,7 +38,6 @@ class UsersModel {
       required this.pronouns,
       required this.aboutMe,
       required this.friends,
-      required this.preference,
       required this.followingPosts,
       this.docRef,
       this.id});
@@ -48,13 +46,5 @@ class UsersModel {
       _$UsersModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$UsersModelToJson(this);
-
-// static Color _colorFromJson(dynamic json) {
-//   return Color(int.parse('0xFF$json}'));
-// }
-//
-// static String _colorToJson(Color color) {
-//   return color.value.toRadixString(16);
-// }
 }
 

@@ -169,7 +169,6 @@ class PostController extends GetxController {
       } else {
         attachmentVisible.value = false;
         sendVisible.value = false;
-        debugPrint('nothing selected');
       }
     }
   }

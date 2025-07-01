@@ -9,6 +9,9 @@ part of 'settings_model.dart';
 SettingsModel _$SettingsModelFromJson(Map<String, dynamic> json) =>
     SettingsModel(
       language: json['language'] as String,
+      postPreference: (json['postPreference'] as List<dynamic>)
+          .map((e) => e as String)
+          .toSet(),
       accessibility: AccessibilitySettingsModel.fromJson(
           json['accessibility'] as Map<String, dynamic>),
       notifications: NotificationSettingsModel.fromJson(

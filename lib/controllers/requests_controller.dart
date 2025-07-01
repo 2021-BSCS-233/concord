@@ -1,5 +1,5 @@
 import 'package:concord/controllers/main_controller.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:concord/models/request_model.dart';
 import 'package:concord/services/firebase_services.dart';
@@ -32,11 +32,16 @@ class RequestsController extends GetxController {
         mainController.currentUserData,
         requestsFieldTextController.text.trim().toLowerCase());
     requestsFieldTextController.text = '';
-    debugPrint(response);
+    if (response != 'Request Sent') {
+      errorMessage(response);
+    }
   }
 
-  requestAction(index, action) {
+  inRequestAction(index, action) {
     myFirestore.requestActionFirebase(incomingRequestsData[index].id!, action);
+  }
+  outRequestAction(index, action) {
+    myFirestore.requestActionFirebase(outgoingRequestsData[index].id!, action);
   }
 
   updateRequests(RequestsModel updateData, updateType, sender) {
@@ -61,14 +66,30 @@ class RequestsController extends GetxController {
     }
   }
 
-// updateOutgoingRequests(RequestsModel updateData, updateType) {
-//   var index =
-//       outgoingRequestsData.indexWhere((map) => map.id == updateData.id);
-//   if (updateType == 'added' && index < 0) {
-//     outgoingRequestsData.insert(0, updateData);
-//   } else if (updateType == 'removed') {
-//     outgoingRequestsData.removeAt(index);
-//   }
-//   update(['ORSection']);
-// }
+  errorMessage(String text) {
+    Get.defaultDialog(
+      contentPadding:
+          const EdgeInsetsGeometry.symmetric(horizontal: 30, vertical: 20),
+      titlePadding: const EdgeInsetsGeometry.only(top: 10),
+      backgroundColor: const Color(0xFF121212),
+      barrierDismissible: false,
+      title: 'Alert',
+      titleStyle: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+          fontFamily: 'gg_sans',
+          color: Colors.white),
+      middleText: text,
+      middleTextStyle: const TextStyle(
+        fontFamily: 'gg_sans',
+        color: Colors.white,
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
+      ),
+      textCancel: "Close",
+      cancelTextColor: Colors.white,
+      confirmTextColor: Colors.white,
+      buttonColor: const Color.fromARGB(255, 255, 77, 0),
+    );
+  }
 }

@@ -20,7 +20,10 @@ class SettingsListPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           "Settings",
-          style: TextStyle(color: Colors.white, fontSize: 18),
+          style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Color(0xD0FFFFFF),
+              fontSize: 22),
         ),
       ),
       body: Column(
@@ -41,6 +44,10 @@ class SettingsListPage extends StatelessWidget {
                   modelRef: settingsController.userSettings.notifications),
               tileText: "Notifications",
               tileIcon: Icons.notifications),
+          SettingsNavTile(
+              page: Container(),
+              tileText: "Post Preference",
+              tileIcon: Iconsax.profile_circle),
           SettingsNavTile(
               page: Container(),
               tileText: "Language",

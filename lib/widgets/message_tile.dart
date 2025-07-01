@@ -10,6 +10,7 @@ class MessageTileFull extends StatelessWidget {
   final MessagesModel messageData;
   final UsersModel sendingUser;
   final String? repliedToUser;
+  final bool localUser;
   final Function toggleMenu;
   final Function toggleProfile;
 
@@ -19,6 +20,7 @@ class MessageTileFull extends StatelessWidget {
       required this.sendingUser,
       required this.toggleMenu,
       required this.toggleProfile,
+      required this.localUser,
       this.repliedToUser});
 
   @override
@@ -78,10 +80,12 @@ class MessageTileFull extends StatelessWidget {
                             onTap: () {},
                             child: Text(
                               sendingUser.displayName,
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
-                                  color: Color(0xFFEEEEEE)),
+                                  color: localUser
+                                      ? const Color(0xFF8BC34A)
+                                      : const Color(0xFF40C4FF)),
                             ),
                           ),
                           const SizedBox(
@@ -96,8 +100,7 @@ class MessageTileFull extends StatelessWidget {
                       ),
                       messageData.message == ''
                           ? const SizedBox()
-                          : Text.rich(
-                              TextSpan(
+                          : Text.rich(TextSpan(
                               text: messageData.message,
                               style: const TextStyle(
                                   fontSize: 16,
@@ -196,22 +199,20 @@ class MessageTileCompact extends StatelessWidget {
                 children: [
                   messageData.message == ''
                       ? const SizedBox()
-                      : Text.rich(
-                      TextSpan(
-                        text: messageData.message,
-                        style: const TextStyle(
-                            fontSize: 16,
-                            color: Color(0xFFDEDEE2)),
-                        children: messageData.edited
-                            ? [
-                          TextSpan(
-                              text: ' (edited)',
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey.shade500)),
-                        ]
-                            : null,
-                      )),
+                      : Text.rich(TextSpan(
+                          text: messageData.message,
+                          style: const TextStyle(
+                              fontSize: 16, color: Color(0xFFDEDEE2)),
+                          children: messageData.edited
+                              ? [
+                                  TextSpan(
+                                      text: ' (edited)',
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey.shade500)),
+                                ]
+                              : null,
+                        )),
                   messageData.attachments.isEmpty
                       ? const SizedBox()
                       : attachments(messageData.attachments,
