@@ -7,14 +7,8 @@ class LanguageSettingsPage extends StatelessWidget {
   final SettingsController settingsController = Get.find<SettingsController>();
   final LocalizationController localizationController =
       Get.find<LocalizationController>();
-  final Map languageIndex = {
-    'en': 1,
-    'es': 2,
-  };
 
-  LanguageSettingsPage({super.key}) {
-    settingsController.selectedLang.value = languageIndex['en'];
-  }
+  LanguageSettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {

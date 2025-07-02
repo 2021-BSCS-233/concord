@@ -5,6 +5,7 @@ const { Server } = require('socket.io');
 const admin = require('firebase-admin');
 const { LanguageServiceClient } = require('@google-cloud/language');
 const { classifyPostByEntities } = require('./classifier');
+const { customCategories } = require('./classifier');
 
 const app = express();
 const server = http.createServer(app);
@@ -49,15 +50,18 @@ app.post('/classify-text', async (req, res) => {
                     salience: entity.salience,
                     mentions: entity.mentions.map(mention => mention.text.content)
                 }));
-//        const relevantEntities = entities.filter(entity => entity.salience >= SALIENCE_THRESHOLD)
-        console.log(entities);
         categories = classifyPostByEntities(entities, text);
-        console.log(categories);
         res.status(200).json({ categories: categories });
     } catch (error) {
         console.error('Error classifying text:', error);
         res.status(500).json({ error: 'Failed to classify text.' });
     }
+});
+
+const transformedCategories = transformCategories();
+
+app.get('/get-categories', async (req, res) => {
+    res.status(200).json({categories: transformedCategories})
 });
 
 const connectedUsers = new Set();
@@ -100,6 +104,24 @@ io.on('connection', (socket) => {
     });
 });
 
+function transformCategories() {
+    const transformed = {};
+
+    for (const mainCategoryName in customCategories) {
+        const mainCategoryDetails = customCategories[mainCategoryName];
+        if (mainCategoryDetails.hasOwnProperty('subCategories')) {
+            const subCategoriesMap = mainCategoryDetails.subCategories;
+            const subCategoryNames = Object.keys(subCategoriesMap);
+
+            transformed[mainCategoryName] = subCategoryNames;
+        } else {
+            transformed[mainCategoryName] = [];
+        }
+    }
+
+    transformed['Miscellaneous'] = [];
+    return transformed;
+}
 
 async function gracefulShutdown() {
     io.close();

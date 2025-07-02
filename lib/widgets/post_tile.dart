@@ -114,31 +114,31 @@ class PostTile extends StatelessWidget {
                   ),
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.only(top:2),
-                    child: Text("3.2k", style: TextStyle(fontSize: 16)),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(left:  10,bottom: 0,top: 0),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Icon(Icons.thumb_up_outlined,size: 20,),
-                        SizedBox(width: 12,),
-                        Icon(Icons.thumb_down_outlined,size: 20,),
-                        SizedBox(width: 12,),
-                      ],
-                    ),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.only(top:2),
-                    child: Text("2.1k", style: TextStyle(fontSize: 16)),
-                  ),
-                ],
-              ),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.start,
+              //   children: [
+              //     const Padding(
+              //       padding: EdgeInsets.only(top:2),
+              //       child: Text("3.2k", style: TextStyle(fontSize: 16)),
+              //     ),
+              //     Container(
+              //       margin: const EdgeInsets.only(left:  10,bottom: 0,top: 0),
+              //       child: const Row(
+              //         mainAxisAlignment: MainAxisAlignment.start,
+              //         children: [
+              //           Icon(Icons.thumb_up_outlined,size: 20,),
+              //           SizedBox(width: 12,),
+              //           Icon(Icons.thumb_down_outlined,size: 20,),
+              //           SizedBox(width: 12,),
+              //         ],
+              //       ),
+              //     ),
+              //     const Padding(
+              //       padding: EdgeInsets.only(top:2),
+              //       child: Text("2.1k", style: TextStyle(fontSize: 16)),
+              //     ),
+              //   ],
+              // ),
             ],
           ),
         ),

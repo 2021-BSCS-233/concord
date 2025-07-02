@@ -1,7 +1,9 @@
 import 'package:concord/controllers/main_controller.dart';
 import 'package:concord/pages/settings_pages/accessibility_settings_page.dart';
 import 'package:concord/pages/settings_pages/account_settings_page.dart';
+import 'package:concord/pages/settings_pages/language_settings_page.dart';
 import 'package:concord/pages/settings_pages/notification_settings_page.dart';
+import 'package:concord/pages/settings_pages/preference_settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
@@ -32,7 +34,7 @@ class SettingsListPage extends StatelessWidget {
         children: [
           SettingsNavTile(
               page: AccountSettingsPage(),
-              tileText: "Account settings",
+              tileText: "Account",
               tileIcon: Iconsax.profile_circle),
           SettingsNavTile(
               page: AccessibilitySettingsPage(
@@ -45,12 +47,13 @@ class SettingsListPage extends StatelessWidget {
               tileText: "Notifications",
               tileIcon: Icons.notifications),
           SettingsNavTile(
-              page: Container(),
+              page: PreferenceSettingsPage(
+                  setRef: settingsController.userSettings.postPreference),
               tileText: "Post Preference",
-              tileIcon: Iconsax.profile_circle),
+              tileIcon: Icons.room_preferences),
           SettingsNavTile(
-              page: Container(),
-              tileText: "Language",
+              page: LanguageSettingsPage(),
+              tileText: 'language'.tr,
               tileIcon: Icons.language),
           const SizedBox(
             height: 20,
@@ -60,8 +63,7 @@ class SettingsListPage extends StatelessWidget {
             child: InkWell(
               onTap: () async {
                 Get.defaultDialog(
-                  contentPadding:
-                  const EdgeInsetsGeometry.symmetric(
+                  contentPadding: const EdgeInsetsGeometry.symmetric(
                       horizontal: 30, vertical: 20),
                   titlePadding: const EdgeInsetsGeometry.only(top: 20),
                   backgroundColor: const Color(0xFF121212),

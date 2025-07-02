@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:concord/controllers/settings_controller.dart';
 import 'package:concord/models/chats_model.dart';
 import 'package:concord/models/messages_model.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ import 'package:concord/controllers/chat_post_controller.dart';
 
 class ChatPage extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
+  final SettingsController settingsController = Get.find<SettingsController>();
   final ChatController chatController =
       Get.put(ChatController(collection: 'chats'));
   final ChatsModel chatData;
@@ -420,6 +422,8 @@ class ChatPage extends StatelessWidget {
     try {
       if (content[index].repliedTo != null) {
         return MessageTileFull(
+          colorDisable:
+              settingsController.userSettings.accessibility.userColors,
           localUser:
               content[index].senderId == mainController.currentUserData.id,
           messageData: content[index],
@@ -433,6 +437,8 @@ class ChatPage extends StatelessWidget {
         );
       } else if (content[index].senderId != content[index + 1].senderId) {
         return MessageTileFull(
+            colorDisable:
+                settingsController.userSettings.accessibility.userColors,
             localUser:
                 content[index].senderId == mainController.currentUserData.id,
             messageData: content[index],
@@ -460,8 +466,10 @@ class ChatPage extends StatelessWidget {
               toggleMenu: chatController.toggleMenu);
         } else {
           return MessageTileFull(
+            colorDisable:
+                settingsController.userSettings.accessibility.userColors,
             localUser:
-            content[index].senderId == mainController.currentUserData.id,
+                content[index].senderId == mainController.currentUserData.id,
             messageData: content[index],
             sendingUser: chatController.userMap[content[index].senderId]!,
             toggleMenu: chatController.toggleMenu,
@@ -471,8 +479,8 @@ class ChatPage extends StatelessWidget {
       }
     } catch (e) {
       return MessageTileFull(
-        localUser:
-        content[index].senderId == mainController.currentUserData.id,
+        colorDisable: settingsController.userSettings.accessibility.userColors,
+        localUser: content[index].senderId == mainController.currentUserData.id,
         messageData: content[index],
         sendingUser: chatController.userMap[content[index].senderId]!,
         toggleMenu: chatController.toggleMenu,

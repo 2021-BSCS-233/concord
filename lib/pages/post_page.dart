@@ -7,10 +7,12 @@ import 'package:concord/widgets/message_tile.dart';
 import 'package:concord/widgets/popup_menus.dart';
 import 'package:concord/widgets/input_field.dart';
 import 'package:concord/controllers/main_controller.dart';
+import 'package:concord/controllers/settings_controller.dart';
 import 'package:concord/controllers/chat_post_controller.dart';
 
 class PostPage extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
+  final SettingsController settingsController = Get.find<SettingsController>();
   late final PostController postController =
       Get.put(PostController(collection: 'posts'));
   final PostsModel postData;
@@ -293,6 +295,8 @@ class PostPage extends StatelessWidget {
                         postController.chatContent.length - (index + 1)];
                     if (message.repliedTo != null) {
                       return MessageTileFull(
+                        colorDisable: settingsController
+                            .userSettings.accessibility.userColors,
                         localUser: message.senderId ==
                             mainController.currentUserData.id,
                         messageData: message,
@@ -306,6 +310,8 @@ class PostPage extends StatelessWidget {
                       );
                     } else {
                       return MessageTileFull(
+                          colorDisable: settingsController
+                              .userSettings.accessibility.userColors,
                           localUser: message.senderId ==
                               mainController.currentUserData.id,
                           messageData: message,

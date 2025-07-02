@@ -11,6 +11,7 @@ class MessageTileFull extends StatelessWidget {
   final UsersModel sendingUser;
   final String? repliedToUser;
   final bool localUser;
+  final bool colorDisable;
   final Function toggleMenu;
   final Function toggleProfile;
 
@@ -21,6 +22,7 @@ class MessageTileFull extends StatelessWidget {
       required this.toggleMenu,
       required this.toggleProfile,
       required this.localUser,
+      required this.colorDisable,
       this.repliedToUser});
 
   @override

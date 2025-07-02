@@ -12,9 +12,7 @@ import 'package:concord/models/users_model.dart';
 import 'package:concord/models/settings_model.dart';
 import 'package:concord/services/firebase_services.dart';
 
-
 class MainController extends GetxController {
-
   late UsersModel currentUserData;
   var selectedIndex = 0.obs;
   var showMenu = false.obs;
@@ -34,8 +32,8 @@ class MainController extends GetxController {
   Timer? overlayTimer;
   OverlayEntry? currentOverlayEntry;
 
-  void initializeControllers(SettingsModel userSettings){
-    Get.put(SettingsController(userSettings: userSettings));
+  void initializeControllers(SettingsModel userSettings) {
+    (Get.put(SettingsController(userSettings: userSettings))).getCategories();
     Get.put(ChatsController());
     Get.put(FriendsController());
     Get.put(RequestsController());
@@ -102,7 +100,7 @@ class MainController extends GetxController {
     });
   }
 
-  logOut(){
+  logOut() {
     chatsListenerRef?.cancel();
     chatListenerRef = null;
     profileListenerRef?.cancel();

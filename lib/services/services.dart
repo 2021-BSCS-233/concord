@@ -92,4 +92,27 @@ class APICalls {
       return <String>[];
     }
   }
+
+  Future<Map<String, List<String>>> getCategoriesPerform() async {
+    var url = Uri.parse('$serverUrl/get-categories');
+    var response = await http.get(url);
+    try {
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        Map<String, List<String>> categories =
+            (data['categories'] as Map<String, dynamic>).map(
+          (String key, dynamic value) {
+            return MapEntry(key, List<String>.from(value));
+          },
+        );
+        return categories;
+      } else {
+        debugPrint('communication error');
+        return <String, List<String>>{};
+      }
+    } catch (e) {
+      debugPrint('error in category data: $e');
+      return <String, List<String>>{};
+    }
+  }
 }
