@@ -12,8 +12,8 @@ class SettingsController extends GetxController {
   final MyFirestore myFirestore = MyFirestore();
   Map<String, List<String>> categories = {};
   bool didChange = false;
-  Rx<int> selectedLang = 0.obs;
-  Rx<bool> showMenu = false.obs;
+  var selectedLang = 0.obs;
+  var showMenu = false.obs;
 
   @override
   void onInit(){
@@ -23,6 +23,7 @@ class SettingsController extends GetxController {
       'es': 2,
     };
     selectedLang.value = languageIndex[userSettings.language];
+    getCategories();
   }
 
   TextEditingController usernameTextController = TextEditingController();

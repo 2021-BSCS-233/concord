@@ -127,7 +127,7 @@ class SignInPage extends StatelessWidget {
           ),
         ),
         Obx(() => Visibility(
-              visible: signInController.showOverlaySignIn.value,
+              visible: signInController.showWaitOverlay.value,
               child: Container(
                 color: const Color(0xC01D1D1F),
                 child: const Center(child: CircularProgressIndicator()),

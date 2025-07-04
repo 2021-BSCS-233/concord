@@ -72,7 +72,7 @@ class RequestsController extends GetxController {
           const EdgeInsetsGeometry.symmetric(horizontal: 30, vertical: 20),
       titlePadding: const EdgeInsetsGeometry.only(top: 10),
       backgroundColor: const Color(0xFF121212),
-      barrierDismissible: false,
+      barrierDismissible: true,
       title: 'Alert',
       titleStyle: const TextStyle(
           fontSize: 20,

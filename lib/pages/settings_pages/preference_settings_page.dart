@@ -65,8 +65,6 @@ class PreferenceSettingsPage extends StatelessWidget {
                                     }
                                     controller.didChange = true;
                                     controller.update(['preferenceSettings']);
-                                    debugPrint(
-                                        '${controller.userSettings.postPreference}');
                                   }),
                             ],
                           ),
@@ -124,8 +122,6 @@ class PreferenceSettingsPage extends StatelessWidget {
                                             controller.didChange = true;
                                             controller
                                                 .update(['preferenceSettings']);
-                                            debugPrint(
-                                                '${controller.userSettings.postPreference}');
                                           }),
                                     ],
                                   );

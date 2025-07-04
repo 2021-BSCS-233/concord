@@ -12,7 +12,7 @@ class SignInController extends GetxController {
   TextEditingController signInEmailTextController = TextEditingController();
   TextEditingController signInPassTextController = TextEditingController();
   var hidePassword = true.obs;
-  var showOverlaySignIn = false.obs;
+  var showWaitOverlay = false.obs;
   String failMessage = '';
 
   sendSignIn() async {
@@ -20,7 +20,7 @@ class SignInController extends GetxController {
     String email = signInEmailTextController.text.trim();
     String pass = signInPassTextController.text.trim();
     String display = signInDisplayTextController.text.trim();
-    showOverlaySignIn.value = true;
+    showWaitOverlay.value = true;
     if (RegExp(r'^[a-zA-Z][a-zA-Z0-9_]*?$').hasMatch(user) &&
         user.length >= 3 &&
         user.length <= 20 &&
@@ -44,10 +44,10 @@ class SignInController extends GetxController {
       );
       var response = await authentication.signInUserFirebase(email, pass);
       if (response?[0]) {
-        showOverlaySignIn.value = false;
+        showWaitOverlay.value = false;
         return response?[0];
       } else {
-        showOverlaySignIn.value = false;
+        showWaitOverlay.value = false;
         errorMessage(response?[1]);
         return false;
       }
@@ -66,7 +66,7 @@ class SignInController extends GetxController {
       if (!(RegExp(r'.{8,}').hasMatch(pass))) {
         failMessage = "$failMessage\nPassword Must be At Least 8 Characters";
       }
-      showOverlaySignIn.value = false;
+      showWaitOverlay.value = false;
       errorMessage(failMessage);
       return false;
     }
@@ -78,7 +78,7 @@ class SignInController extends GetxController {
           const EdgeInsetsGeometry.symmetric(horizontal: 30, vertical: 20),
       titlePadding: const EdgeInsetsGeometry.only(top: 10),
       backgroundColor: const Color(0xFF121212),
-      barrierDismissible: false,
+      barrierDismissible: true,
       title: 'Alert',
       titleStyle: const TextStyle(
           fontSize: 20,

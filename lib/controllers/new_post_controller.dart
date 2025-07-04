@@ -10,22 +10,35 @@ class NewPostController extends GetxController {
   TextEditingController titleTextController = TextEditingController();
   TextEditingController descriptionTextController = TextEditingController();
   List<String> categories = [];
+  var autoCat = true.obs;
+  var showWaitOverlay = false.obs;
 
   Future<bool> sendPost(posterId) async {
+    showWaitOverlay.value = true;
     APICalls apiCalls = APICalls();
     if (titleTextController.text.trim() == '' ||
         descriptionTextController.text.trim() == '') {
       errorMessage('Please fill all fields');
+      showWaitOverlay.value = false;
       return false;
     }
     String text =
         '${titleTextController.text.trim()}:${descriptionTextController.text.trim()}';
-
-    categories = await apiCalls.classifyTextPerform(text);
-    if (categories.isEmpty) {
-      errorMessage(
-          'There was an error during auto categorization. Please categorize the post manually or try again later');
-      return false;
+    if (autoCat.value) {
+      categories = await apiCalls.classifyTextPerform(text);
+      if (categories.isEmpty) {
+        errorMessage(
+            'There was an error during auto categorization. Please categorize the post manually or try again later');
+        showWaitOverlay.value = false;
+        return false;
+      }
+      //else show the cats to user to verify
+    } else {
+      if (categories.isEmpty) {
+        errorMessage('Please Select Categories');
+        showWaitOverlay.value = false;
+        return false;
+      }
     }
     PostsModel newPost = PostsModel(
         poster: posterId,
@@ -44,7 +57,9 @@ class NewPostController extends GetxController {
         edited: false,
         pinged: [],
         attachments: []);
-    return await myFirestore.sendPostFirebase(newPost, firstMessage, []);
+    bool response = await myFirestore.sendPostFirebase(newPost, firstMessage, []);
+    showWaitOverlay.value = false;
+    return response;
   }
 
   errorMessage(String text) {
@@ -53,7 +68,7 @@ class NewPostController extends GetxController {
           const EdgeInsetsGeometry.symmetric(horizontal: 30, vertical: 20),
       titlePadding: const EdgeInsetsGeometry.only(top: 10),
       backgroundColor: const Color(0xFF121212),
-      barrierDismissible: false,
+      barrierDismissible: true,
       title: 'Alert',
       titleStyle: const TextStyle(
           fontSize: 20,

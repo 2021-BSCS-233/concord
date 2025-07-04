@@ -33,12 +33,9 @@ class NotificationsPage extends StatelessWidget {
             return const Material(
                 color: Colors.transparent,
                 child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("We could not access our services"),
-                      Text("Check your connection or try again later"),
-                    ],
+                  child: Text(
+                    "We could not access our services\nCheck your connection or try again later",
+                    textAlign: TextAlign.center,
                   ),
                 ));
           }

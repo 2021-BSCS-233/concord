@@ -67,7 +67,7 @@ class SettingsListPage extends StatelessWidget {
                       horizontal: 30, vertical: 20),
                   titlePadding: const EdgeInsetsGeometry.only(top: 20),
                   backgroundColor: const Color(0xFF121212),
-                  barrierDismissible: false,
+                  barrierDismissible: true,
                   title: 'Confirm',
                   titleStyle: const TextStyle(
                       fontSize: 20,

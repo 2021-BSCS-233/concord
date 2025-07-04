@@ -7,27 +7,27 @@ class LogInController extends GetxController {
   TextEditingController logInEmailTextController = TextEditingController();
   TextEditingController logInPassTextController = TextEditingController();
   var hidePassword = true.obs;
-  var showOverlayLogIn = false.obs;
+  var showWaitOverlay = false.obs;
 
   // var showMessageLogIn = false.obs;
 
   Future<bool> sendLogIn() async {
     var email = logInEmailTextController.text.trim();
     var pass = logInPassTextController.text.trim();
-    showOverlayLogIn.value = true;
+    showWaitOverlay.value = true;
     if (RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(email) &&
         RegExp(r'.{8,}').hasMatch(pass)) {
       var response = await authentication.logInUserFirebase(email, pass);
       debugPrint('error: $response');
       if (response) {
-        showOverlayLogIn.value = false;
+        showWaitOverlay.value = false;
       } else {
-        showOverlayLogIn.value = false;
+        showWaitOverlay.value = false;
         errorMessage('Incorrect Email or Password Input');
       }
       return response;
     } else {
-      showOverlayLogIn.value = false;
+      showWaitOverlay.value = false;
       errorMessage('Invalid Email or Password');
       return false;
     }
@@ -39,7 +39,7 @@ class LogInController extends GetxController {
           const EdgeInsetsGeometry.symmetric(horizontal: 30, vertical: 20),
       titlePadding: const EdgeInsetsGeometry.only(top: 10),
       backgroundColor: const Color(0xFF121212),
-      barrierDismissible: false,
+      barrierDismissible: true,
       title: 'Alert',
       titleStyle: const TextStyle(
           fontSize: 20,

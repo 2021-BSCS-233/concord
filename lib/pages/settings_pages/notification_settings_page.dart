@@ -81,44 +81,90 @@ class NotificationSettingsPage extends StatelessWidget {
                         controller.didChange = true;
                         controller.update(['notificationSettings']);
                       }),
-                  //TODO: add group notif tile
-                  SettingsToggleTile(
-                      tileText: 'Posts',
-                      tileIcon: Icons.notifications,
-                      toggleValue: modelRef.overallPostNotif,
-                      toggleFunction: (value) {
-                        modelRef.overallPostNotif = value;
-                        controller.didChange = true;
-                        controller.update(['notificationSettings']);
-                        debugPrint(
-                            'here: ${modelRef.postNotifications.friendPostNotif}');
-                      }),
-                  Visibility(
-                      visible: modelRef.overallPostNotif,
-                      child: Container(
-                        margin: const EdgeInsets.all(7),
-                        padding: const EdgeInsets.only(left: 10),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF121218),
-                          borderRadius: BorderRadius.all(Radius.circular(20)),
-                        ),
-                        child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              SettingsToggleTile(
-                                  tileText: 'Friend\'s Posts',
-                                  tileIcon: Icons.post_add,
-                                  toggleValue: modelRef
-                                      .postNotifications.friendPostNotif,
-                                  toggleFunction: (value) {
-                                    modelRef.postNotifications.friendPostNotif =
-                                        value;
-                                    controller.didChange = true;
-                                    controller.update(['notificationSettings']);
-                                  }),
-                              //TODO: add remaining options
-                            ]),
-                      )),
+                  Container(
+                    margin: const EdgeInsets.all(7),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF121218),
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                    ),
+                    child: Column(
+                      children: [
+                        SettingsToggleTile(
+                            subTile: true,
+                            tileText: 'Posts',
+                            tileIcon: Icons.notifications,
+                            toggleValue: modelRef.overallPostNotif,
+                            toggleFunction: (value) {
+                              modelRef.overallPostNotif = value;
+                              controller.didChange = true;
+                              controller.update(['notificationSettings']);
+                            }),
+                        Visibility(
+                            visible: modelRef.overallPostNotif,
+                            child: Column(
+                              children: [
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 15),
+                                  child: Divider(
+                                    thickness: 3,
+                                    color: Color(0xFF222222),
+                                  ),
+                                ),
+                                SettingsToggleTile(
+                                    subTile: true,
+                                    tileText: 'Friend\'s Posts',
+                                    tileIcon: Icons.post_add,
+                                    toggleValue: modelRef
+                                        .postNotifications.friendPostNotif,
+                                    toggleFunction: (value) {
+                                      modelRef.postNotifications
+                                          .friendPostNotif = value;
+                                      controller.didChange = true;
+                                      controller
+                                          .update(['notificationSettings']);
+                                    }),
+                              ],
+                            )),
+                      ],
+                    ),
+                  ),
+                  // SettingsToggleTile(
+                  //     tileText: 'Posts',
+                  //     tileIcon: Icons.notifications,
+                  //     toggleValue: modelRef.overallPostNotif,
+                  //     toggleFunction: (value) {
+                  //       modelRef.overallPostNotif = value;
+                  //       controller.didChange = true;
+                  //       controller.update(['notificationSettings']);
+                  //       debugPrint(
+                  //           'here: ${modelRef.postNotifications.friendPostNotif}');
+                  //     }),
+                  // Visibility(
+                  //     visible: modelRef.overallPostNotif,
+                  //     child: Container(
+                  //       margin: const EdgeInsets.all(7),
+                  //       padding: const EdgeInsets.only(left: 10),
+                  //       decoration: const BoxDecoration(
+                  //         color: Color(0xFF121218),
+                  //         borderRadius: BorderRadius.all(Radius.circular(20)),
+                  //       ),
+                  //       child: Column(
+                  //           mainAxisAlignment: MainAxisAlignment.start,
+                  //           children: [
+                  //             SettingsToggleTile(
+                  //                 tileText: 'Friend\'s Posts',
+                  //                 tileIcon: Icons.post_add,
+                  //                 toggleValue: modelRef
+                  //                     .postNotifications.friendPostNotif,
+                  //                 toggleFunction: (value) {
+                  //                   modelRef.postNotifications.friendPostNotif =
+                  //                       value;
+                  //                   controller.didChange = true;
+                  //                   controller.update(['notificationSettings']);
+                  //                 }),
+                  //             //TODO: add remaining options
+                  //           ]),
+                  //     )),
                 ],
               );
             }),

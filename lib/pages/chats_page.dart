@@ -77,12 +77,9 @@ class ChatsPage extends StatelessWidget {
             return const Material(
                 color: Colors.transparent,
                 child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("We could not access our services"),
-                      Text("Check your connection or try again later"),
-                    ],
+                  child: Text(
+                    "We could not access our services\nCheck your connection or try again later",
+                    textAlign: TextAlign.center,
                   ),
                 ));
           }
@@ -127,8 +124,8 @@ class ChatsPage extends StatelessWidget {
                                   width: 70,
                                   decoration: const BoxDecoration(
                                       color: Color(0xAA18181F),
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(15))),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(15))),
                                   child: Center(
                                     child: InkWell(
                                       onTap: () {
@@ -153,10 +150,12 @@ class ChatsPage extends StatelessWidget {
                                                           .friendsData[index]
                                                           .status ==
                                                       'Online'
-                                                  ? controller.friendsData[index]
+                                                  ? controller
+                                                      .friendsData[index]
                                                       .displayStatus
                                                   : controller
-                                                      .friendsData[index].status,
+                                                      .friendsData[index]
+                                                      .status,
                                               iconSize: 17,
                                               iconBorder: 3.5,
                                             ),

@@ -434,7 +434,7 @@ class MyFirestore {
   }
 
   StreamSubscription chatsListenerFirebase(
-      String currentUserId, Function updateChats) {
+      String currentUserId, DateTime timeStamp, Function updateChats) {
     return chatsRef
         .orderBy('timeStamp', descending: true)
         .where('visible', arrayContains: currentUserId)
@@ -445,15 +445,16 @@ class MyFirestore {
         ChatsModel updateData = ChatsModel.fromJson(change.doc.data()!);
         updateData.id = change.doc.id;
         updateData.docRef = change.doc.reference;
-        if (change.type == DocumentChangeType.modified) {
-          updateChats(updateData, 'modified');
-        } else if (change.type == DocumentChangeType.added) {
+        if (change.type == DocumentChangeType.added &&
+            updateData.timeStamp.isAfter(timeStamp)) {
           updateData.receiverData = [];
           updateData.users.removeWhere((element) => element == currentUserId);
           for (var userId in updateData.users) {
             updateData.receiverData?.add(await getUserProfileFirebase(userId));
           }
           updateChats(updateData, 'added');
+        } else if (change.type == DocumentChangeType.modified) {
+          updateChats(updateData, 'modified');
         } else if (change.type == DocumentChangeType.removed) {
           updateChats(updateData, 'removed');
         }
@@ -558,7 +559,7 @@ class MyFirestore {
   }
 
   StreamSubscription messagesListenerFirebase(
-      DocumentReference docRef, Function updateMessages) {
+      DocumentReference docRef, DateTime timeStamp, Function updateMessages) {
     return docRef
         .collection('messages')
         .orderBy('timeStamp', descending: true)
@@ -582,7 +583,8 @@ class MyFirestore {
             updateData.repliedMessage!.docRef = rmData.reference;
           }
         }
-        if (change.type == DocumentChangeType.added) {
+        if (change.type == DocumentChangeType.added &&
+            updateData.timeStamp!.isAfter(timeStamp)) {
           updateMessages(updateData, 'added');
         } else if (change.type == DocumentChangeType.modified) {
           updateMessages(updateData, 'modified');

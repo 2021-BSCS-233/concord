@@ -33,7 +33,7 @@ class MainController extends GetxController {
   OverlayEntry? currentOverlayEntry;
 
   void initializeControllers(SettingsModel userSettings) {
-    (Get.put(SettingsController(userSettings: userSettings))).getCategories();
+    Get.put(SettingsController(userSettings: userSettings));
     Get.put(ChatsController());
     Get.put(FriendsController());
     Get.put(RequestsController());

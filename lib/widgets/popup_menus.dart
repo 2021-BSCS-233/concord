@@ -10,12 +10,10 @@ import 'package:concord/services/firebase_services.dart';
 import 'package:concord/widgets/status_icons.dart';
 import 'package:concord/widgets/option_tile.dart';
 
-//TODO: make a controller for popup menus, someone i forgot
+//TODO: make a controller for popup menus, somehow i forgot
 class UserGroupPopup extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
   final MyFirestore myFirestore = MyFirestore();
-
-  // final List tileContent;
 
   UserGroupPopup({super.key});
 

@@ -1,5 +1,6 @@
 import 'package:concord/controllers/main_controller.dart';
 import 'package:concord/controllers/posts_controller.dart';
+import 'package:concord/controllers/settings_controller.dart';
 import 'package:concord/pages/new_post_page.dart';
 import 'package:concord/widgets/post_tile.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 class PostsPage extends StatelessWidget {
   final MainController mainController = Get.find<MainController>();
+  final SettingsController settingsController = Get.find<SettingsController>();
   final PostsController postsController = Get.find<PostsController>();
 
   PostsPage({super.key});
@@ -56,12 +58,9 @@ class PostsPage extends StatelessWidget {
               return const Material(
                 color: Colors.transparent,
                 child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("We could not access our services"),
-                      Text("Check your connection or try again later")
-                    ],
+                  child: Text(
+                    "We could not access our services\nCheck your connection or try again later",
+                    textAlign: TextAlign.center,
                   ),
                 ),
               );
@@ -79,28 +78,38 @@ class PostsPage extends StatelessWidget {
   }
 
   Future<Widget> postsData() async {
-    postsController.initial ? await refreshContent() : null;
+    if (postsController.initial &&
+        settingsController.userSettings.postPreference.isNotEmpty) {
+      await refreshContent();
+    }
     return TabBarView(children: [
-      Container(
-        padding: const EdgeInsets.only(left: 10, right: 10),
-        child: RefreshIndicator(
-            onRefresh: () async {
-              refreshContent();
-              await Future.delayed(
-                  const Duration(seconds: 2)); // Simulate a delay
-              return Future.value(null);
-            },
-            child: GetBuilder(
-                init: postsController,
-                builder: (controller) {
-                  return ListView.builder(
-                      itemCount: controller.publicPosts.length,
-                      itemBuilder: (context, index) {
-                        return PostTile(
-                            postData: controller.publicPosts[index]);
-                      });
-                })),
-      ),
+      settingsController.userSettings.postPreference.isEmpty
+          ? const Center(
+              child: Text(
+                'Select Post Preference from\nsettings to see posts',
+                textAlign: TextAlign.center,
+              ),
+            )
+          : Container(
+              padding: const EdgeInsets.only(left: 10, right: 10),
+              child: RefreshIndicator(
+                  onRefresh: () async {
+                    refreshContent();
+                    await Future.delayed(
+                        const Duration(seconds: 2)); // Simulate a delay
+                    return Future.value(null);
+                  },
+                  child: GetBuilder(
+                      init: postsController,
+                      builder: (controller) {
+                        return ListView.builder(
+                            itemCount: controller.publicPosts.length,
+                            itemBuilder: (context, index) {
+                              return PostTile(
+                                  postData: controller.publicPosts[index]);
+                            });
+                      })),
+            ),
       Container(
         padding: const EdgeInsets.only(left: 10, right: 10),
         child: RefreshIndicator(

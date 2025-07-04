@@ -48,8 +48,8 @@ class PostController extends GetxController {
 
   getMessages() async {
     chatContent = await myFirestore.getInitialMessagesFirebase(docRef!);
-    mainController.chatListenerRef ??=
-        myFirestore.messagesListenerFirebase(docRef!, updateMessages);
+    mainController.chatListenerRef ??= myFirestore.messagesListenerFirebase(
+        docRef!, chatContent.first.timeStamp!, updateMessages);
     initial = false;
   }
 

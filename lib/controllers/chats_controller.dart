@@ -11,8 +11,8 @@ class ChatsController extends GetxController {
 
   getInitialData(currentUserId) async {
     chatsData = await myFirestore.getInitialChatsFirebase(currentUserId);
-    mainController.chatsListenerRef ??=
-        myFirestore.chatsListenerFirebase(currentUserId, updateChats);
+    mainController.chatsListenerRef ??= myFirestore.chatsListenerFirebase(
+        currentUserId, chatsData.first.timeStamp, updateChats);
     initial = false;
   }
 

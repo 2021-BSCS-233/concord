@@ -165,7 +165,7 @@ class FriendsPage extends StatelessWidget {
                                                     top: 10),
                                             backgroundColor:
                                                 const Color(0xFF121212),
-                                            barrierDismissible: false,
+                                            barrierDismissible: true,
                                             title: 'Alert',
                                             titleStyle: const TextStyle(
                                                 fontSize: 20,
@@ -187,6 +187,7 @@ class FriendsPage extends StatelessWidget {
                                             onConfirm: () {
                                               friendsController
                                                   .removeFriend(index);
+                                              Get.back();
                                             });
                                       })
                                 ],
