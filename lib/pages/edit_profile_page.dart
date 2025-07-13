@@ -15,11 +15,11 @@ class EditProfilePage extends StatelessWidget {
   EditProfilePage({
     super.key,
   }) {
-    editProfileController.displayTextController.text =
+    editProfileController.displayTC.text =
         mainController.currentUserData.displayName;
-    editProfileController.pronounceTextController.text =
+    editProfileController.pronounceTC.text =
         mainController.currentUserData.pronouns;
-    editProfileController.aboutMeTextController.text =
+    editProfileController.aboutMeTC.text =
         mainController.currentUserData.aboutMe;
     editProfileController.image = '';
   }
@@ -174,7 +174,7 @@ class EditProfilePage extends StatelessWidget {
                             color: Colors.grey.shade400,
                             fontSize: 12)),
                     TextFormField(
-                      controller: editProfileController.displayTextController,
+                      controller: editProfileController.displayTC,
                       decoration: InputDecoration(
                         contentPadding: const EdgeInsets.symmetric(
                             vertical: 5, horizontal: 10),
@@ -193,7 +193,7 @@ class EditProfilePage extends StatelessWidget {
                             fontSize: 12)),
                     TextFormField(
                       maxLength: 40,
-                      controller: editProfileController.pronounceTextController,
+                      controller: editProfileController.pronounceTC,
                       decoration: InputDecoration(
                           contentPadding: const EdgeInsets.symmetric(
                               vertical: 5, horizontal: 10),
@@ -210,7 +210,7 @@ class EditProfilePage extends StatelessWidget {
                             color: Colors.grey.shade400,
                             fontSize: 12)),
                     TextFormField(
-                      controller: editProfileController.aboutMeTextController,
+                      controller: editProfileController.aboutMeTC,
                       maxLines: 7,
                       maxLength: 190,
                       decoration: InputDecoration(

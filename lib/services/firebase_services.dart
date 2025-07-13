@@ -42,6 +42,7 @@ class MyAuthentication {
 
       mainController.currentUserData.id = userId;
       mainController.currentUserData.docRef = userInstance;
+      mainController.mySocket = mySocket;
       mainController.initializeControllers(userSettings);
 
       mySocket.connectSocket(userId);
@@ -88,6 +89,7 @@ class MyAuthentication {
           UsersModel.fromJson(userData.data() as Map<String, dynamic>);
       mainController.currentUserData.id = userId;
       mainController.currentUserData.docRef = userData.reference;
+      mainController.mySocket = mySocket;
       mainController.initializeControllers(userSettings);
 
       mySocket.connectSocket(userId);
@@ -129,6 +131,7 @@ class MyAuthentication {
             UsersModel.fromJson(userData.data() as Map<String, dynamic>);
         mainController.currentUserData.id = userId;
         mainController.currentUserData.docRef = userData.reference;
+        mainController.mySocket = mySocket;
         mainController.initializeControllers(userSettings);
 
         mySocket.connectSocket(userId);
@@ -147,6 +150,37 @@ class MyAuthentication {
       }
     } else {
       debugPrint('No login data found');
+      return false;
+    }
+  }
+
+  Future<bool> changeUsernameFirebase(newUsername, currentPassword) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      debugPrint('User not logged in');
+      return false;
+    }
+    try {
+      final AuthCredential credential = EmailAuthProvider.credential(
+        email: user.email!,
+        password: currentPassword,
+      );
+
+      await user.reauthenticateWithCredential(credential);
+
+      await usersRef.doc(user.uid).update({'username': newUsername});
+
+      return true;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'wrong-password') {
+        debugPrint('Incorrect password');
+        return false;
+      } else {
+        debugPrint('Re-authentication error: ${e.message}');
+        return false;
+      }
+    } catch (e) {
+      debugPrint('An unexpected error occurred: $e');
       return false;
     }
   }
@@ -173,6 +207,17 @@ class MyFirestore {
       FirebaseFirestore.instance.collection('notifications');
 
 //TODO: stop using listener for this (maybe)
+
+  Future<bool> checkUsernameAvailabilityFirebase(username) async {
+    var instances = await usersRef.where('username', isEqualTo: username).limit(1).get();
+    if(instances.docs.isEmpty){
+      return true;
+    } else {
+      debugPrint('username already in use');
+      return false;
+    }
+  }
+
   void profileListenerFirebase(String currentUserId) {
     mainController.profileListenerRef ??=
         usersRef.doc(currentUserId).snapshots().listen((event) {
@@ -484,7 +529,7 @@ class MyFirestore {
         .where('users', whereIn: [
       [currentUserId, otherUserId],
       [otherUserId, currentUserId]
-    ]).get();
+    ]).limit(1).get();
     if (instances.docs.isNotEmpty) {
       ChatsModel chatData = ChatsModel.fromJson(instances.docs[0].data());
       chatData.id = instances.docs[0].id;

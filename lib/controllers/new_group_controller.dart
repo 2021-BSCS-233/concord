@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 class NewGroupController extends GetxController {
   final MainController mainController = Get.find<MainController>();
   final MyFirestore myFirestore = MyFirestore();
-  TextEditingController groupNameTextController = TextEditingController();
+  TextEditingController groupNameTC = TextEditingController();
   List<UsersModel> friendsData;
   List<bool> markedUsers = [];
 
@@ -25,9 +25,9 @@ class NewGroupController extends GetxController {
           selectUsers.map((user) => user.displayName).toList();
       String groupName = '';
       usersId.add(mainController.currentUserData.id!);
-      usersDisplayName.insert(0,mainController.currentUserData.displayName);
-      if (groupNameTextController.text.trim() != '') {
-        groupName = groupNameTextController.text.trim();
+      usersDisplayName.insert(0, mainController.currentUserData.displayName);
+      if (groupNameTC.text.trim() != '') {
+        groupName = groupNameTC.text.trim();
       } else {
         groupName = usersDisplayName.take(3).join(', ') +
             (usersDisplayName.length > 3 ? ', ...' : '');

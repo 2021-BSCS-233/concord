@@ -7,19 +7,19 @@ import 'package:concord/services/firebase_services.dart';
 class SignInController extends GetxController {
   final MainController mainController = Get.find<MainController>();
   final MyAuthentication authentication = MyAuthentication();
-  TextEditingController signInUsernameTextController = TextEditingController();
-  TextEditingController signInDisplayTextController = TextEditingController();
-  TextEditingController signInEmailTextController = TextEditingController();
-  TextEditingController signInPassTextController = TextEditingController();
+  TextEditingController signInUsernameTC = TextEditingController();
+  TextEditingController signInDisplayTC = TextEditingController();
+  TextEditingController signInEmailTC = TextEditingController();
+  TextEditingController signInPassTC = TextEditingController();
   var hidePassword = true.obs;
   var showWaitOverlay = false.obs;
   String failMessage = '';
 
   sendSignIn() async {
-    String user = signInUsernameTextController.text.trim().toLowerCase();
-    String email = signInEmailTextController.text.trim();
-    String pass = signInPassTextController.text.trim();
-    String display = signInDisplayTextController.text.trim();
+    String user = signInUsernameTC.text.trim().toLowerCase();
+    String email = signInEmailTC.text.trim();
+    String pass = signInPassTC.text.trim();
+    String display = signInDisplayTC.text.trim();
     showWaitOverlay.value = true;
     if (RegExp(r'^[a-zA-Z][a-zA-Z0-9_]*?$').hasMatch(user) &&
         user.length >= 3 &&

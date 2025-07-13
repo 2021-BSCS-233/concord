@@ -162,7 +162,7 @@ class RequestsPage extends StatelessWidget {
                     child: CustomInputField(
                       fieldLabel: 'Add Friend',
                       controller:
-                          requestsController.requestsFieldTextController,
+                          requestsController.requestsFieldTC,
                       prefixIcon: CupertinoIcons.person_add,
                       onChange: requestsController.changing,
                       contentTopPadding: 10,

@@ -11,10 +11,10 @@ class RequestsController extends GetxController {
   List<RequestsModel> incomingRequestsData = [];
   List<RequestsModel> outgoingRequestsData = [];
   var fieldCheck = false.obs;
-  TextEditingController requestsFieldTextController = TextEditingController();
+  TextEditingController requestsFieldTC = TextEditingController();
 
   void changing() {
-    fieldCheck.value = (requestsFieldTextController.text != '' ? true : false);
+    fieldCheck.value = (requestsFieldTC.text != '' ? true : false);
   }
 
   getInitialData(currentUserId) async {
@@ -30,8 +30,8 @@ class RequestsController extends GetxController {
     fieldCheck.value = false;
     var response = await myFirestore.sendRequestFirebase(
         mainController.currentUserData,
-        requestsFieldTextController.text.trim().toLowerCase());
-    requestsFieldTextController.text = '';
+        requestsFieldTC.text.trim().toLowerCase());
+    requestsFieldTC.text = '';
     if (response != 'Request Sent') {
       errorMessage(response);
     }

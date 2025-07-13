@@ -55,7 +55,7 @@ class LogInPage extends StatelessWidget {
                   ),
                   CustomInputField(
                     fieldLabel: 'Email',
-                    controller: logInController.logInEmailTextController,
+                    controller: logInController.logInEmailTC,
                     fieldRadius: 2,
                     horizontalMargin: 0,
                     verticalMargin: 2,
@@ -65,7 +65,7 @@ class LogInPage extends StatelessWidget {
                   ),
                   Obx(() => CustomInputField(
                         fieldLabel: 'Password',
-                        controller: logInController.logInPassTextController,
+                        controller: logInController.logInPassTC,
                         fieldRadius: 2,
                         horizontalMargin: 0,
                         verticalMargin: 2,
@@ -85,7 +85,7 @@ class LogInPage extends StatelessWidget {
                       bool response = await logInController.sendLogIn();
                       if (response) {
                         Get.delete<LogInController>();
-                        Get.offAll(Home());
+                        Get.offAll(()=> Home());
                       }
                     },
                     child: Container(
@@ -109,7 +109,7 @@ class LogInPage extends StatelessWidget {
                     child: InkWell(
                       enableFeedback: false,
                       onTap: () {
-                        Get.to(SignInPage());
+                        Get.to(() => SignInPage());
                       },
                       child: const Padding(
                         padding: EdgeInsets.only(top: 10, bottom: 10, left: 10),

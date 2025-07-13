@@ -7,8 +7,8 @@ import 'package:get/get.dart';
 
 class NewPostController extends GetxController {
   final MyFirestore myFirestore = MyFirestore();
-  TextEditingController titleTextController = TextEditingController();
-  TextEditingController descriptionTextController = TextEditingController();
+  TextEditingController titleTC = TextEditingController();
+  TextEditingController descriptionTC = TextEditingController();
   List<String> categories = [];
   var autoCat = true.obs;
   var showWaitOverlay = false.obs;
@@ -16,14 +16,14 @@ class NewPostController extends GetxController {
   Future<bool> sendPost(posterId) async {
     showWaitOverlay.value = true;
     APICalls apiCalls = APICalls();
-    if (titleTextController.text.trim() == '' ||
-        descriptionTextController.text.trim() == '') {
+    if (titleTC.text.trim() == '' ||
+        descriptionTC.text.trim() == '') {
       errorMessage('Please fill all fields');
       showWaitOverlay.value = false;
       return false;
     }
     String text =
-        '${titleTextController.text.trim()}:${descriptionTextController.text.trim()}';
+        '${titleTC.text.trim()}:${descriptionTC.text.trim()}';
     if (autoCat.value) {
       categories = await apiCalls.classifyTextPerform(text);
       if (categories.isEmpty) {
@@ -42,8 +42,8 @@ class NewPostController extends GetxController {
     }
     PostsModel newPost = PostsModel(
         poster: posterId,
-        title: titleTextController.text.trim(),
-        description: descriptionTextController.text.trim(),
+        title: titleTC.text.trim(),
+        description: descriptionTC.text.trim(),
         topAttachment: '',
         categories: categories,
         followers: [posterId],
@@ -53,7 +53,7 @@ class NewPostController extends GetxController {
         timeStamp: DateTime.now());
     MessagesModel firstMessage = MessagesModel(
         senderId: posterId,
-        message: descriptionTextController.text.trim(),
+        message: descriptionTC.text.trim(),
         edited: false,
         pinged: [],
         attachments: []);

@@ -60,7 +60,7 @@ class NewGroupPage extends StatelessWidget {
             ),
             CustomInputField(
               fieldLabel: 'Group Name',
-              controller: newGroupController.groupNameTextController,
+              controller: newGroupController.groupNameTC,
               fieldRadius: 2,
               horizontalMargin: 0,
               verticalMargin: 2,

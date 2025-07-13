@@ -49,7 +49,7 @@ class NewPostPage extends StatelessWidget {
                       maxLines: 3,
                       maxLength: 90,
                       contentBottomPadding: 6.5,
-                      controller: newPostController.titleTextController),
+                      controller: newPostController.titleTC),
                   const Padding(
                     padding: EdgeInsets.only(top: 8, left: 6),
                     child: Text(
@@ -65,7 +65,7 @@ class NewPostPage extends StatelessWidget {
                       maxLines: 15,
                       maxLength: 900,
                       contentBottomPadding: 6.5,
-                      controller: newPostController.descriptionTextController),
+                      controller: newPostController.descriptionTC),
                   const SizedBox(height: 10),
                   Obx(() => Container(
                         margin: const EdgeInsets.symmetric(horizontal: 6),

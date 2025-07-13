@@ -213,9 +213,10 @@ class Home extends StatelessWidget {
 }
 //things left
 //TODO: ability to change account data
-//TODO: auto notifications for posts
 //TODO: setup settings usage
+//TODO: auto notifications for posts
 //TODO: notification redirects
+//TODO: cloud messaging system
 //TODO: language support fot new text
 
 /* things to add in UI page

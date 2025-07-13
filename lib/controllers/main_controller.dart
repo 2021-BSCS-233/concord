@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:concord/services/services.dart';
+
 import 'settings_controller.dart';
 import 'requests_controller.dart';
 import 'posts_controller.dart';
@@ -14,6 +16,7 @@ import 'package:concord/services/firebase_services.dart';
 
 class MainController extends GetxController {
   late UsersModel currentUserData;
+  late MySocket mySocket;
   var selectedIndex = 0.obs;
   var showMenu = false.obs;
   var showStatus = false.obs;
@@ -33,6 +36,7 @@ class MainController extends GetxController {
   OverlayEntry? currentOverlayEntry;
 
   void initializeControllers(SettingsModel userSettings) {
+    debugPrint('running controllers');
     Get.put(SettingsController(userSettings: userSettings));
     Get.put(ChatsController());
     Get.put(FriendsController());
@@ -111,9 +115,10 @@ class MainController extends GetxController {
     requestListenerRef = null;
     notificationListenerRef?.cancel();
     notificationListenerRef = null;
+    mySocket.disconnectSocket();
     selectedIndex.value = 0;
     MyAuthentication.logoutUser();
     Get.deleteAll();
-    Get.offAll(LogInPage());
+    Get.offAll(()=> LogInPage());
   }
 }

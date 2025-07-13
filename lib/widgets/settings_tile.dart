@@ -28,7 +28,7 @@ class SettingsNavTile extends StatelessWidget {
             ),
       child: InkWell(
         onTap: () {
-          Get.to(page);
+          Get.to(() => page);
         },
         child: ListTile(
           leading: Icon(

@@ -201,7 +201,7 @@ class PostPage extends StatelessWidget {
                         fieldFocusNode: postController.chatFocusNode,
                         fieldRadius: 20,
                         fieldLabel: 'Send a message in "${postData.title}"',
-                        controller: postController.chatFieldTextController,
+                        controller: postController.chatFieldTC,
                         suffixIcon: Icons.all_inclusive,
                         fieldColor: const Color(0xFF151515),
                         onChange: postController.sendVisibility,

@@ -37,7 +37,7 @@ class PostsPage extends StatelessWidget {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            Get.to(NewPostPage())?.then((value) {
+            Get.to(() => NewPostPage())?.then((value) {
               refreshContent();
             });
           },

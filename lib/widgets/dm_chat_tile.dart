@@ -34,7 +34,7 @@ class DmChatTile extends StatelessWidget {
       child: ListTile(
         titleAlignment: ListTileTitleAlignment.top,
         onTap: () {
-          Get.to(ChatPage(chatData: chatData))?.then((value) {
+          Get.to(() => ChatPage(chatData: chatData))?.then((value) {
             mainController.chatListenerRef?.cancel();
             mainController.chatListenerRef = null;
           });

@@ -69,7 +69,7 @@ class PostTile extends StatelessWidget {
               ),
               ListTile(
                 onTap: (){
-                  Get.to(PostPage(postData: postData))?.then((value){
+                  Get.to(() => PostPage(postData: postData))?.then((value){
                     mainController.chatListenerRef?.cancel();
                     mainController.chatListenerRef = null;
                   });

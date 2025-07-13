@@ -243,7 +243,7 @@ class ChatPage extends StatelessWidget {
                               : chatData.chatGroupName
                         }),
                         fieldHint: 'Send a Message',
-                        controller: chatController.chatFieldTextController,
+                        controller: chatController.chatFieldTC,
                         suffixIcon: Icons.all_inclusive,
                         fieldColor: const Color(0xFF151515),
                         onChange: chatController.sendVisibility,

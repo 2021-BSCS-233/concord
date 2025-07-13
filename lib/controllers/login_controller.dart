@@ -4,16 +4,16 @@ import 'package:concord/services/firebase_services.dart';
 
 class LogInController extends GetxController {
   final MyAuthentication authentication = MyAuthentication();
-  TextEditingController logInEmailTextController = TextEditingController();
-  TextEditingController logInPassTextController = TextEditingController();
+  TextEditingController logInEmailTC = TextEditingController();
+  TextEditingController logInPassTC = TextEditingController();
   var hidePassword = true.obs;
   var showWaitOverlay = false.obs;
 
   // var showMessageLogIn = false.obs;
 
   Future<bool> sendLogIn() async {
-    var email = logInEmailTextController.text.trim();
-    var pass = logInPassTextController.text.trim();
+    var email = logInEmailTC.text.trim();
+    var pass = logInPassTC.text.trim();
     showWaitOverlay.value = true;
     if (RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(email) &&
         RegExp(r'.{8,}').hasMatch(pass)) {

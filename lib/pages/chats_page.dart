@@ -34,7 +34,7 @@ class ChatsPage extends StatelessWidget {
           InkWell(
             enableFeedback: true,
             onTap: () {
-              Get.to(FriendsPage());
+              Get.to(() => FriendsPage());
             },
             child: SizedBox(
               height: 40,
@@ -58,7 +58,7 @@ class ChatsPage extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Get.to(NewGroupPage());
+          Get.to(() => NewGroupPage());
         },
         backgroundColor: const Color.fromARGB(255, 255, 77, 0),
         shape: const CircleBorder(),

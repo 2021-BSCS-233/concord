@@ -18,7 +18,7 @@ class LazyCachedImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Get.to(ImagePage(url: url));
+        Get.to(() => ImagePage(url: url));
       },
       // child: CachedNetworkImage(
       //   imageUrl: url,

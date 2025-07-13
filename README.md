@@ -1,16 +1,13 @@
 # concord
 
-A new Flutter project.
+A Flutter project as my final year project.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+This project is a combination of a chatting app and a QnA site.
 
-A few resources to get you started if this is your first Flutter project:
+It tries to remove the limitation of communication a QnA site has and limitation of a formal 
+and publicly available QnA section in a chatting app
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+The project uses Flutter framework for app UI/UX, Firebase Firestone for real time database 
+and a Node.js server

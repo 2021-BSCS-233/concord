@@ -27,7 +27,7 @@ class PostController extends GetxController {
   var sendVisible = false.obs;
   var attachmentVisible = false.obs;
   final chatFocusNode = FocusNode();
-  TextEditingController chatFieldTextController = TextEditingController();
+  TextEditingController chatFieldTC = TextEditingController();
 
   PostController({required this.collection});
 
@@ -54,11 +54,11 @@ class PostController extends GetxController {
   }
 
   void sendVisibility() {
-    if (!editMode.value && chatFieldTextController.text.trim() != '') {
+    if (!editMode.value && chatFieldTC.text.trim() != '') {
       sendVisible.value = true;
     } else if (editMode.value &&
-        chatFieldTextController.text.trim() != messageSelected.message &&
-        chatFieldTextController.text.trim() != '') {
+        chatFieldTC.text.trim() != messageSelected.message &&
+        chatFieldTC.text.trim() != '') {
       sendVisible.value = true;
     } else {
       sendVisible.value = false;
@@ -91,14 +91,14 @@ class PostController extends GetxController {
     replyMode.value = false;
     showMenu.value = false;
     editMode.value = true;
-    chatFieldTextController.text = messageSelected.message;
+    chatFieldTC.text = messageSelected.message;
     chatFocusNode.requestFocus();
     // update(['editReplyMode']);
   }
 
   exitEditMode() {
     editMode.value = false;
-    chatFieldTextController.text = '';
+    chatFieldTC.text = '';
     chatFocusNode.unfocus();
     // update(['editReplyMode']);
   }
@@ -127,12 +127,12 @@ class PostController extends GetxController {
     } else {
       MessagesModel messageData = MessagesModel(
           senderId: currentUserId,
-          message: chatFieldTextController.text.trim(),
+          message: chatFieldTC.text.trim(),
           edited: false,
           repliedTo: replyingTo['messageId'],
           pinged: [],
           attachments: []);
-      chatFieldTextController.clear();
+      chatFieldTC.clear();
       replyMode.value = false;
       replyingTo.clear();
       attachments.isNotEmpty ? uploadCount++ : null;
@@ -145,8 +145,8 @@ class PostController extends GetxController {
 
   sendEditedMessage() {
     myFirestore.editMessageFirebase(
-        messageSelected.docRef!, chatFieldTextController.text.trim());
-    chatFieldTextController.clear();
+        messageSelected.docRef!, chatFieldTC.text.trim());
+    chatFieldTC.clear();
     chatFocusNode.unfocus();
     editMode.value = false;
     // update(['editReplyMode']);

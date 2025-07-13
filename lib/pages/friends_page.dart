@@ -30,7 +30,7 @@ class FriendsPage extends StatelessWidget {
         actions: [
           InkWell(
             onTap: () {
-              Get.to(RequestsPage());
+              Get.to(() => RequestsPage());
             },
             child: Container(
               height: 40,
@@ -138,7 +138,7 @@ class FriendsPage extends StatelessWidget {
                                       ChatsModel chatData =
                                           await friendsController
                                               .getUserChat(index);
-                                      Get.to(ChatPage(chatData: chatData));
+                                      Get.to(() => ChatPage(chatData: chatData));
                                     },
                                   ),
                                   const SizedBox(

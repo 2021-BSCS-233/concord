@@ -1,3 +1,4 @@
+import 'package:concord/controllers/login_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:concord/main.dart';
 import 'package:get/get.dart';
@@ -54,7 +55,7 @@ class SignInPage extends StatelessWidget {
                   ),
                   CustomInputField(
                     fieldLabel: 'Username',
-                    controller: signInController.signInUsernameTextController,
+                    controller: signInController.signInUsernameTC,
                     fieldRadius: 2,
                     horizontalMargin: 0,
                     verticalMargin: 2,
@@ -65,7 +66,7 @@ class SignInPage extends StatelessWidget {
                   ),
                   CustomInputField(
                     fieldLabel: 'Display Name',
-                    controller: signInController.signInDisplayTextController,
+                    controller: signInController.signInDisplayTC,
                     fieldRadius: 2,
                     horizontalMargin: 0,
                     verticalMargin: 2,
@@ -75,7 +76,7 @@ class SignInPage extends StatelessWidget {
                   ),
                   CustomInputField(
                     fieldLabel: 'Email',
-                    controller: signInController.signInEmailTextController,
+                    controller: signInController.signInEmailTC,
                     fieldRadius: 2,
                     horizontalMargin: 0,
                     verticalMargin: 2,
@@ -85,7 +86,7 @@ class SignInPage extends StatelessWidget {
                   ),
                   Obx(() => CustomInputField(
                         fieldLabel: 'Password',
-                        controller: signInController.signInPassTextController,
+                        controller: signInController.signInPassTC,
                         fieldRadius: 2,
                         horizontalMargin: 0,
                         verticalMargin: 2,
@@ -104,8 +105,9 @@ class SignInPage extends StatelessWidget {
                     onTap: () async {
                       var response = await signInController.sendSignIn();
                       if (response) {
-                        Get.deleteAll();
-                        Get.offAll(Home());
+                        Get.delete<SignInController>();
+                        Get.delete<LogInController>();
+                        Get.offAll(()=> Home());
                       }
                     },
                     child: Container(

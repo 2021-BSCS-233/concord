@@ -6,19 +6,19 @@ import 'package:get/get.dart';
 class EditProfileController extends GetxController {
   final MainController mainController = Get.find();
   final MyFirestore myFirestore = MyFirestore();
-  TextEditingController displayTextController = TextEditingController();
-  TextEditingController pronounceTextController = TextEditingController();
-  TextEditingController aboutMeTextController = TextEditingController();
+  TextEditingController displayTC = TextEditingController();
+  TextEditingController pronounceTC = TextEditingController();
+  TextEditingController aboutMeTC = TextEditingController();
   String image = '';
 
   Future<void> updateProfile() async {
     await myFirestore.updateProfileFirebase(
         mainController.currentUserData.id,
-        displayTextController.text.trim() != ''
-            ? displayTextController.text.trim()
+        displayTC.text.trim() != ''
+            ? displayTC.text.trim()
             : mainController.currentUserData.displayName,
-        pronounceTextController.text.trim(),
-        aboutMeTextController.text.trim(),
+        pronounceTC.text.trim(),
+        aboutMeTC.text.trim(),
         image);
   }
 }

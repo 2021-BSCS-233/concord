@@ -76,7 +76,7 @@ class ProfilePage extends StatelessWidget {
                             top: 40,
                             child: InkWell(
                               onTap: () {
-                                Get.to(SettingsListPage());
+                                Get.to(() => SettingsListPage());
                               },
                               child: Container(
                                   height: 35,
@@ -166,7 +166,7 @@ class ProfilePage extends StatelessWidget {
                                 ),
                                 InkWell(
                                   onTap: () {
-                                    Get.to(EditProfilePage());
+                                    Get.to(() => EditProfilePage());
                                   },
                                   child: Container(
                                     height: 38,
