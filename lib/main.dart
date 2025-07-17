@@ -14,13 +14,42 @@ import 'package:concord/widgets/popup_menus.dart';
 import 'package:concord/widgets/status_icons.dart';
 import 'package:concord/firebase_options.dart';
 import 'package:concord/controllers/main_controller.dart';
+import 'package:concord/controllers/auth_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+class RootWidget extends StatelessWidget {
+  const RootWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    Get.put<AuthController>(AuthController(), permanent: true);
+    Get.put(MainController(), permanent: true);
+
+    return Obx(() {
+      final AuthController authController = Get.find<AuthController>();
+      final MainController mainController = Get.find<MainController>();
+
+      if (mainController.isUserDataLoading.value) {
+        return const Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
+      }
+
+      if (authController.user.value != null) {
+        return const HomePageWrapper();
+      } else {
+        return LogInPage();
+      }
+    });
+  }
+}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  Get.put(MainController(), permanent: true);
   Get.put(LocalizationController(prefs: prefs), permanent: true);
   runApp(GetMaterialApp(
     debugShowCheckedModeBanner: false,
@@ -40,50 +69,19 @@ Future<void> main() async {
     locale: Get.locale,
     fallbackLocale: const Locale('en', ''),
     home:
-        InitialLoading(), // default is suppose to be InitialLoading() any other page is debugging
+        const RootWidget(), // default is suppose to be InitialLoading() any other page is debugging
   ));
 }
 
 bool initialMain = true;
 
-class InitialLoading extends StatelessWidget {
-  InitialLoading({super.key});
-
-  final MyAuthentication authentication = MyAuthentication();
+class HomePageWrapper extends StatelessWidget {
+  const HomePageWrapper({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Widget>(
-      future: _buildContent(context),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return snapshot.data!;
-        } else if (snapshot.hasError) {
-          debugPrint("${snapshot.error}");
-          return Material(
-              color: Colors.transparent,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(snapshot.error.toString()),
-                  ],
-                ),
-              ));
-        }
-        return const Center(child: CircularProgressIndicator());
-      },
-    );
-  }
-
-  Future<Widget> _buildContent(BuildContext context) async {
-    bool response = false;
-    initialMain ? (response = await authentication.autoLoginFirebase()) : null;
-    if (response) {
-      return Home();
-    } else {
-      return LogInPage();
-    }
+    HomePageBindings().dependencies();
+    return Home();
   }
 }
 

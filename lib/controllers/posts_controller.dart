@@ -5,12 +5,12 @@ import 'package:get/get.dart';
 
 class PostsController extends GetxController {
   final MyFirestore myFirestore = MyFirestore();
-  final SettingsController settingsController = Get.find<SettingsController>();
   bool initial = true;
   List<PostsModel> publicPosts = [];
   List<PostsModel> followingPosts = [];
 
   getInitialPosts(currentUserId) async {
+    final SettingsController settingsController = Get.find<SettingsController>();
     var result = await myFirestore.getInitialPostsFirebase(
         currentUserId, settingsController.userSettings.postPreference.toList());
     publicPosts = result[0];

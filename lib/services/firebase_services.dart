@@ -6,7 +6,6 @@ import 'package:concord/models/notifications_model.dart';
 import 'package:concord/models/posts_model.dart';
 import 'package:concord/models/request_model.dart';
 import 'package:concord/models/settings_model.dart';
-import 'package:concord/services/services.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -23,10 +22,10 @@ class MyAuthentication {
       FirebaseFirestore.instance.collection('users');
   final CollectionReference settingsRef =
       FirebaseFirestore.instance.collection('settings');
-  final MySocket mySocket = MySocket();
 
   Future<List?> signInUserFirebase(String email, String pass) async {
     MainController mainController = Get.find<MainController>();
+    mainController.isUserDataLoading.value = true;
     try {
       var userCredential = await authRef.createUserWithEmailAndPassword(
           email: email, password: pass);
@@ -38,118 +37,47 @@ class MyAuthentication {
       SettingsModel userSettings = SettingsModel.defaultSettings();
       DocumentReference settingsInstance = settingsRef.doc(userId);
       await settingsInstance.set(userSettings.toJson());
-      userSettings.docRef = settingsInstance;
-
-      mainController.currentUserData.id = userId;
-      mainController.currentUserData.docRef = userInstance;
-      mainController.mySocket = mySocket;
-      mainController.initializeControllers(userSettings);
-
-      mySocket.connectSocket(userId);
       return [true, ''];
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
+        mainController.isUserDataLoading.value = false;
         return [false, 'Please enter a stronger password'];
       } else if (e.code == 'email-already-in-use') {
+        mainController.isUserDataLoading.value = false;
         return [false, 'Email already in use'];
       } else {
         debugPrint('An error occurred: ${e.message}');
+        mainController.isUserDataLoading.value = false;
         return [
           false,
           'An error occurred while registering your user, Pls try again later'
         ];
       }
     } catch (e) {
-      debugPrint('An error occurred during signin: $e');
+      debugPrint('An error occurred during sign-in: $e');
+      mainController.isUserDataLoading.value = false;
       return [false, 'An unknown error occurred, Pls try again later'];
     }
   }
 
   Future<bool> logInUserFirebase(String email, String pass) async {
     MainController mainController = Get.find<MainController>();
+    mainController.isUserDataLoading.value = true;
     try {
-      var userCredential = await authRef.signInWithEmailAndPassword(
+      await authRef.signInWithEmailAndPassword(
           email: email, password: pass);
-      var userId = userCredential.user?.uid;
-
-      var userData = await usersRef.doc(userId).get();
-      var settingsData = await settingsRef.doc(userId).get();
-      SettingsModel userSettings;
-      if (!settingsData.exists) {
-        userSettings = SettingsModel.defaultSettings();
-        userSettings.docRef = settingsRef.doc(userId);
-        await userSettings.docRef!.set(userSettings.toJson());
-      } else {
-        userSettings =
-            SettingsModel.fromJson(settingsData.data() as Map<String, dynamic>);
-        userSettings.docRef = settingsData.reference;
-      }
-
-      mainController.currentUserData =
-          UsersModel.fromJson(userData.data() as Map<String, dynamic>);
-      mainController.currentUserData.id = userId;
-      mainController.currentUserData.docRef = userData.reference;
-      mainController.mySocket = mySocket;
-      mainController.initializeControllers(userSettings);
-
-      mySocket.connectSocket(userId);
       return true;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         debugPrint("Email not found. Please check and try again.");
-        return false;
       } else {
         debugPrint("An error occurred: ${e.message}");
-        return false;
       }
+      mainController.isUserDataLoading.value = false;
+      return false;
     } catch (e) {
       debugPrint("An error occurred during login: $e");
-      return false;
-    }
-  }
-
-  Future<bool> autoLoginFirebase() async {
-    MainController mainController = Get.find<MainController>();
-    User? currentUser = authRef.currentUser;
-    if (currentUser != null) {
-      String userId = currentUser.uid;
-      try {
-        var userData = await usersRef.doc(userId).get();
-        var settingsData = await settingsRef.doc(userId).get();
-        SettingsModel userSettings;
-        if (!settingsData.exists) {
-          userSettings = SettingsModel.defaultSettings();
-          userSettings.docRef = settingsRef.doc(userId);
-          await userSettings.docRef!.set(userSettings.toJson());
-        } else {
-          userSettings = SettingsModel.fromJson(
-              settingsData.data() as Map<String, dynamic>);
-          userSettings.docRef = settingsData.reference;
-        }
-
-        mainController.currentUserData =
-            UsersModel.fromJson(userData.data() as Map<String, dynamic>);
-        mainController.currentUserData.id = userId;
-        mainController.currentUserData.docRef = userData.reference;
-        mainController.mySocket = mySocket;
-        mainController.initializeControllers(userSettings);
-
-        mySocket.connectSocket(userId);
-        return true;
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'user-not-found') {
-          debugPrint("Email not found. Please check and try again.");
-          return false;
-        } else {
-          debugPrint("An error occurred: ${e.message}");
-          return false;
-        }
-      } catch (e) {
-        debugPrint("(catch) An error occurred during auto login: $e");
-        return false;
-      }
-    } else {
-      debugPrint('No login data found');
+      mainController.isUserDataLoading.value = false;
       return false;
     }
   }

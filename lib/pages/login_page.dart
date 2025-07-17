@@ -1,6 +1,5 @@
 import 'package:concord/pages/signin_page.dart';
 import 'package:flutter/material.dart';
-import 'package:concord/main.dart';
 import 'package:get/get.dart';
 import 'package:concord/widgets/input_field.dart';
 import 'package:concord/controllers/login_controller.dart';
@@ -85,7 +84,6 @@ class LogInPage extends StatelessWidget {
                       bool response = await logInController.sendLogIn();
                       if (response) {
                         Get.delete<LogInController>();
-                        Get.offAll(()=> Home());
                       }
                     },
                     child: Container(

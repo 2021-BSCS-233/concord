@@ -1,22 +1,22 @@
 import 'dart:async';
-import 'package:concord/services/services.dart';
-
-import 'settings_controller.dart';
-import 'requests_controller.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'posts_controller.dart';
 import 'chats_controller.dart';
 import 'friends_controller.dart';
+import 'settings_controller.dart';
+import 'requests_controller.dart';
 import 'notification_controller.dart';
-import 'package:get/get.dart';
-import 'package:flutter/material.dart';
 import 'package:concord/pages/login_page.dart';
+import 'package:concord/services/services.dart';
 import 'package:concord/models/users_model.dart';
 import 'package:concord/models/settings_model.dart';
 import 'package:concord/services/firebase_services.dart';
 
 class MainController extends GetxController {
   late UsersModel currentUserData;
-  late MySocket mySocket;
+  late SettingsModel userSettings;
+  var isUserDataLoading = false.obs;
   var selectedIndex = 0.obs;
   var showMenu = false.obs;
   var showStatus = false.obs;
@@ -34,16 +34,7 @@ class MainController extends GetxController {
   StreamSubscription? notificationListenerRef;
   Timer? overlayTimer;
   OverlayEntry? currentOverlayEntry;
-
-  void initializeControllers(SettingsModel userSettings) {
-    debugPrint('running controllers');
-    Get.put(SettingsController(userSettings: userSettings));
-    Get.put(ChatsController());
-    Get.put(FriendsController());
-    Get.put(RequestsController());
-    Get.put(PostsController());
-    Get.put(NotificationController());
-  }
+  MySocket? mySocket;
 
   void toggleMenu(dataList) {
     selectedChatId = dataList[0];
@@ -115,10 +106,25 @@ class MainController extends GetxController {
     requestListenerRef = null;
     notificationListenerRef?.cancel();
     notificationListenerRef = null;
-    mySocket.disconnectSocket();
     selectedIndex.value = 0;
+    isUserDataLoading.value = false;
+    mySocket?.disconnectSocket();
+    mySocket = null;
     MyAuthentication.logoutUser();
-    Get.deleteAll();
-    Get.offAll(()=> LogInPage());
+    // Get.offAll(()=> LogInPage());
+  }
+}
+
+class HomePageBindings implements Bindings {
+  MainController mainController = Get.find<MainController>();
+  @override
+  void dependencies() {
+    final mainController = Get.find<MainController>();
+    Get.put(SettingsController(userSettings: mainController.userSettings));
+    Get.put(ChatsController());
+    Get.put(FriendsController());
+    Get.put(RequestsController());
+    Get.put(PostsController());
+    Get.put(NotificationController());
   }
 }
