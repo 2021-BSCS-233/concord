@@ -2,6 +2,7 @@ import 'package:concord/controllers/main_controller.dart';
 import 'package:concord/controllers/posts_controller.dart';
 import 'package:concord/controllers/settings_controller.dart';
 import 'package:concord/pages/new_post_page.dart';
+import 'package:concord/widgets/custom_loading_logo.dart';
 import 'package:concord/widgets/post_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -65,7 +66,7 @@ class PostsPage extends StatelessWidget {
                 ),
               );
             }
-            return const Center(child: CircularProgressIndicator());
+            return const CustomLoadingLogo();
           },
         ),
       ),

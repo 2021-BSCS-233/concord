@@ -1,5 +1,6 @@
 import 'package:concord/models/chats_model.dart';
 import 'package:concord/pages/chat_page.dart';
+import 'package:concord/widgets/custom_loading_logo.dart';
 import 'package:concord/widgets/profile_picture.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -74,7 +75,7 @@ class FriendsPage extends StatelessWidget {
                   ),
                 ));
           }
-          return const Center(child: CircularProgressIndicator());
+          return const CustomLoadingLogo();
         },
       ),
     );

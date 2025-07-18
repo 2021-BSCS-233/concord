@@ -1,50 +1,22 @@
 import 'package:concord/pages/login_page.dart';
 import 'package:concord/pages/notification_page.dart';
 import 'package:concord/pages/posts_page.dart';
+import 'package:concord/widgets/custom_loading_logo.dart';
 import 'package:concord/widgets/profile_picture.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:concord/firebase_options.dart';
 import 'package:concord/pages/chats_page.dart';
 import 'package:concord/pages/profile_page.dart';
 import 'package:concord/services/firebase_services.dart';
-import 'package:concord/controllers/language_controller.dart';
 import 'package:concord/widgets/popup_menus.dart';
 import 'package:concord/widgets/status_icons.dart';
-import 'package:concord/firebase_options.dart';
 import 'package:concord/controllers/main_controller.dart';
 import 'package:concord/controllers/auth_controller.dart';
+import 'package:concord/controllers/language_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-class RootWidget extends StatelessWidget {
-  const RootWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    Get.put<AuthController>(AuthController(), permanent: true);
-    Get.put(MainController(), permanent: true);
-
-    return Obx(() {
-      final AuthController authController = Get.find<AuthController>();
-      final MainController mainController = Get.find<MainController>();
-
-      if (mainController.isUserDataLoading.value) {
-        return const Scaffold(
-          body: Center(
-            child: CircularProgressIndicator(),
-          ),
-        );
-      }
-
-      if (authController.user.value != null) {
-        return const HomePageWrapper();
-      } else {
-        return LogInPage();
-      }
-    });
-  }
-}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -68,20 +40,37 @@ Future<void> main() async {
     translations: Messages(),
     locale: Get.locale,
     fallbackLocale: const Locale('en', ''),
+    getPages: [GetPage(name: '/home_page', page: () => Home(), binding: HomePageBindings())],
     home:
         const RootWidget(), // default is suppose to be InitialLoading() any other page is debugging
   ));
 }
 
-bool initialMain = true;
 
-class HomePageWrapper extends StatelessWidget {
-  const HomePageWrapper({super.key});
+class RootWidget extends StatelessWidget {
+  const RootWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    HomePageBindings().dependencies();
-    return Home();
+    Get.put<AuthController>(AuthController(), permanent: true);
+    Get.put(MainController(), permanent: true);
+
+    return Obx(() {
+      final AuthController authController = Get.find<AuthController>();
+      final MainController mainController = Get.find<MainController>();
+
+      if (mainController.isUserDataLoading.value) {
+        return const Scaffold(
+          body: CustomLoadingLogo(),
+        );
+      }
+
+      if (authController.user.value == null) {
+        return LogInPage();
+      } else {
+        return const CustomLoadingLogo();
+      }
+    });
   }
 }
 

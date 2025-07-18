@@ -5,7 +5,7 @@ import 'package:socket_io_client/socket_io_client.dart' as io;
 import 'package:http/http.dart' as http;
 // import 'package:connectivity_plus/connectivity_plus.dart';
 
-String serverUrl = 'http://192.168.1.14:3000';
+String serverUrl = 'http://192.168.18.2:3000';
 
 class MySocket {
   io.Socket? socket;

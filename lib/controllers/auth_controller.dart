@@ -1,12 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:concord/services/firebase_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:concord/models/settings_model.dart';
+import 'package:concord/models/users_model.dart';
+import 'package:concord/services/services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-
-import '../models/settings_model.dart';
-import '../models/users_model.dart';
-import '../services/services.dart';
 import 'main_controller.dart';
 
 class AuthController extends GetxController {
@@ -49,7 +48,7 @@ class AuthController extends GetxController {
         mainController.mySocket = MySocket();
         mainController.userSettings = userSettings;
         mainController.isUserDataLoading.value = false;
-
+        Get.offAllNamed('/home_page');
         mainController.mySocket!.connectSocket(userId);
       } catch (e) {
         debugPrint("Error fetching user data: $e");

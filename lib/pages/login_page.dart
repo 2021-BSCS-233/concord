@@ -1,4 +1,5 @@
 import 'package:concord/pages/signin_page.dart';
+import 'package:concord/widgets/custom_loading_logo.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:concord/widgets/input_field.dart';
@@ -128,7 +129,7 @@ class LogInPage extends StatelessWidget {
               visible: logInController.showWaitOverlay.value,
               child: Container(
                 color: const Color(0xC01D1D1F),
-                child: const Center(child: CircularProgressIndicator()),
+                child: const CustomLoadingLogo(),
               ),
             )),
       ],

@@ -1,6 +1,7 @@
 import 'package:concord/controllers/main_controller.dart';
 import 'package:concord/controllers/new_post_controller.dart';
 import 'package:concord/pages/post_cat_select.page.dart';
+import 'package:concord/widgets/custom_loading_logo.dart';
 import 'package:concord/widgets/input_field.dart';
 import 'package:concord/widgets/settings_tile.dart';
 import 'package:flutter/material.dart';
@@ -142,7 +143,7 @@ class NewPostPage extends StatelessWidget {
           visible: newPostController.showWaitOverlay.value,
           child: Container(
             color: const Color(0xC01D1D1F),
-            child: const Center(child: CircularProgressIndicator()),
+            child: const CustomLoadingLogo(),
           ),
         )),
       ],

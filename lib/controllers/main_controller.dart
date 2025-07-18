@@ -95,7 +95,7 @@ class MainController extends GetxController {
     });
   }
 
-  logOut() {
+  logOut() async {
     chatsListenerRef?.cancel();
     chatListenerRef = null;
     profileListenerRef?.cancel();
@@ -111,12 +111,11 @@ class MainController extends GetxController {
     mySocket?.disconnectSocket();
     mySocket = null;
     MyAuthentication.logoutUser();
-    // Get.offAll(()=> LogInPage());
+    Get.offAll(()=> LogInPage());
   }
 }
 
 class HomePageBindings implements Bindings {
-  MainController mainController = Get.find<MainController>();
   @override
   void dependencies() {
     final mainController = Get.find<MainController>();
