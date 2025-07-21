@@ -63,9 +63,9 @@ class SettingsListPage extends StatelessWidget {
             child: InkWell(
               onTap: () async {
                 Get.defaultDialog(
-                  contentPadding: const EdgeInsetsGeometry.symmetric(
+                  contentPadding: const EdgeInsets.symmetric(
                       horizontal: 30, vertical: 20),
-                  titlePadding: const EdgeInsetsGeometry.only(top: 20),
+                  titlePadding: const EdgeInsets.only(top: 20),
                   backgroundColor: const Color(0xFF121212),
                   barrierDismissible: true,
                   title: 'Confirm',

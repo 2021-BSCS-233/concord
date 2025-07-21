@@ -53,7 +53,7 @@ class SettingsController extends GetxController {
   }
 
   Future<void> checkUsernameAvailability() async {
-    String username = usernameTC.text.trim();
+    String username = usernameTC.text.trim().toLowerCase();
     if (RegExp(r'^[a-zA-Z][a-zA-Z0-9_]*?$').hasMatch(username) &&
         username.length >= 3 &&
         username.length <= 20) {
@@ -92,9 +92,24 @@ class SettingsController extends GetxController {
     return false;
   }
 
-  void changeEmail() {}
+  Future<bool> changePass() async {
+    if(RegExp(r'.{8,}').hasMatch(newPassTC.text.trim())) {
+      var result = await myAuthentication.changeUserPassword(
+          newPassTC.text.trim(), passwordTC.text.trim());
+      if (!result) {
+        showValueField2.value = true;
+        return false;
+      }
+      update(['accountPage']);
+      return true;
+    }
+    field1Message = 'Incorrect formate';
+    field1Bool = false;
+    showValueField1.value = true;
+    return false;
+  }
 
-  void changePass() {}
+  void changeEmail() {}
 
   final Map<String, List<String>> _fallbackCustomCategories = {
     'Programming': [

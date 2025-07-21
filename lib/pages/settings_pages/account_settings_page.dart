@@ -85,7 +85,9 @@ class AccountSettingsPage extends StatelessWidget {
                           fieldData: '',
                           hidden: true,
                           fieldCheck: false,
-                          saveFunction: () {},
+                          saveFunction: () async {
+                            return await controller.changePass();
+                          },
                         ),
                       ],
                     ),

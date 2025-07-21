@@ -157,12 +157,12 @@ class FriendsPage extends StatelessWidget {
                                       onTap: () {
                                         Get.defaultDialog(
                                             contentPadding:
-                                                const EdgeInsetsGeometry
+                                                const EdgeInsets
                                                     .symmetric(
                                                     horizontal: 30,
                                                     vertical: 20),
                                             titlePadding:
-                                                const EdgeInsetsGeometry.only(
+                                                const EdgeInsets.only(
                                                     top: 10),
                                             backgroundColor:
                                                 const Color(0xFF121212),

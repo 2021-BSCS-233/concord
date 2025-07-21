@@ -75,8 +75,8 @@ class SignInController extends GetxController {
   errorMessage(String text) {
     Get.defaultDialog(
       contentPadding:
-          const EdgeInsetsGeometry.symmetric(horizontal: 30, vertical: 20),
-      titlePadding: const EdgeInsetsGeometry.only(top: 10),
+          const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+      titlePadding: const EdgeInsets.only(top: 10),
       backgroundColor: const Color(0xFF121212),
       barrierDismissible: true,
       title: 'Alert',

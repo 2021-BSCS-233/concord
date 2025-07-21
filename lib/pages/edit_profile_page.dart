@@ -41,7 +41,7 @@ class EditProfilePage extends StatelessWidget {
               Get.back();
             },
             child: Container(
-              margin: const EdgeInsetsGeometry.only(right: 5),
+              margin: const EdgeInsets.only(right: 5),
               height: 40,
               width: 80,
               decoration: const BoxDecoration(

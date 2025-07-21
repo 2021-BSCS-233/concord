@@ -64,8 +64,7 @@ class MyAuthentication {
     MainController mainController = Get.find<MainController>();
     mainController.isUserDataLoading.value = true;
     try {
-      await authRef.signInWithEmailAndPassword(
-          email: email, password: pass);
+      await authRef.signInWithEmailAndPassword(email: email, password: pass);
       return true;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
@@ -113,6 +112,40 @@ class MyAuthentication {
     }
   }
 
+  Future<bool> changeUserPassword(
+      String oldPassword, String newPassword) async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      debugPrint('No user is currently signed in.');
+      return false;
+    }
+
+    try {
+      AuthCredential credential = EmailAuthProvider.credential(
+        email: user.email!,
+        password: oldPassword,
+      );
+      await user.reauthenticateWithCredential(credential);
+
+      await user.updatePassword(newPassword);
+
+      debugPrint('Password updated successfully!');
+      return true;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'wrong-password') {
+        debugPrint('Incorrect password');
+        return false;
+      } else {
+        debugPrint('Re-authentication error: ${e.message}');
+        return false;
+      }
+    } catch (e) {
+      debugPrint('An unexpected error occurred: $e');
+      return false;
+    }
+  }
+
   static logoutUser() async {
     await FirebaseAuth.instance.signOut();
   }
@@ -137,8 +170,9 @@ class MyFirestore {
 //TODO: stop using listener for this (maybe)
 
   Future<bool> checkUsernameAvailabilityFirebase(username) async {
-    var instances = await usersRef.where('username', isEqualTo: username).limit(1).get();
-    if(instances.docs.isEmpty){
+    var instances =
+        await usersRef.where('username', isEqualTo: username).limit(1).get();
+    if (instances.docs.isEmpty) {
       return true;
     } else {
       debugPrint('username already in use');
@@ -455,9 +489,11 @@ class MyFirestore {
     var instances = await chatsRef
         .where('chatType', isEqualTo: 'dm')
         .where('users', whereIn: [
-      [currentUserId, otherUserId],
-      [otherUserId, currentUserId]
-    ]).limit(1).get();
+          [currentUserId, otherUserId],
+          [otherUserId, currentUserId]
+        ])
+        .limit(1)
+        .get();
     if (instances.docs.isNotEmpty) {
       ChatsModel chatData = ChatsModel.fromJson(instances.docs[0].data());
       chatData.id = instances.docs[0].id;
