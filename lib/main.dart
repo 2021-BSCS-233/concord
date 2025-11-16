@@ -40,24 +40,28 @@ Future<void> main() async {
     translations: Messages(),
     locale: Get.locale,
     fallbackLocale: const Locale('en', ''),
-    getPages: [GetPage(name: '/home_page', page: () => Home(), binding: HomePageBindings())],
+    getPages: [
+      GetPage(
+          name: '/home_page', page: () => Home(), binding: HomePageBindings())
+    ],
     home:
         const RootWidget(), // default is suppose to be InitialLoading() any other page is debugging
   ));
 }
-
 
 class RootWidget extends StatelessWidget {
   const RootWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    Get.put<AuthController>(AuthController(), permanent: true);
-    Get.put(MainController(), permanent: true);
+    final AuthController authController =
+        Get.put<AuthController>(AuthController(), permanent: true);
+    final MainController mainController =
+        Get.put(MainController(), permanent: true);
 
     return Obx(() {
-      final AuthController authController = Get.find<AuthController>();
-      final MainController mainController = Get.find<MainController>();
+      // final AuthController authController = Get.find<AuthController>();
+      // final MainController mainController = Get.find<MainController>();
 
       if (mainController.isUserDataLoading.value) {
         return const Scaffold(

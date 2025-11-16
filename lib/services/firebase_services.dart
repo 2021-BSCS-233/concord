@@ -167,7 +167,6 @@ class MyFirestore {
   final CollectionReference<Map<String, dynamic>> notificationsRef =
       FirebaseFirestore.instance.collection('notifications');
 
-//TODO: stop using listener for this (maybe)
 
   Future<bool> checkUsernameAvailabilityFirebase(username) async {
     var instances =
@@ -180,6 +179,7 @@ class MyFirestore {
     }
   }
 
+//TODO: stop using listener for this (maybe)
   void profileListenerFirebase(String currentUserId) {
     mainController.profileListenerRef ??=
         usersRef.doc(currentUserId).snapshots().listen((event) {
@@ -665,7 +665,10 @@ class MyFirestore {
         'timeStamp': messageData.timeStamp
       });
     } else if (collection == 'posts') {
-      //TODO: finish later
+      batch.update(docRef, {
+        'timeStamp': messageData.timeStamp,
+        'participants': FieldValue.arrayUnion([messageData.senderId])
+      });
     }
     batch.commit();
   }
